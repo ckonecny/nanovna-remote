@@ -1,0 +1,4 @@
+# cargo make build
+[tasks.build]
+command = "wasm-pack"
+args = ["build", "--target", "web", "--out-dir", "web"]
