@@ -15,6 +15,7 @@ import Multi from './components/Multi.vue';
 import Cable from './components/Cable.vue';
 import Tdr from './components/Tdr.vue';
 import { HAM_BANDS, bandSweep } from './lib/bands';
+import { bandFileName, chartsToPng, download, hamChartItems, multiChartItems, saveTouchstone } from './lib/export';
 
 const menuVisible = ref(false);
 const freqInputSelect = ref('start-stop');
@@ -213,9 +214,16 @@ const downloadFile = (url, filename) => {
 
 // Save As Touchstone format
 const saveAs = (format) => {
-  if (store.status !== 'connected' || !store.data.ch0.length) return;
-  
-  if (format === 's1p') {
+  if (store.status !== 'connected') return;
+  if (format === 's1p' && graphSelected.value === 'multi') {
+    saveMultiS1p();
+    return;
+  }
+  if (!store.data.ch0.length) return;
+
+  if (format === 's1p' && graphSelected.value === 'ham') {
+    saveTouchstone(store.data.ch0, bandFileName(store.hamBand, 's1p'));
+  } else if (format === 's1p') {
     const body = ['# Hz S RI R 50\n'];
     store.data.ch0.forEach((d) => {
       body.push(`${d.freq}\t${d.real}\t${d.imag}\n`);
@@ -235,6 +243,23 @@ const saveAs = (format) => {
     const name = `nanovna-${strftime('%Y%m%d-%H%M%S')}.s2p`;
     downloadFile(url, name);
   }
+};
+
+// Multi: one file per measured band; browsers drop downloads started in the same instant
+const saveMultiS1p = async () => {
+  for (const name of store.multiBands.filter(n => store.multi[n] && store.multi[n].points.length)) {
+    saveTouchstone(store.multi[name].points, bandFileName(name, 's1p'));
+    await new Promise(r => setTimeout(r, 300));
+  }
+};
+
+// HAM and Multi draw SVG charts: all of them go into one picture
+const saveSvgPng = async (graphType) => {
+  const root = document.querySelector(graphType === 'ham' ? '.ham' : '.multi');
+  if (!root) return;
+  const items = graphType === 'ham' ? hamChartItems(root, store.hamBand) : multiChartItems(root);
+  const name = graphType === 'ham' ? bandFileName(store.hamBand, 'png') : 'multi-' + bandFileName(store.multiBands.join('-'), 'png');
+  download(await chartsToPng(items), name);
 };
 
 // Save chart as PNG
@@ -395,10 +420,13 @@ const quit = () => {
         
         <div class="nav-subheader">Save</div>
         <button class="btn-nav" @click="saveAs('s1p')" :disabled="store.status !== 'connected'">
-          <span class="icon">save_alt</span> Save As .s1p
+          <span class="icon">save_alt</span> {{ graphSelected === 'multi' ? 'Save As .s1p (one per band)' : 'Save As .s1p' }}
         </button>
         <button class="btn-nav" @click="saveAs('s2p')" :disabled="store.status !== 'connected'">
           <span class="icon">save_alt</span> Save As .s2p
+        </button>
+        <button class="btn-nav" @click="saveSvgPng(graphSelected)" :disabled="store.status !== 'connected'" v-show="graphSelected === 'ham' || graphSelected === 'multi'">
+          <span class="icon">image</span> Save Charts As .png
         </button>
         <button class="btn-nav" @click="saveAsPng('smith')" :disabled="store.status !== 'connected'" v-show="graphSelected === 'smith'">
           <span class="icon">image</span> Save Smith Chart As .png

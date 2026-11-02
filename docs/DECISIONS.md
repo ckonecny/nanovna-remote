@@ -84,6 +84,13 @@ Newest first within each section. Record new decisions here as they are made.
 - Stub helper: shortest shorted/open stub for a reactance (x = Z0 tan(bl), x = -Z0 / tan(bl)); no matching of a
   measured load (single-stub matching) yet.
 
+## Export in HAM and Multi (2026-11)
+- `lib/export.js`. The SVG charts are turned into PNG by cloning the SVG, copying the computed styles (CSS variables do
+  not exist in a standalone image) onto the clone, drawing it on a canvas in the page's colours; several charts are
+  stacked with a title each. The .s1p contains what the view shows (app calibration already applied), same layout as the
+  side menu's export. The buttons live in the side menu (Save section), not in the views, so that all saving is in one
+  place; the menu entries act on the current tab. File names are `<band>-<date>`; Multi saves one .s1p per measured band, 300 ms apart.
+
 ## TDR view (2026-11)
 - Replaces the chart.js TDR of the original client (time axis only, no distance, no marker, window/DC handling for an
   unsuitable sweep). New `lib/tdr.js`; the sweep runs on a harmonic grid (start = step, stop = 101 start) so that it
