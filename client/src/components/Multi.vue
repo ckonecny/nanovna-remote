@@ -2,6 +2,8 @@
 import { computed } from 'vue';
 import { store } from '../store';
 import { HAM_BANDS } from '../lib/bands';
+import CalStatus from './CalStatus.vue';
+import CalPanel from './CalPanel.vue';
 import { calcSWR, formatFrequency } from '../lib/dsp';
 
 const SWR_MAX = 5;
@@ -44,12 +46,14 @@ const cards = computed(() => {
     }).filter(Boolean);
 });
 
-const fmt = (v) => (isFinite(v) ? v.toFixed(2) : '∞');
+const fmt = (v) => (!isFinite(v) ? '∞' : v > 99 ? '> 99' : v.toFixed(2));
 const grid = [1, 2, 3, 5];
 </script>
 
 <template>
   <div class="multi">
+    <CalStatus :bands="store.multiBands" />
+
     <div class="bands">
       <button v-for="b in HAM_BANDS" :key="b.name" class="band" :class="{ active: store.multiBands.includes(b.name) }" @click="toggle(b.name)">{{ b.name }}</button>
     </div>
@@ -61,7 +65,7 @@ const grid = [1, 2, 3, 5];
       <div v-for="c in cards" :key="c.band.name" class="card" :class="c.cls">
         <div class="head">
           <span class="name">{{ c.band.name }}</span>
-          <span v-if="c.measured && !c.calibrated" class="flag">not calibrated</span>
+          <span v-if="c.measured" class="flag" :class="c.calibrated ? 'is-cal' : ''">{{ c.calibrated ? 'calibrated' : 'not calibrated' }}</span>
           <span v-if="c.min" class="swr">{{ fmt(c.min.swr) }}</span>
         </div>
         <svg :viewBox="`0 0 ${W} ${H}`" class="chart">
@@ -81,6 +85,8 @@ const grid = [1, 2, 3, 5];
         </div>
       </div>
     </div>
+
+    <CalPanel />
   </div>
 </template>
 
@@ -96,7 +102,8 @@ const grid = [1, 2, 3, 5];
 .card.bad { border-left-color: #f44336; }
 .head { display: flex; align-items: baseline; gap: 8px; }
 .name { font-size: 16px; font-weight: 500; }
-.flag { font-size: 12px; color: #ff9800; }
+.flag { font-size: 12px; color: #f44336; }
+.flag.is-cal { color: #4caf50; }
 .swr { margin-left: auto; font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .chart { display: block; width: 100%; height: auto; }
 .band-area { fill: var(--band-area); }

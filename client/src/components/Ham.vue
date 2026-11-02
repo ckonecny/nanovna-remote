@@ -1,7 +1,8 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { store, calRun, appCalMeasure, appCalReset } from '../store';
-import { appCal } from '../lib/oslcal';
+import { store } from '../store';
+import CalStatus from './CalStatus.vue';
+import CalPanel from './CalPanel.vue';
 import { HAM_BANDS } from '../lib/bands';
 import { calcSWR, calcZ, formatFrequency } from '../lib/dsp';
 
@@ -79,11 +80,6 @@ const onChartClick = (event) => {
     cursorFreq.value = fmin.value + (px - L) / (W.value - L - R) * (fmax.value - fmin.value);
 };
 
-const calibratedBands = computed(() => Object.keys(appCal.bands).length);
-const pending = (step) => HAM_BANDS.filter(b => appCal.raw[b.name]?.[step]).length;
-const steps = [['open', 'Open'], ['short', 'Short'], ['load', 'Load']];
-const resetCal = () => { if (confirm('Delete the calibration of all bands?')) appCalReset(); };
-
 const fmt = (v) => (isFinite(v) ? v.toFixed(2) : '∞');
 const grid = [1, 1.5, 2, 3, 5];
 const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * (fmax.value - fmin.value)));
@@ -91,6 +87,8 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
 
 <template>
   <div class="ham" ref="wrap">
+    <CalStatus :bands="[store.hamBand]" />
+
     <div class="bands">
       <button v-for="b in HAM_BANDS" :key="b.name" class="band" :class="{ active: b.name === store.hamBand }" @click="emit('select-band', b)">{{ b.name }}</button>
     </div>
@@ -107,9 +105,6 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
       <line v-if="cursor" :x1="x(cursor.p.freq)" :x2="x(cursor.p.freq)" :y1="T" :y2="H - B" class="cursor" />
     </svg>
 
-    <div v-if="appCal.enabled && store.appCalCovered < 1" class="warn">This band is not calibrated: values are uncorrected. Run the calibration below.</div>
-    <div v-else-if="!appCal.enabled" class="warn">Not calibrated yet. Calibrate once below, then all bands are corrected.</div>
-
     <div v-if="!points.length" class="empty">{{ store.status === 'connected' ? 'Waiting for measurement…' : 'Connect to the NanoVNA to measure' }}</div>
     <div v-else class="tiles">
       <div class="tile" v-if="minPoint"><span class="label">Minimum SWR</span><span class="value">{{ fmt(minPoint.swr) }}</span><span class="sub">at {{ formatFrequency(minPoint.freq, 4) }}</span></div>
@@ -122,18 +117,7 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
       </div>
     </div>
 
-    <div class="cal">
-      <span class="label">Calibration ({{ calibratedBands }} of {{ HAM_BANDS.length }} bands)</span>
-      <div class="cal-steps">
-        <button v-for="[id, name] in steps" :key="id" class="band" :disabled="calRun.running || store.status !== 'connected'" @click="appCalMeasure(id)">
-          Measure {{ name }}<span v-if="pending(id)"> ✓</span>
-        </button>
-        <button class="band" :disabled="calRun.running" @click="resetCal">Reset</button>
-      </div>
-      <div class="sub">Connect the standard to the NanoVNA, then press its button. All bands are measured in one go.</div>
-      <div v-if="calRun.running" class="sub">Measuring {{ calRun.step }}: {{ calRun.band }} ({{ calRun.done }} of {{ calRun.total }})</div>
-      <div v-if="calRun.error" class="sub err">{{ calRun.error }}</div>
-    </div>
+    <CalPanel />
   </div>
 </template>
 
@@ -157,10 +141,5 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
 .value { font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .value.small { font-size: 16px; }
 .sub { font-size: 12px; color: var(--text-dim); }
-.warn { padding: 8px 12px; border-radius: 8px; background: var(--notice-bg); font-size: 14px; }
-.cal { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 8px; background: var(--tile-bg); }
-.cal-steps { display: flex; flex-wrap: wrap; gap: 6px; }
-.band:disabled { opacity: 0.5; cursor: default; }
-.err { color: #f44336; }
 .empty { padding: 16px; text-align: center; color: var(--text-dim); }
 </style>

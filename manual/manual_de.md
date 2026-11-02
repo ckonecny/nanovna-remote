@@ -61,13 +61,13 @@ Später wechselst du das Netz mit den Tasten (Abschnitt 3) oder auf der Seite `/
 
 - **Single** — eine Frequenz: SWR, Rückflussdämpfung, Impedanz (R + jX) und ein Diagramm um die Frequenz.
 - **HAM** — Sweep über ein Amateurfunkband mit den Bandtasten; SWR-Kurve und Minimum werden angezeigt.
-- **Multi** — beliebig viele Bänder antippen; jedes bekommt eine Karte mit SWR-Kurve, minimalem SWR und dem Bereich mit SWR ≤ 2. Die Bänder werden nacheinander gemessen (etwa eine Sekunde pro Band), die Aktualisierung wird also mit jedem Band langsamer. Eine Karte mit „not calibrated" zeigt unkorrigierte Werte. Die Auswahl wird gemerkt.
+- **Multi** — beliebig viele Bänder antippen; jedes bekommt eine Karte mit SWR-Kurve, minimalem SWR und dem Bereich mit SWR ≤ 2. Die Bänder werden nacheinander gemessen (etwa eine Sekunde pro Band), die Aktualisierung wird also mit jedem Band langsamer. Jede Karte zeigt, ob ihr Band „calibrated" (grün) oder „not calibrated" (rot, unkorrigierte Werte) ist, ein Banner oben fasst die Auswahl zusammen. Das Kalibrierfeld steht auch unten in der Multi-Ansicht. Die Auswahl wird gemerkt.
 - Hell/Dunkel schaltest du mit der Taste in der Kopfzeile um.
 - Kommen längere Zeit keine Daten, zeigt die Seite einen Hinweis (Kabel prüfen, NanoVNA neu starten).
 
 ## 6. Kalibrierung
 
-Kalibriere einmal im Reiter **HAM** mit Open, Short und Load am Anschluss (oder am Ende des Kabels, durch das du
+Kalibriere einmal im Reiter **HAM** oder **Multi** mit Open, Short und Load am Anschluss (oder am Ende des Kabels, durch das du
 misst). **Measure Open**, **Measure Short**, **Measure Load** jeweils nach dem Anstecken des Normals drücken. Die
 Kalibrierung gilt für **alle HAM-Bänder** und wird im Feather gespeichert, jeder Browser nutzt sie. **Reset** löscht sie.
 Ohne Kalibrierung zeigt die Seite eine Warnung.
