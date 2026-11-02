@@ -1,7 +1,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { store } from '../store';
-import { CABLE_RANGES, CABLE_TYPES, analyseCable } from '../lib/cable';
+import { CABLE_RANGES, CABLE_TYPES, analyseCable, analyseImpedance, stubLength, wavelength } from '../lib/cable';
 import { formatFrequency } from '../lib/dsp';
 
 const mode = ref('length'); // 'length': velocity factor known, 'vf': length known
@@ -58,6 +58,33 @@ const lossRows = computed(() => {
         return { freq: p.freq, db: p.db, per100: len >= 1 ? p.db / len * 100 : null };
     });
 });
+
+// characteristic impedance: one sweep with the far end open and one shorted, both of the same sweep
+const snapshot = () => store.cable.points.map(p => ({ freq: p.freq, real: p.real, imag: p.imag }));
+const openSweep = ref(null), shortSweep = ref(null);
+const keep = (end) => {
+    const pts = snapshot();
+    if (!pts.length) return;
+    const other = end === 'open' ? shortSweep : openSweep;
+    if (other.value && other.value.preset !== store.cablePreset) other.value = null; // sweeps of different ranges cannot be combined
+    (end === 'open' ? openSweep : shortSweep).value = { preset: store.cablePreset, points: pts };
+};
+const clearImpedance = () => { openSweep.value = null; shortSweep.value = null; };
+const impedance = computed(() => (openSweep.value && shortSweep.value ? analyseImpedance(openSweep.value.points, shortSweep.value.points) : null));
+
+// stub and cut lengths
+const stub = ref({ freqMHz: 14.2, x: 100, z0: 50 });
+const stubFreq = computed(() => stub.value.freqMHz * 1e6);
+const stubOk = computed(() => stubFreq.value > 0 && store.velocityFactor > 0 && stub.value.z0 > 0 && isFinite(stub.value.x));
+const stubs = computed(() => {
+    if (!stubOk.value) return null;
+    const a = { freq: stubFreq.value, vf: store.velocityFactor, x: stub.value.x, z0: stub.value.z0 };
+    return {
+        quarter: wavelength(a.freq, a.vf) / 4, half: wavelength(a.freq, a.vf) / 2,
+        short: stubLength({ ...a, type: 'short' }), open: stubLength({ ...a, type: 'open' }),
+    };
+});
+const useMeasuredZ0 = () => { if (impedance.value) stub.value.z0 = Math.round(impedance.value.z0 * 10) / 10; };
 
 const pickType = (e) => {
     const t = CABLE_TYPES.find(c => c.name === e.target.value);
@@ -135,6 +162,39 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
       </div>
     </template>
 
+    <div class="section">
+      <span class="label">Characteristic impedance</span>
+      <div class="sub">Measure the same cable twice with the same sweep: once with the far end open, once shorted. Both sweeps are kept until cleared.</div>
+      <div class="zero">
+        <button class="btn-small" :disabled="!result" @click="keep('open')">Measure open</button>
+        <button class="btn-small" :disabled="!result" @click="keep('short')">Measure short</button>
+        <button class="btn-small" :disabled="!openSweep && !shortSweep" @click="clearImpedance">Clear</button>
+        <span class="sub">Open: {{ openSweep ? 'measured' : '–' }} · Short: {{ shortSweep ? 'measured' : '–' }}</span>
+      </div>
+      <div v-if="impedance" class="tiles">
+        <div class="tile"><span class="label">Impedance</span><span class="value">{{ fmt(impedance.z0, 1) }} Ω</span><span class="sub">median of {{ impedance.n }} points, spread ±{{ fmt(impedance.spread, 1) }} Ω</span></div>
+      </div>
+      <div v-else-if="openSweep && shortSweep" class="warn">No usable result. The cable is too short for this sweep (try 1 – 200 MHz) or the two sweeps do not belong together.</div>
+      <div class="sub">The value is only as good as the NanoVNA's own calibration for this sweep.</div>
+    </div>
+
+    <div class="section">
+      <span class="label">Cut and stub lengths</span>
+      <div class="row">
+        <label>Frequency (MHz)<input type="number" v-model.number="stub.freqMHz" class="input" step="0.1" min="0.1"></label>
+        <label>Reactance to produce (Ω, negative: capacitive)<input type="number" v-model.number="stub.x" class="input" step="1"></label>
+        <label>Cable impedance (Ω)<input type="number" v-model.number="stub.z0" class="input" step="1" min="1"></label>
+      </div>
+      <div class="zero"><button class="btn-small" :disabled="!impedance" @click="useMeasuredZ0">Use measured impedance</button><span class="sub">Uses the velocity factor above ({{ fmt(store.velocityFactor) }}).</span></div>
+      <div v-if="stubs" class="tiles">
+        <div class="tile"><span class="label">λ/4</span><span class="value">{{ fmt(stubs.quarter) }} m</span></div>
+        <div class="tile"><span class="label">λ/2</span><span class="value">{{ fmt(stubs.half) }} m</span></div>
+        <div class="tile"><span class="label">Shorted stub</span><span class="value">{{ fmt(stubs.short) }} m</span><span class="sub">shortest length with this reactance</span></div>
+        <div class="tile"><span class="label">Open stub</span><span class="value">{{ fmt(stubs.open) }} m</span><span class="sub">shortest length with this reactance</span></div>
+      </div>
+      <div class="sub">Lengths are of the cable itself, cut from the connector's reference plane to the end; add the length of a T piece or connector as needed.</div>
+    </div>
+
     <div class="sub">Accuracy: set the zero with the port open and no adapter; an adapter between port and cable adds about 1 cm. The NanoVNA's calibration state is not touched. The sweep must not turn the phase by more than half a revolution between two points, so a cable longer than the sweep's limit ({{ range.maxLength }} m) shows a wrong, shorter length.</div>
   </div>
 </template>
@@ -164,5 +224,6 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
 .loss { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-radius: 8px; background: var(--tile-bg); }
 .loss-row { display: flex; gap: 16px; font-variant-numeric: tabular-nums; }
 .loss-row span { min-width: 90px; }
+.section { display: flex; flex-direction: column; gap: 8px; padding-top: 6px; border-top: 1px solid var(--border-color); }
 .empty { padding: 16px; text-align: center; color: var(--text-dim); }
 </style>

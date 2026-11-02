@@ -13,7 +13,7 @@ Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
 
 ## Phone/device checks still open
 - TDR view (#2): confirmed working on a real cable by the user (no numbers recorded). Not yet checked: all three sweeps, a cable with a break, accuracy at 0 m.
-- Cable view (#1): length/velocity factor/loss confirmed working on a real cable by the user (no numbers recorded). Still missing: characteristic impedance, stub helper.
+- Cable view (#1): length/velocity factor/loss confirmed working on a real cable by the user (no numbers recorded). Characteristic impedance (open + short) and cut/stub lengths added; impedance confirmed on a real 50 ohm cable (52.3 ohm). Not checked on hardware: 75 ohm cable, stub lengths (maths covered by tests).
 - Multi view: checked uncalibrated against the NanoVNA; still to check with the calibration of all bands.
 - Second network (hotspot): join, switch with the buttons, fall back to the setup WiFi when
   a network is out of range; the 60 s retry of stored networks in the setup WiFi.
@@ -23,8 +23,7 @@ Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
 - The old Feather (still on the pre-display firmware): update over WiFi.
 
 ## Next steps
-Feature backlog (Stick Pro parity) is in GitHub issues: cable tools, TDR, multi-band view,
-export buttons in HAM/Multi, accuracy check of the calibration (issues #1, #2, #6, #7).
+Feature backlog (Stick Pro parity) is in GitHub issues: single-stub matching, export buttons in HAM/Multi, accuracy check of the calibration (issues #6, #7, #8).
 
 ## Hints for the next session
 - Logs: `http://<ip>/log`. The Feather's IP is on its display.

@@ -78,6 +78,11 @@ Newest first within each section. Record new decisions here as they are made.
   A longer cable aliases into a straight line and shows a shorter length; a single sweep cannot detect that.
 - The NanoVNA has a delay of its own (measured 0.2 to 2 ns with nothing attached, varying between runs and not yet
   understood): the view has a Zero button that subtracts the delay measured with nothing attached, per sweep.
+- Characteristic impedance: Z0 = sqrt(Zoc * Zsc) from an open and a shorted sweep of the same cable. This holds for any
+  length and loss; points with either impedance outside 3 to 3000 ohm are skipped (ill-conditioned), the median is
+  reported with the spread of the real part. Raw readings: accuracy depends on the device calibration of the sweep.
+- Stub helper: shortest shorted/open stub for a reactance (x = Z0 tan(bl), x = -Z0 / tan(bl)); no matching of a
+  measured load (single-stub matching) yet.
 
 ## TDR view (2026-11)
 - Replaces the chart.js TDR of the original client (time axis only, no distance, no marker, window/DC handling for an
