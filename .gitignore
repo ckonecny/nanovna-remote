@@ -14,3 +14,5 @@ firmware/src/client_assets.cpp
 # dev tools
 dev-tools/venv/
 __pycache__/
+dev-tools/sim_state/
+dev-tools/screenshots/node_modules/

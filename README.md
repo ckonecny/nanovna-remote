@@ -16,7 +16,9 @@ app. Open `http://<feather-ip>/` on a phone or computer and measure. Nothing has
   an app-side open/short/load calibration for all ham bands at once, dark mode, a no-data notice. See
   [client/README.md](client/README.md).
 - **manual/** - user manual, English and German. Project notes for contributors and Claude sessions: `CLAUDE.md`, `docs/`.
-- **dev-tools/** - small Python scripts for testing the bridge from a computer.
+- **dev-tools/** - small Python scripts for testing the bridge from a computer, and a simulator that imitates the
+  bridge (used for the screenshots).
+- **site/** - the feature page (GitHub Pages).
 
 ## Quick start
 

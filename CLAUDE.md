@@ -17,7 +17,9 @@ points: `docs/STATUS.md` — read it before starting new work.**
 
 - `firmware/` — ESP-IDF firmware (PlatformIO, env `feather`). GPL-3.0-or-later.
 - `client/` — the web app (Vue 3, Vite; based on cho45's NanoVNA-Web-Client). GPL-2.0.
-- `dev-tools/` — Python scripts to test the bridge from a computer.
+- `dev-tools/` — Python scripts to test the bridge from a computer, `simulator.py` (a modelled NanoVNA bridge) and
+  `screenshots/` (screenshots from the simulator).
+- `site/` — the feature page published with GitHub Pages (dark, English + German).
 - `manual/` — end-user manual, English + German (`manual_en.md`, `manual_de.md`).
 - `docs/` — `PROJECT.md`, `STATUS.md`, `STATUS-ARCHIVE.md`, `DECISIONS.md`.
 
@@ -26,7 +28,7 @@ points: `docs/STATUS.md` — read it before starting new work.**
 - Chat with the user: **German**.
 - Everything in the repo is **English**: code, comments, commit messages, issues,
   `docs/`, and every user interface (device display, web app, `/wifi` page).
-- The only bilingual part is the end-user manual (rule 7).
+- The only bilingual parts are the end-user manual (rule 7) and the feature page in `site/` (English and German).
 
 ## Hard rules
 

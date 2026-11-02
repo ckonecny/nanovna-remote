@@ -113,6 +113,18 @@ Newest first within each section. Record new decisions here as they are made.
   size of at least 0.05.
 - The worker's `calcTDR` (wasm FFT) is no longer used by the UI.
 
+## Simulator, screenshots and feature page (2026-11)
+- `dev-tools/simulator.py` imitates the bridge: serves `client/dist` (build with `npm run build:esp`), `/api/appcal` and the
+  NanoVNA text shell on `/ws`. It needs `aiohttp` (`pip install aiohttp` in `dev-tools/venv`); `websockets` alone cannot
+  serve the PUT of `/api/appcal`. The raw readings carry error terms, so the app's own OSL calibration works on them.
+  `GET /sim/dut/<name>` picks what is connected (antenna, open, short, load, cable-open, cable-short, cable-fault).
+  The values are modelled, never measured: screenshots made from it say so (manual, feature page).
+- `dev-tools/screenshots/shots.mjs` (puppeteer-core with the installed Chrome) takes the phone shots (390x844 at 2x, dark
+  and some light) and a few desktop shots into `site/img/`; the manual links them from there.
+- `site/` is the feature page (dark, English and German in one file, language switch); `.github/workflows/pages.yml`
+  publishes it to GitHub Pages. Pages has to be enabled in the repository settings (source: GitHub Actions) and needs a
+  public repository on the free plan.
+
 ## NanoVNA-H behaviour (verified on hardware)
 
 - `resume` restarts the sweep. `data 0` returns immediately with the previous sweep's values

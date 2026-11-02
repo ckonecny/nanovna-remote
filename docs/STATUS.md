@@ -11,6 +11,9 @@ Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
   dark mode, no-data notice. 107 client tests pass.
 - Tested on the new Feather (display, buttons, WiFi list, `/wifi` page).
 
+- Simulator and screenshots: `dev-tools/simulator.py` + `dev-tools/screenshots/shots.mjs` (see DECISIONS); the manual has
+  screenshots and `site/` holds the feature page (not published yet: GitHub Pages must be enabled, repo must be public).
+
 ## Phone/device checks still open
 - TDR view (#2): confirmed working on a real cable by the user (no numbers recorded). Not yet checked: all three sweeps, a cable with a break, accuracy at 0 m.
 - Export in HAM and Multi (#7, side menu Save section): .s1p (band-date file names, one per band in Multi) and PNG of the SVG charts; checked in the browser against the device (files created, PNG rendered correctly). Not checked: iPhone/Safari download behaviour, many downloads in a row.
@@ -27,6 +30,7 @@ Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
 Feature backlog (Stick Pro parity) is in GitHub issues: accuracy check of the calibration against an independent mismatch (#6; kit-only check done, see DECISIONS), single-stub matching (#8).
 
 ## Hints for the next session
+- Screenshots without hardware: `dev-tools/venv/bin/python dev-tools/simulator.py`, then `node shots.mjs` in `dev-tools/screenshots` (after `npm install`).
 - Logs: `http://<ip>/log`. The Feather's IP is on its display.
 - Over USB: hold D0, tap RESET, then `-t upload --upload-port /dev/cu.usbmodem...`.
 - `dns.cpp` still logs every query (diagnostic); remove when no longer needed.
