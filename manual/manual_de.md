@@ -16,6 +16,10 @@ und stellt die Mess-App bereit. Du musst nichts installieren: Adresse des Feathe
 
 Das Display zeigt den Status: WLAN-Netz und IP-Adresse, ob ein USB-Gerät angeschlossen ist.
 
+<img src="../site/img/feather-status.jpg" width="320" alt="Die Statusseite"> <img src="../site/img/feather-menu.jpg" width="320" alt="Das Menü">
+
+<sub>Die Statusseite (Netzname und Adresse unkenntlich gemacht) und das Menü.</sub>
+
 | Taste | Kurz drücken | Lang drücken (0,6 s) |
 |---|---|---|
 | D0 | hoch | — |

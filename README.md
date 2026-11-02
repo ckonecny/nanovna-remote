@@ -39,6 +39,13 @@ More pictures and a short tour: **[feature page](https://ckonecny.github.io/nano
  NanoVNA-H --USB-- ESP32-S3 Feather --WiFi-- browser (all the evaluation happens here)
 ```
 
+<p align="center">
+  <img src="site/img/feather-status.jpg" width="330" alt="The Feather's status screen: WiFi connected, USB device found">
+  <img src="site/img/feather-menu.jpg" width="330" alt="The Feather's menu">
+</p>
+
+<p align="center"><sub>The Feather's display: status screen (network name and address blurred) and menu.</sub></p>
+
 The Feather is the USB host for the NanoVNA and passes its text commands through unchanged (WebSocket to USB serial). It
 also serves the web app and keeps the calibration in flash. Everything else, the measurement maths, the charts, the
 calibration, runs in the browser.

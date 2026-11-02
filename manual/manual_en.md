@@ -16,6 +16,10 @@ serves the measurement app. You do not install anything: open the Feather's addr
 
 The display shows the status: WiFi network and IP address, whether a USB device is plugged in.
 
+<img src="../site/img/feather-status.jpg" width="320" alt="The status screen"> <img src="../site/img/feather-menu.jpg" width="320" alt="The menu">
+
+<sub>The status screen (network name and address blurred) and the menu.</sub>
+
 | Button | Short press | Long press (0.6 s) |
 |---|---|---|
 | D0 | up | — |
