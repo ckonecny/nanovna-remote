@@ -203,16 +203,15 @@ async def appcal_put(request):
     return web.json_response({"ok": True})
 
 
-async def asset(request):
-    f = ROOT / (request.match_info["path"] or "index.html")
-    if not f.is_file() or ROOT not in f.resolve().parents: f = ROOT / "index.html"
-    return web.FileResponse(f)
+async def index(request):
+    return web.FileResponse(ROOT / "index.html")
 
 
 STATE_DIR.mkdir(exist_ok=True)
 app = web.Application(client_max_size=1024 ** 3)
 app.add_routes([web.get("/ws", shell), web.get("/sim", sim), web.get("/sim/dut/{name}", sim),
                 web.get("/api/appcal", appcal_get), web.put("/api/appcal", appcal_put),
-                web.get("/{path:.*}", asset)])
+                web.get("/", index)])
+app.router.add_static("/", ROOT)  # aiohttp refuses paths outside of ROOT
 print(f"simulator on http://localhost:{PORT}/?host=localhost:{PORT}  (dut: antenna)", flush=True)
 web.run_app(app, host="0.0.0.0", port=PORT, print=None)
