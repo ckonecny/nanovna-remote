@@ -436,52 +436,6 @@ const quit = () => {
 
     <!-- Main Content -->
     <main class="main-content">
-      <div class="input-panel" v-show="!['single', 'ham', 'multi'].includes(graphSelected)">
-        <div class="tabs-navigation">
-          <button class="tab-btn" :class="{ active: freqInputSelect === 'start-stop' }" @click="freqInputSelect = 'start-stop'">Start/Stop</button>
-          <button class="tab-btn" :class="{ active: freqInputSelect === 'center-span' }" @click="freqInputSelect = 'center-span'">Center/Span</button>
-        </div>
-        
-        <div class="freq-inputs" v-if="freqInputSelect === 'start-stop'">
-          <div class="input-group">
-            <label>Start</label>
-            <div class="field" @click="openKeypad('Start Frequency', 'range.start', store.frequencies.start)">
-              {{ formatFrequency(store.frequencies.start) }}
-            </div>
-          </div>
-          <div class="input-group">
-            <label>Stop</label>
-            <div class="field" @click="openKeypad('Stop Frequency', 'range.stop', store.frequencies.stop)">
-              {{ formatFrequency(store.frequencies.stop) }}
-            </div>
-          </div>
-        </div>
-
-        <div class="freq-inputs" v-if="freqInputSelect === 'center-span'">
-          <div class="input-group">
-            <label>Center</label>
-            <div class="field" @click="openKeypad('Center Frequency', 'range.center', store.frequencies.center)">
-              {{ formatFrequency(store.frequencies.center) }}
-            </div>
-          </div>
-          <div class="input-group">
-            <label>Span</label>
-            <div class="field" @click="openKeypad('Frequency Span', 'range.span', store.frequencies.span)">
-              {{ formatFrequency(store.frequencies.span) }}
-            </div>
-          </div>
-        </div>
-
-        <div class="traces-chips">
-          <button v-for="trace in store.traces" :key="trace.id" 
-                  class="chip" 
-                  :style="{ backgroundColor: trace.show ? trace.color : 'var(--surface-3)', color: trace.show ? '#fff' : 'var(--text-main)' }"
-                  @click="openTraceSettings(trace)">
-            CH{{ trace.channel }} {{ nameOfFormat(trace.format) }}
-          </button>
-        </div>
-      </div>
-
       <div class="graph-area">
         <div class="tabs-navigation">
           <button class="tab-btn" :class="{ active: graphSelected === 'single' }" @click="selectSingle">Single</button>
@@ -490,6 +444,51 @@ const quit = () => {
           <button class="tab-btn" :class="{ active: graphSelected === 'smith' }" @click="graphSelected = 'smith'">Smith</button>
           <button class="tab-btn" :class="{ active: graphSelected === 'frequency' }" @click="graphSelected = 'frequency'">Freq</button>
           <button class="tab-btn" :class="{ active: graphSelected === 'tdr' }" @click="graphSelected = 'tdr'">TDR</button>
+        </div>
+        <div class="input-panel" v-show="!['single', 'ham', 'multi'].includes(graphSelected)">
+          <div class="tabs-navigation">
+            <button class="tab-btn" :class="{ active: freqInputSelect === 'start-stop' }" @click="freqInputSelect = 'start-stop'">Start/Stop</button>
+            <button class="tab-btn" :class="{ active: freqInputSelect === 'center-span' }" @click="freqInputSelect = 'center-span'">Center/Span</button>
+          </div>
+        
+          <div class="freq-inputs" v-if="freqInputSelect === 'start-stop'">
+            <div class="input-group">
+              <label>Start</label>
+              <div class="field" @click="openKeypad('Start Frequency', 'range.start', store.frequencies.start)">
+                {{ formatFrequency(store.frequencies.start) }}
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Stop</label>
+              <div class="field" @click="openKeypad('Stop Frequency', 'range.stop', store.frequencies.stop)">
+                {{ formatFrequency(store.frequencies.stop) }}
+              </div>
+            </div>
+          </div>
+
+          <div class="freq-inputs" v-if="freqInputSelect === 'center-span'">
+            <div class="input-group">
+              <label>Center</label>
+              <div class="field" @click="openKeypad('Center Frequency', 'range.center', store.frequencies.center)">
+                {{ formatFrequency(store.frequencies.center) }}
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Span</label>
+              <div class="field" @click="openKeypad('Frequency Span', 'range.span', store.frequencies.span)">
+                {{ formatFrequency(store.frequencies.span) }}
+              </div>
+            </div>
+          </div>
+
+          <div class="traces-chips">
+            <button v-for="trace in store.traces" :key="trace.id" 
+                    class="chip" 
+                    :style="{ backgroundColor: trace.show ? trace.color : 'var(--surface-3)', color: trace.show ? '#fff' : 'var(--text-main)' }"
+                    @click="openTraceSettings(trace)">
+              CH{{ trace.channel }} {{ nameOfFormat(trace.format) }}
+            </button>
+          </div>
         </div>
         <div class="graph-wrapper">
           <Single v-if="graphSelected === 'single'" @edit-frequency="openKeypad('Frequency', 'single.freq', store.singleFreq)" />
@@ -577,7 +576,7 @@ const quit = () => {
 }
 
 .input-panel {
-  margin-bottom: 24px;
+  margin: 16px 0 24px;
 }
 
 .freq-inputs {

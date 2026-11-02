@@ -143,18 +143,6 @@ h6 {
   flex-direction: column;
 }
 
-@media (orientation: landscape) {
-  .main-content {
-    flex-direction: row;
-  }
-
-  .input-panel {
-    max-width: 480px;
-    min-width: 240px;
-    margin-right: 16px;
-  }
-}
-
 /* Buttons */
 .btn {
   display: inline-flex;
