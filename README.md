@@ -15,6 +15,7 @@ app. Open `http://<feather-ip>/` on a phone or computer and measure. Nothing has
   [NanoVNA-Web-Client](https://github.com/cho45/NanoVNA-WebClient) and extended: Single frequency and HAM band views,
   an app-side open/short/load calibration for all ham bands at once, dark mode, a no-data notice. See
   [client/README.md](client/README.md).
+- **manual/** - user manual, English and German. Project notes for contributors and Claude sessions: `CLAUDE.md`, `docs/`.
 - **dev-tools/** - small Python scripts for testing the bridge from a computer.
 
 ## Quick start
@@ -24,9 +25,10 @@ app. Open `http://<feather-ip>/` on a phone or computer and measure. Nothing has
    cd client && npm install && npm run build:esp
    cd ../firmware && python3 -m platformio run -e feather -t upload
    ```
-2. On first start the Feather opens a WiFi `NanoVNA-Remote` (password `nanovna-remote`). Join it, open
-   <http://192.168.4.1/wifi>, pick your home network. The Feather restarts and joins it.
-3. Open `http://<feather-ip>/` (also `http://nanovna.local/` where mDNS works), tap Connect, and calibrate once on the
+2. On first start the Feather opens a WiFi `NanoVNA-Remote` (password `nanovna-remote`); the display shows it. Join it, open
+   <http://192.168.4.1/wifi>, scan, pick your network, enter the password, save and press Connect. You can store up to 8
+   networks (home, phone hotspot, ...) and switch between them with the Feather's buttons (D0 up, D2 down, D1 confirm).
+3. Open `http://<feather-ip>/` (the address is on the display) (also `http://nanovna.local/` where mDNS works), tap Connect, and calibrate once on the
    HAM tab (open, short, load, each connected once).
 
 Later firmware updates go over WiFi: `firmware/tools/ota.sh <feather-ip>`.

@@ -3,3 +3,4 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 void dns_start();
+void dns_stop();

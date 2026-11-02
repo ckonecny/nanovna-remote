@@ -12,6 +12,8 @@
 static const char *TAG = "dns";
 static const uint8_t AP_IP[4] = {192, 168, 4, 1};
 
+static volatile bool dns_run, dns_alive;
+
 static void dns_task(void *) {
     int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     sockaddr_in addr = {};
@@ -20,10 +22,13 @@ static void dns_task(void *) {
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     if (sock < 0 || bind(sock, (sockaddr *)&addr, sizeof addr) < 0) {
         ESP_LOGE(TAG, "cannot bind UDP port 53");
+        dns_alive = false;
         vTaskDelete(nullptr);
     }
+    timeval tv = {1, 0};  // wake up now and then to notice dns_stop()
+    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv);
     uint8_t buf[512];
-    while (true) {
+    while (dns_run) {
         sockaddr_in from;
         socklen_t from_len = sizeof from;
         int n = recvfrom(sock, buf, sizeof buf - 16, 0, (sockaddr *)&from, &from_len);
@@ -59,24 +64,16 @@ static void dns_task(void *) {
         }
         sendto(sock, buf, len, 0, (sockaddr *)&from, from_len);
     }
-}
-
-// DIAGNOSTIC: logs connection attempts to the HTTPS port (nothing is served there)
-static void https_probe_task(void *) {
-    int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-    sockaddr_in addr = {};
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(443);
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    if (sock < 0 || bind(sock, (sockaddr *)&addr, sizeof addr) < 0 || listen(sock, 2) < 0) vTaskDelete(nullptr);
-    while (true) {
-        int c = accept(sock, nullptr, nullptr);
-        if (c >= 0) {
-            ESP_LOGI(TAG, "HTTPS connection attempt on port 443");
-            close(c);
-        }
-    }
+    close(sock);
+    dns_alive = false;
+    vTaskDelete(nullptr);
 }
 
 void dns_start() {
-    xTaskCreate(https_probe_task, "https_probe", 3072, nullptr, 3, nullptr); xTaskCreate(dns_task, "dns", 4096, nullptr, 3, nullptr); }
+    dns_run = true;
+    if (dns_alive) return;
+    dns_alive = true;
+    xTaskCreate(dns_task, "dns", 4096, nullptr, 3, nullptr);
+}
+
+void dns_stop() { dns_run = false; }

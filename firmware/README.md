@@ -24,10 +24,17 @@ log at `http://<ip>/log`.
 
 ## WiFi
 
-- Without stored credentials, or if the network cannot be joined, the Feather opens its own WiFi `NanoVNA-Remote`
-  (password `nanovna-remote`, see `src/main.cpp`; change it before using the device anywhere public). It runs a captive
-  portal (catch-all DNS + redirect), so phones offer to sign in and open the setup page by themselves.
-- Hold **D0 (BOOT)** while powering up to forget the stored WiFi.
+- Up to 8 networks are stored (NVS), edited on the `/wifi` page or chosen with the buttons (see `../manual/manual_en.md`).
+  At boot the Feather tries the stored networks in range, the last used first.
+- If none can be joined it opens its own WiFi `NanoVNA-Remote` (password `nanovna-remote`, see `src/wifi_mgr.h`; change it
+  before using the device anywhere public). It runs a captive portal (catch-all DNS + redirect), so phones offer to sign in and
+  open the setup page by themselves, and it looks for the stored networks again every minute while nobody is connected.
+- Hold **D0 (BOOT)** while powering up or resetting to open the setup WiFi right away. Nothing is deleted.
+
+## Display and buttons
+
+ST7789 via `esp_lcd` (`src/display.cpp`), buttons with debouncing (`src/buttons.cpp`), screens and menus in `src/ui.cpp`.
+D0 = up, D2 = down, D1 short = confirm, D1 long = menu / back. Design notes: `../docs/DECISIONS.md`.
 
 ## Hardware notes
 

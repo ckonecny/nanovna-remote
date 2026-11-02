@@ -226,8 +226,12 @@ void usb_lib_task(void *) {
 
 // logs every device that shows up on the bus (VID/PID, speed), so a missing NanoVNA can be told apart from a missing hub
 static usb_host_client_handle_t diag_client;
+static volatile int usb_devices;
+bool vna_usb_attached() { return usb_devices > 0; }
+
 static void diag_event(const usb_host_client_event_msg_t *msg, void *) {
     if (msg->event == USB_HOST_CLIENT_EVENT_NEW_DEV) {
+        usb_devices = usb_devices + 1;
         usb_device_handle_t dev;
         if (usb_host_device_open(diag_client, msg->new_dev.address, &dev) == ESP_OK) {
             const usb_device_desc_t *desc;
@@ -238,6 +242,7 @@ static void diag_event(const usb_host_client_event_msg_t *msg, void *) {
             usb_host_device_close(diag_client, dev);
         }
     } else if (msg->event == USB_HOST_CLIENT_EVENT_DEV_GONE) {
+        if (usb_devices > 0) usb_devices = usb_devices - 1;
         ESP_LOGI(TAG, "USB device removed");
     }
 }

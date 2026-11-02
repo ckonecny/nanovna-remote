@@ -5,6 +5,8 @@
 #include <string>
 
 void vna_usb_init();
+// Is any USB device plugged into the Feather's USB-C port?
+bool vna_usb_attached();
 
 // Transparent serial bridge to a NanoVNA: bytes pass through unchanged. Only one session at a time.
 bool vna_bridge_open(std::string &err);

@@ -20,6 +20,7 @@
 #include "esp_system.h"
 #include "vna.h"
 #include "client_assets.h"
+#include "wifi_mgr.h"
 #include "wifi_setup.h"
 
 static const char *TAG = "web";
@@ -115,34 +116,138 @@ std::string form_field(const std::string &body, const char *key) {
     return url_decode(body.substr(p + k.size(), e == std::string::npos ? e : e - p - k.size()));
 }
 
+const char WIFI_PAGE[] = R"HTML(<!doctype html><html lang=en><head><meta charset=utf-8>
+<meta name=viewport content='width=device-width,initial-scale=1'><title>NanoVNA Remote WiFi</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:30em;margin:1em auto;padding:0 1em;color:#222}
+h2{margin:.8em 0 .3em} button,input{font-size:1.05em;box-sizing:border-box;padding:.45em .6em;margin:.2em 0}
+input{width:100%} button{cursor:pointer}
+.net{display:flex;align-items:center;gap:.4em;padding:.35em 0;border-bottom:1px solid #ddd}
+.net b{flex:1;overflow:hidden;text-overflow:ellipsis} .off{color:#999} .on{color:#080}
+.scan{display:block;width:100%;text-align:left;background:#f3f3f3;border:1px solid #ccc;border-radius:4px}
+#msg{background:#fff4d6;padding:.5em;border-radius:4px;display:none}
+</style></head><body>
+<h2>Saved networks</h2><div id=status></div><div id=nets></div><div id=msg></div>
+<h2>Add network</h2>
+<button id=scanbtn>Scan for networks</button><div id=found></div>
+<input id=ssid placeholder='Network name' maxlength=32>
+<input id=pass type=password placeholder='Password (empty for open networks)' maxlength=64>
+<button id=save>Save</button>
+<p><a href=/>Open the app</a></p>
+<script>
+const $=s=>document.getElementById(s);
+const post=(p,o)=>fetch(p,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(o).toString()});
+const say=t=>{$('msg').textContent=t;$('msg').style.display=t?'block':'none'};
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+async function load(){
+  try{
+    const d=await (await fetch('/api/wifi/nets')).json();
+    $('status').textContent=d.state=='sta'?'Connected to '+d.ssid+' ('+d.ip+')':d.state=='ap'?'Setup WiFi is open':'Connecting ...';
+    const box=$('nets');box.textContent='';
+    if(!d.nets.length)box.append(el('p','off','No network saved yet.'));
+    d.nets.forEach((n,i)=>{
+      const row=el('div','net');
+      row.append(el('b',n.enabled?'':'off',(n.active?'● ':'')+n.ssid));
+      const use=el('button',0,'Connect');use.onclick=async()=>{say('Connecting to '+n.ssid+' ... If it works, the device leaves this WiFi; open the new address shown on its display.');await post('/api/wifi/connect',{ssid:n.ssid})};
+      const tog=el('button',0,n.enabled?'Off':'On');tog.title='enable / disable';tog.onclick=async()=>{await post('/api/wifi/toggle',{i});load()};
+      const del=el('button',0,'Delete');del.onclick=async()=>{if(confirm('Delete '+n.ssid+'?')){await post('/api/wifi/delete',{i});load()}};
+      row.append(use,tog,del);box.append(row);
+    });
+  }catch(e){}
+}
+$('scanbtn').onclick=async()=>{
+  const f=$('found');f.textContent='Scanning ...';
+  try{
+    const list=await (await fetch('/api/wifi/scan')).json();f.textContent='';
+    if(!list.length)f.textContent='Nothing found.';
+    list.forEach(n=>{const b=el('button','scan',n.ssid+(n.secure?' 🔒':'')+'  ('+n.rssi+' dBm)');b.onclick=()=>{$('ssid').value=n.ssid;$('pass').focus()};f.append(b)});
+  }catch(e){f.textContent='Scan failed.'}
+};
+$('save').onclick=async()=>{
+  const ssid=$('ssid').value.trim();if(!ssid)return;
+  const r=await post('/api/wifi',{ssid,pass:$('pass').value});
+  if(!r.ok){say((await r.json()).detail);return}
+  $('pass').value='';$('ssid').value='';say('Saved. Press "Connect" to switch to this network.');load();
+};
+load();setInterval(load,5000);
+</script></body></html>)HTML";
+
 esp_err_t wifi_page_handler(httpd_req_t *req) {
-    std::string html =
-        "<!doctype html><html><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'>"
-        "<title>NanoVNA Tuner WiFi</title><style>body{font-family:sans-serif;max-width:26em;margin:1em auto;padding:0 1em}"
-        "input,button{font-size:1.1em;width:100%;box-sizing:border-box;margin:.4em 0;padding:.5em}</style></head><body>"
-        "<h2>Connect to your WiFi</h2><p>Choose the network the tuner should join. Afterwards it restarts and is reachable at "
-        "<b>http://nanovna.local/</b> (or the IP shown on the log). Hold D0 while resetting to forget the network.</p>"
-        "<form method=post action=/api/wifi><input name=ssid list=nets placeholder='Network name' required>"
-        "<datalist id=nets>" + wifi_scan_options() + "</datalist>"
-        "<input name=pass type=password placeholder='Password' maxlength=64><button>Save and restart</button></form>"
-        "<p><a href=/>Skip, use the tuner on this WiFi</a></p></body></html>";
     httpd_resp_set_type(req, "text/html");
-    return httpd_resp_send(req, html.data(), html.size());
+    return httpd_resp_send(req, WIFI_PAGE, HTTPD_RESP_USE_STRLEN);
+}
+
+std::string json_string(const std::string &s) {
+    std::string out = "\"";
+    for (unsigned char c : s) {
+        if (c == '"' || c == '\\') { out += '\\'; out += (char)c; }
+        else if (c < 0x20) { char b[8]; snprintf(b, sizeof b, "\\u%04x", c); out += b; }
+        else out += (char)c;
+    }
+    return out + "\"";
+}
+
+esp_err_t send_json(httpd_req_t *req, const std::string &json) {
+    httpd_resp_set_type(req, "application/json");
+    httpd_resp_set_hdr(req, "Cache-Control", "no-store");
+    return httpd_resp_send(req, json.data(), json.size());
+}
+
+esp_err_t wifi_nets_handler(httpd_req_t *req) {
+    auto st = wifi_mgr_status();
+    std::string json = std::string("{\"state\":\"") + (st.state == WIFI_STA ? "sta" : st.state == WIFI_AP ? "ap" : "busy") +
+                       "\",\"ssid\":" + json_string(st.ssid) + ",\"ip\":" + json_string(st.ip) + ",\"nets\":[";
+    bool first = true;
+    for (const WifiNet &n : wifi_nets_load()) {  // passwords are never sent back
+        if (!first) json += ',';
+        first = false;
+        json += "{\"ssid\":" + json_string(n.ssid) + ",\"enabled\":" + (n.enabled ? "true" : "false") + ",\"active\":" +
+                (st.state == WIFI_STA && st.ssid == n.ssid ? "true" : "false") + "}";
+    }
+    return send_json(req, json + "]}");
+}
+
+esp_err_t wifi_scan_handler(httpd_req_t *req) {
+    std::string json = "[";
+    bool first = true;
+    for (const WifiScanResult &r : wifi_scan()) {
+        if (!first) json += ',';
+        first = false;
+        json += "{\"ssid\":" + json_string(r.ssid) + ",\"rssi\":" + std::to_string(r.rssi) + ",\"secure\":" + (r.secure ? "true" : "false") + "}";
+    }
+    return send_json(req, json + "]");
 }
 
 esp_err_t wifi_save_handler(httpd_req_t *req) {
     char buf[256];
-    if (!read_body(req, buf, sizeof buf)) return send_detail(req, "422 Unprocessable Entity", "Invalid form");
+    if (!read_body(req, buf, sizeof buf)) return send_detail(req, "422 Unprocessable Entity", "Invalid input");
     std::string ssid = form_field(buf, "ssid"), pass = form_field(buf, "pass");
     if (ssid.empty() || ssid.size() > 32 || pass.size() > 64) return send_detail(req, "422 Unprocessable Entity", "Invalid network");
-    wifi_creds_save(ssid, pass);
-    httpd_resp_set_type(req, "text/html");
-    httpd_resp_send(req, "<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width'><body style='font-family:sans-serif;padding:1em'>"
-                         "<h2>Saved</h2><p>Restarting. Join your normal WiFi again and open <b>http://nanovna.local/</b>. "
-                         "If this WiFi appears again, the password was wrong - connect and retry.</p>", HTTPD_RESP_USE_STRLEN);
-    vTaskDelay(pdMS_TO_TICKS(1000));
-    esp_restart();
-    return ESP_OK;
+    if (!wifi_nets_add(ssid, pass)) return send_detail(req, "422 Unprocessable Entity", "The list is full - delete a network first.");
+    return send_json(req, "{}");
+}
+
+esp_err_t wifi_connect_handler(httpd_req_t *req) {
+    char buf[128];
+    if (!read_body(req, buf, sizeof buf)) return send_detail(req, "422 Unprocessable Entity", "Invalid input");
+    wifi_mgr_connect(form_field(buf, "ssid"));
+    return send_json(req, "{}");
+}
+
+esp_err_t wifi_toggle_handler(httpd_req_t *req) {
+    char buf[64];
+    if (!read_body(req, buf, sizeof buf)) return send_detail(req, "422 Unprocessable Entity", "Invalid input");
+    size_t i = atoi(form_field(buf, "i").c_str());
+    auto nets = wifi_nets_load();
+    if (i < nets.size()) wifi_nets_set_enabled(i, !nets[i].enabled);
+    return send_json(req, "{}");
+}
+
+esp_err_t wifi_delete_handler(httpd_req_t *req) {
+    char buf[64];
+    if (!read_body(req, buf, sizeof buf)) return send_detail(req, "422 Unprocessable Entity", "Invalid input");
+    wifi_nets_remove(atoi(form_field(buf, "i").c_str()));
+    return send_json(req, "{}");
 }
 
 esp_err_t log_handler(httpd_req_t *req) {
@@ -335,8 +440,7 @@ esp_err_t redirect_handler(httpd_req_t *req, httpd_err_code_t) {
     if (!web_captive_portal) return httpd_resp_send_404(req);
     ESP_LOGI(TAG, "redirect %s", req->uri);
     httpd_resp_set_status(req, "302 Found");
-    std::string ssid, pass;
-    httpd_resp_set_hdr(req, "Location", wifi_creds_load(ssid, pass) ? "http://192.168.4.1/" : "http://192.168.4.1/wifi");
+    httpd_resp_set_hdr(req, "Location", wifi_nets_load().empty() ? "http://192.168.4.1/wifi" : "http://192.168.4.1/");
     return httpd_resp_send(req, "Redirecting", HTTPD_RESP_USE_STRLEN);
 }
 
@@ -347,7 +451,7 @@ void web_log_capture() { log_previous = esp_log_set_vprintf(log_hook); }
 void web_start() {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.stack_size = 8192;
-    config.max_uri_handlers = 24;
+    config.max_uri_handlers = 32;
     config.max_open_sockets = 7;
     config.lru_purge_enable = true;
     config.send_wait_timeout = 5;
@@ -372,6 +476,11 @@ void web_start() {
         {.uri = "/log", .method = HTTP_GET, .handler = log_handler, .user_ctx = nullptr},
         {.uri = "/wifi", .method = HTTP_GET, .handler = wifi_page_handler, .user_ctx = nullptr},
         {.uri = "/api/wifi", .method = HTTP_POST, .handler = wifi_save_handler, .user_ctx = nullptr},
+        {.uri = "/api/wifi/nets", .method = HTTP_GET, .handler = wifi_nets_handler, .user_ctx = nullptr},
+        {.uri = "/api/wifi/scan", .method = HTTP_GET, .handler = wifi_scan_handler, .user_ctx = nullptr},
+        {.uri = "/api/wifi/connect", .method = HTTP_POST, .handler = wifi_connect_handler, .user_ctx = nullptr},
+        {.uri = "/api/wifi/toggle", .method = HTTP_POST, .handler = wifi_toggle_handler, .user_ctx = nullptr},
+        {.uri = "/api/wifi/delete", .method = HTTP_POST, .handler = wifi_delete_handler, .user_ctx = nullptr},
         {.uri = "/api/info", .method = HTTP_GET, .handler = info_handler, .user_ctx = nullptr},
         {.uri = "/*", .method = HTTP_GET, .handler = asset_handler, .user_ctx = nullptr},
     };
