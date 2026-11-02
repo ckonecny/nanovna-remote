@@ -1,13 +1,16 @@
 # Known findings that are accepted on purpose (build tooling only, nothing of it ships in the web app or the firmware).
-# They sit in vite-plugin-pwa -> workbox-build; a fix needs a downgrade of vite-plugin-pwa. Revisit when workbox-build updates.
+# They sit in vite-plugin-pwa -> workbox-build; a fix needs a downgrade of vite-plugin-pwa. Revisit when workbox-build updates; the entries expire on 2027-02-02 so the scan turns red again then.
 [[IgnoredVulns]]
 id = "GHSA-gcqx-w48m-w2h4"
+ignoreUntil = 2027-02-02
 reason = "deepmerge in workbox-build (build tool only)"
 
 [[IgnoredVulns]]
 id = "GHSA-3g3m-2fjr-6pw4"
+ignoreUntil = 2027-02-02
 reason = "glob in js-beautify via workbox-build (build tool only)"
 
 [[IgnoredVulns]]
 id = "GHSA-g3hv-75wg-m249"
+ignoreUntil = 2027-02-02
 reason = "minimatch in editorconfig/filelist via workbox-build (build tool only)"

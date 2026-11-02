@@ -28,6 +28,7 @@ Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
 - The old Feather (still on the pre-display firmware): update over WiFi.
 
 ## Next steps
+OSV ignore list (`client/osv-scanner.toml`, 3 build-tool findings in vite-plugin-pwa/workbox-build) expires 2027-02-02: check for a workbox-build update before then and drop the entries.
 Feature backlog (Stick Pro parity) is in GitHub issues: accuracy check of the calibration against an independent mismatch (#6; kit-only check done, see DECISIONS), single-stub matching (#8).
 
 ## Hints for the next session
