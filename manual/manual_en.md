@@ -63,6 +63,8 @@ Open `http://<address on the display>/` and press **Connect**.
 - Switch light/dark mode with the button in the header.
 - If no data arrives for a while the page shows a notice (check the cable, restart the NanoVNA).
 
+- **Cable** — measures a coax cable. Connect it to the NanoVNA and leave the far end open or shorted. Pick the sweep (1–30 MHz for cables up to about 150 m, 1–200 MHz for up to about 20 m) and what to measure: the **length** (enter the velocity factor or pick a typical cable type) or the **velocity factor** (enter the known length). The view shows the result, the one-way delay, whether the phase is a straight line (a plausibility check) and the one-way loss at three frequencies (dB per 100 m from 1 m of cable on). First press **Zero: nothing attached** with the cable removed: the NanoVNA has a delay of its own that would otherwise be added to the length; the zero is remembered per sweep. A cable longer than the limit of the sweep shows a wrong, shorter length without any warning.
+
 ## 6. Calibration
 
 Calibrate once, on the **HAM** or **Multi** tab, with the open, short and load standards at the connector (or at the

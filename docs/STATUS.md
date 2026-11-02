@@ -12,6 +12,7 @@ Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
 - Tested on the new Feather (display, buttons, WiFi list, `/wifi` page).
 
 ## Phone/device checks still open
+- Cable view (#1): length/velocity factor/loss confirmed working on a real cable by the user (no numbers recorded). Still missing: characteristic impedance, stub helper.
 - Multi view: checked uncalibrated against the NanoVNA; still to check with the calibration of all bands.
 - Second network (hotspot): join, switch with the buttons, fall back to the setup WiFi when
   a network is out of range; the 60 s retry of stored networks in the setup WiFi.

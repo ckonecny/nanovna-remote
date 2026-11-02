@@ -70,6 +70,15 @@ Newest first within each section. Record new decisions here as they are made.
 - Each band is corrected with its own OSL calibration; a band without one is shown uncorrected and flagged.
 - Leaving the view restores the device to the range held in the store.
 
+## Cable view (2026-11)
+- Length from the slope of the unwrapped reflection phase of an open/shorted cable over a wide sweep
+  (`lib/cable.js`); loss from the reflection magnitude (round trip, halved). Client only; the readings are raw, the
+  app-side HAM calibration is not applied.
+- Unwrapping needs less than half a turn between points, so the sweep limits the cable length (150 m / 20 m at VF 0.66).
+  A longer cable aliases into a straight line and shows a shorter length; a single sweep cannot detect that.
+- The NanoVNA has a delay of its own (measured 0.2 to 2 ns with nothing attached, varying between runs and not yet
+  understood): the view has a Zero button that subtracts the delay measured with nothing attached, per sweep.
+
 ## NanoVNA-H behaviour (verified on hardware)
 
 - `resume` restarts the sweep. `data 0` returns immediately with the previous sweep's values
