@@ -16,13 +16,12 @@ Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
   a network is out of range; the 60 s retry of stored networks in the setup WiFi.
 - Switching networks from the `/wifi` page while connected over the same WiFi.
 - No-data banner against a real NanoVNA freeze.
-- Accuracy check with a known 50 ohm load after the app-side calibration.
 - Client on an iPhone.
 - The old Feather (still on the pre-display firmware): update over WiFi.
 
 ## Next steps
 Feature backlog (Stick Pro parity) is in GitHub issues: cable tools, TDR, multi-band view,
-RL/RX charts, .s1p export.
+RL/RX charts, .s1p export, accuracy check of the calibration (issues #1-#6).
 
 ## Hints for the next session
 - Logs: `http://<ip>/log`. The Feather's IP is on its display.
