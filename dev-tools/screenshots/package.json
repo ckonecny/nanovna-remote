@@ -4,6 +4,6 @@
   "description": "Takes the manual and feature page screenshots from the simulator (dev-tools/simulator.py)",
   "type": "module",
   "dependencies": {
-    "puppeteer-core": "^24.0.0"
+    "puppeteer-core": "^25.16.0"
   }
 }
