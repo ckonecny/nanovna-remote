@@ -7,11 +7,12 @@ let commitHash = 'local'
 try { commitHash = execSync('git rev-parse --short HEAD', { stdio: 'pipe' }).toString().trim() } catch (e) { /* not a git checkout */ }
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   base: './',
   plugins: [
     vue(),
     VitePWA({
+      disable: mode === 'demo', // no offline cache for the hosted demo
       registerType: 'autoUpdate',
       manifest: {
         name: 'NanoVNA Remote',
@@ -46,4 +47,4 @@ export default defineConfig({
   server: {
     allowedHosts: ['.trycloudflare.com']
   }
-})
+}))

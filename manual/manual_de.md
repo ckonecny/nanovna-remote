@@ -65,6 +65,11 @@ Später wechselst du das Netz mit den Tasten (Abschnitt 3) oder auf der Seite `/
 
 Die Screenshots in diesem Handbuch zeigen simulierte Werte, keine echten Messungen.
 
+Die App lässt sich ohne Hardware ausprobieren: Die [Live-Demo](https://ckonecny.github.io/nanovna-remote/demo/) ist dieselbe App
+mit einem simulierten NanoVNA. **connect** drücken und in der Leiste oben wählen, was angeschlossen ist (Antenne,
+Open/Short/Load-Standard, Kabel). Auch die Kalibrierung funktioniert mit den simulierten Standards. Die Werte sind
+modelliert, nicht gemessen, und die Kalibrierung bleibt nur in deinem Browser.
+
 ### 5.1 Überblick
 
 **Kopfzeile.** Links der Menüknopf (öffnet das Seitenmenü, 5.9). Dann der Hell/Dunkel-Schalter und je nach Zustand **connect** /

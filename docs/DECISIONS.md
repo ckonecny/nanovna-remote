@@ -125,6 +125,18 @@ Newest first within each section. Record new decisions here as they are made.
   publishes it to GitHub Pages. Pages has to be enabled in the repository settings (source: GitHub Actions) and needs a
   public repository on the free plan.
 
+## Live demo on GitHub Pages (2026-11)
+- `npm run build:demo` (mode `demo`, `client/.env.demo` sets `VITE_ESP` and `VITE_DEMO`) builds the app into `client/dist-demo`
+  with a simulated NanoVNA in the page: `client/src/lib/demo.js` has `DemoSocket`, which `NanoVNA_WebSocket` uses instead of
+  `WebSocket` when `VITE_DEMO` is set, so all the ESP-mode behaviour stays the same. The models are a JS port of
+  `dev-tools/simulator.py` (keep both in step).
+- What is attached is chosen in `DemoPanel.vue`; the choice reaches the worker (which owns the transport) through a
+  `BroadcastChannel`. `pullFromDevice`/`pushToDevice` do nothing in the demo: the calibration stays in the browser's
+  localStorage. The PWA plugin is disabled for the demo (no offline cache).
+- The ESP build does not contain the demo code (checked: no demo strings in `client/dist`), so the flash budget is unchanged.
+- `pages.yml` builds the demo and publishes it next to the feature page under `/demo/` (`site/` + `client/dist-demo`).
+  It also runs on changes in `client/`.
+
 ## Build reproducibility (2026-11)
 - `client/dsp-wasm/web/` (the wasm DSP package of cho45's client, built by wasm-pack from `client/dsp-wasm/`) is tracked in
   git although wasm-pack writes a `.gitignore` for it: without it a fresh clone cannot build or test the client (CI found

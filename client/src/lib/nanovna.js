@@ -17,6 +17,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 */
 
 
+import { DemoSocket } from './demo';
+
 const CDC_ACM_INTERFACE = 0;
 const CDC_DATA_INTERFACE = 1;
 const CDC_SET_LINE_CODING = 0x20;
@@ -581,7 +583,7 @@ export class NanoVNA_WebSocket extends NanoVNA_Base {
     async open(device) {
         this.encoder = new TextEncoder();
         this.socket = await new Promise((resolve, reject) => {
-            const socket = new WebSocket(device.url);
+            const socket = import.meta.env.VITE_DEMO ? new DemoSocket() : new WebSocket(device.url); // demo build: a simulated NanoVNA in the page
             socket.binaryType = 'arraybuffer';
             socket.onopen = () => resolve(socket);
             socket.onerror = () => reject(new Error('cannot reach ' + device.url));

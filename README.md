@@ -14,6 +14,7 @@ browser: SWR, impedance, Smith chart, ham bands, cables and fault finding, with 
 
 <p align="center"><sub>The screenshots show simulated values, not real measurements.</sub></p>
 
+**Try it now, no hardware needed: [live demo](https://ckonecny.github.io/nanovna-remote/demo/)** (the real app with a simulated NanoVNA).
 More pictures and a short tour: **[feature page](https://ckonecny.github.io/nanovna-remote/)**. Everything in detail:
 **[manual (English)](manual/manual_en.md)** · **[Handbuch (Deutsch)](manual/manual_de.md)**.
 
@@ -78,8 +79,11 @@ Later firmware updates go over WiFi: `firmware/tools/ota.sh <feather-ip>`. Probl
 
 ## Try it without hardware
 
-`dev-tools/simulator.py` imitates the bridge with modelled antennas and cables, so you can look at the app without a
-NanoVNA. See [dev-tools/](dev-tools/) and `docs/DECISIONS.md`.
+The **[live demo](https://ckonecny.github.io/nanovna-remote/demo/)** runs the real web app in your browser against a
+simulated NanoVNA: press connect, pick what is attached (antenna, open / short / load, cables) and try everything,
+including the calibration. The values are modelled, not measured. The demo is built from the same code (`npm run build:demo`
+in `client/`); `dev-tools/simulator.py` is the same simulation as a server, used for the screenshots. See
+[dev-tools/](dev-tools/) and `docs/DECISIONS.md`.
 
 ## Project layout
 

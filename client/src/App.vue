@@ -14,9 +14,11 @@ import Ham from './components/Ham.vue';
 import Multi from './components/Multi.vue';
 import Cable from './components/Cable.vue';
 import Tdr from './components/Tdr.vue';
+import DemoPanel from './components/DemoPanel.vue';
 import { HAM_BANDS, bandSweep } from './lib/bands';
 import { bandFileName, chartsToPng, download, hamChartItems, multiChartItems, saveTouchstone } from './lib/export';
 
+const isDemo = !!import.meta.env.VITE_DEMO; // the hosted demo with a simulated NanoVNA
 const menuVisible = ref(false);
 const freqInputSelect = ref('start-stop');
 const graphSelected = ref('frequency');
@@ -367,6 +369,8 @@ const quit = () => {
         </template>
       </template>
     </header>
+
+    <DemoPanel v-if="isDemo" />
 
     <div class="stale" v-if="store.status === 'connected' && store.autoUpdate && (store.deviceFrozen || store.silentSecs > 6)">
       <template v-if="store.deviceFrozen">The NanoVNA delivers no new measurements (the values no longer change). Please restart the NanoVNA.</template>

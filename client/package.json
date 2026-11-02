@@ -9,7 +9,8 @@
     "build": "CI=1 vite build",
     "preview": "CI=1 vite preview",
     "test": "CI=1 vitest",
-    "build:esp": "vite build --mode esp"
+    "build:esp": "vite build --mode esp",
+    "build:demo": "vite build --mode demo --outDir dist-demo"
   },
   "dependencies": {
     "chart.js": "^2.9.4",

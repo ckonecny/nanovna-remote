@@ -64,6 +64,11 @@ data on.
 
 The screenshots in this manual show simulated values, not real measurements.
 
+You can try the app without hardware: the [live demo](https://ckonecny.github.io/nanovna-remote/demo/) is the same app with a
+simulated NanoVNA. Press **connect**, and choose in the bar at the top what is attached (antenna, open / short / load
+standard, cable). The calibration works on the simulated standards too. The values are modelled, not measured, and the
+calibration stays in your browser only.
+
 ### 5.1 Overview
 
 **Header.** Left: the menu button (opens the side menu, 5.9). Then the light/dark switch and, depending on the state,

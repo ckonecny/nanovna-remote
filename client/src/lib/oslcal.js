@@ -90,6 +90,7 @@ const url = (host) => `http://${host || location.host}/api/appcal`;
 
 // device -> browser. The device's copy wins; a browser-only calibration is uploaded when the device has none.
 export async function pullFromDevice(host) {
+    if (import.meta.env.VITE_DEMO) return; // demo build: the calibration stays in this browser
     try {
         const res = await fetch(url(host));
         if (res.ok) {
@@ -104,6 +105,7 @@ export async function pullFromDevice(host) {
 }
 
 export async function pushToDevice(host) {
+    if (import.meta.env.VITE_DEMO) return;
     try {
         await fetch(url(host), { method: 'PUT', body: JSON.stringify({ bands: appCal.bands, raw: appCal.raw }, round) });
     } catch (e) { /* see above */ }

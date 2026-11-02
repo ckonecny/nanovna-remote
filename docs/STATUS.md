@@ -11,6 +11,7 @@ Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
   dark mode, no-data notice. 107 client tests pass.
 - Tested on the new Feather (display, buttons, WiFi list, `/wifi` page).
 
+- Live demo: `npm run build:demo`, published to `/demo/` of the Pages site by `pages.yml` (see DECISIONS).
 - Simulator and screenshots: `dev-tools/simulator.py` + `dev-tools/screenshots/shots.mjs` (see DECISIONS); the manual has
   screenshots and `site/` holds the feature page (not published yet: GitHub Pages must be enabled, repo must be public).
 

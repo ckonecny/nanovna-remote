@@ -73,6 +73,7 @@ points: `docs/STATUS.md` — read it before starting new work.**
 
 ## Build / run
 
+- Client demo (simulated NanoVNA, hosted on Pages): `npm run build:demo` (output `client/dist-demo`).
 - Client: `cd client && npm install && npm run build:esp` (output in `client/dist`,
   embedded by the firmware build). Tests: `npm test`. Dev server: `npm run dev`,
   then `?host=<ip>` (CORS blocks `/api/appcal` there — calibrate on the ESP-served page).
