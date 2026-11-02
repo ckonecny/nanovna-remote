@@ -32,4 +32,4 @@ jobs:
           grep ' osv-scanner_linux_amd64$' SHA256SUMS | sed 's/osv-scanner_linux_amd64$/osv-scanner/' | sha256sum -c -
           chmod +x osv-scanner
       - name: Scan the lockfiles
-        run: ./osv-scanner --lockfile=client/package-lock.json --lockfile=dev-tools/screenshots/package-lock.json
+        run: ./osv-scanner --config=client/osv-scanner.toml --lockfile=client/package-lock.json --lockfile=dev-tools/screenshots/package-lock.json
