@@ -68,11 +68,9 @@ public:
         static unsigned round = 0;
         unsigned step = round++ % 3;
         ESP_LOGW(TAG, "NanoVNA not answering: recovery step %u", step);
-        if (step >= 0) {
-            for (uint8_t ep : {0x01, 0x81}) {
-                esp_err_t err = cdc_acm_host_send_custom_request(hdl_, 0x02, 0x01, 0, ep, 0, nullptr);
-                ESP_LOGW(TAG, "  CLEAR_FEATURE(HALT) endpoint 0x%02x -> %s", ep, esp_err_to_name(err));
-            }
+        for (uint8_t ep : {0x01, 0x81}) {  // every step starts with this
+            esp_err_t err = cdc_acm_host_send_custom_request(hdl_, 0x02, 0x01, 0, ep, 0, nullptr);
+            ESP_LOGW(TAG, "  CLEAR_FEATURE(HALT) endpoint 0x%02x -> %s", ep, esp_err_to_name(err));
         }
         if (step >= 1) {
             esp_err_t err = cdc_acm_host_set_control_line_state(hdl_, false, false);

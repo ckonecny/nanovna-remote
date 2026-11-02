@@ -1,39 +1,95 @@
 # NanoVNA Remote
 
-Measure antennas with a NanoVNA from any browser on your WiFi, without a computer next to the antenna.
+**Measure antennas and cables with a NanoVNA from any phone or computer on your WiFi, right at the antenna.**
 
-An Adafruit ESP32-S3 Reverse TFT Feather (#5691) acts as USB host for a NanoVNA-H, joins your WiFi and serves a web
-app. Open `http://<feather-ip>/` on a phone or computer and measure. Nothing has to be installed.
+A small ESP32 board sits next to your NanoVNA-H, joins your WiFi and serves a measurement app. Open its address in a
+browser: SWR, impedance, Smith chart, ham bands, cables and fault finding, with nothing to install on the phone.
+
+<p align="center">
+  <img src="site/img/phone-ham.png" width="190" alt="HAM view: SWR curve of the 20 m band">
+  <img src="site/img/phone-multi.png" width="190" alt="Multi view: several bands at a glance">
+  <img src="site/img/phone-smith.png" width="190" alt="Smith chart">
+  <img src="site/img/phone-tdr.png" width="190" alt="TDR view: a cable fault at 12 m">
+</p>
+
+<p align="center"><sub>The screenshots show simulated values, not real measurements.</sub></p>
+
+More pictures and a short tour: **[feature page](https://ckonecny.github.io/nanovna-remote/)**. Everything in detail:
+**[manual (English)](manual/manual_en.md)** · **[Handbuch (Deutsch)](manual/manual_de.md)**.
+
+## What it does
+
+- **Single frequency:** SWR, return loss, impedance (R + jX), |Γ| and phase at one frequency.
+- **Ham bands (HAM):** sweep a band, see the SWR curve, the minimum, the range with SWR ≤ 2, plus return loss and R / X charts.
+- **Multi:** compare several bands side by side, each swept in turn.
+- **Calibration once for all bands:** open, short and load, each connected once. The app corrects all 14 ham bands from
+  160 m to 70 cm, the result is stored in the device and every browser uses it.
+- **Cables:** length, velocity factor, loss and characteristic impedance of a coax cable, stub lengths.
+- **TDR:** shows where along a cable the signal is reflected (break, short, water).
+- **Smith and Freq:** your own sweep as a Smith chart or as curves, with markers, scales and several traces.
+- **Export:** Touchstone `.s1p` / `.s2p` files and PNG pictures of the charts.
+- **Phone first:** dark and light theme, a layout that follows the screen size, works on desktop too.
+- **Device display and buttons:** the Feather shows the WiFi, the address and the USB state; three buttons choose the
+  network. Up to eight WiFi networks can be stored (home, hotspot, ...), with a setup WiFi as fallback.
+- **Updates over WiFi**, no cable needed after the first flash.
+
+## How it works
 
 ```
  NanoVNA-H --USB-- ESP32-S3 Feather --WiFi-- browser (all the evaluation happens here)
 ```
 
-- **firmware/** - ESP-IDF firmware (PlatformIO). Transparent WebSocket to USB-serial bridge, serves the web app,
-  WiFi setup page, over-the-air updates, stores the calibration. See [firmware/README.md](firmware/README.md).
-- **client/** - the web app (Vue 3, Vite). Based on cho45's
-  [NanoVNA-Web-Client](https://github.com/cho45/NanoVNA-WebClient) and extended: Single frequency and HAM band views,
-  an app-side open/short/load calibration for all ham bands at once, dark mode, a no-data notice. See
-  [client/README.md](client/README.md).
-- **manual/** - user manual, English and German. Project notes for contributors and Claude sessions: `CLAUDE.md`, `docs/`.
-- **dev-tools/** - small Python scripts for testing the bridge from a computer, and a simulator that imitates the
-  bridge (used for the screenshots).
-- **site/** - the feature page (GitHub Pages).
+The Feather is the USB host for the NanoVNA and passes its text commands through unchanged (WebSocket to USB serial). It
+also serves the web app and keeps the calibration in flash. Everything else, the measurement maths, the charts, the
+calibration, runs in the browser.
+
+## What you need
+
+- A **NanoVNA-H** (the text shell over USB; other NanoVNA models may work but are untested)
+- An **Adafruit ESP32-S3 Reverse TFT Feather**, [product 5691](https://www.adafruit.com/product/5691)
+- A **USB-C cable** between the two (the Feather is the host)
+- Power for the Feather (USB-C power or a LiPo battery) and the **calibration kit** (open, short, load) that came with the NanoVNA
+- To build it: [Node.js](https://nodejs.org/) and [PlatformIO](https://platformio.org/)
 
 ## Quick start
 
-1. Build the client, then the firmware (the firmware embeds the client):
+1. **Build the web app and flash the firmware** (the firmware embeds the app). Connect the Feather over USB-C to the computer:
    ```sh
    cd client && npm install && npm run build:esp
    cd ../firmware && python3 -m platformio run -e feather -t upload
    ```
-2. On first start the Feather opens a WiFi `NanoVNA-Remote` (password `nanovna-remote`); the display shows it. Join it, open
-   <http://192.168.4.1/wifi>, scan, pick your network, enter the password, save and press Connect. You can store up to 8
-   networks (home, phone hotspot, ...) and switch between them with the Feather's buttons (D0 up, D2 down, D1 confirm).
-3. Open `http://<feather-ip>/` (the address is on the display) (also `http://nanovna.local/` where mDNS works), tap Connect, and calibrate once on the
-   HAM tab (open, short, load, each connected once).
+   If the Feather is not found, hold **D0**, tap **RESET**, release D0 and run the upload again.
+2. **Set up the WiFi.** On first start the Feather opens its own WiFi `NanoVNA-Remote` (password `nanovna-remote`), the
+   display shows it. Join it, open <http://192.168.4.1/wifi>, scan, pick your network, enter its password, save, press Connect.
+3. **Connect the NanoVNA** to the Feather's USB-C port. The display says "USB: device found".
+4. **Measure.** Open the address shown on the display (`http://<feather-ip>/`, also `http://nanovna.local/` where that
+   works) on a phone or computer and tap **connect**.
+5. **Calibrate once.** On the HAM tab press **Measure Open**, **Measure Short**, **Measure Load**, each after attaching the
+   standard at the end of your cable. Done for all bands.
 
-Later firmware updates go over WiFi: `firmware/tools/ota.sh <feather-ip>`.
+Later firmware updates go over WiFi: `firmware/tools/ota.sh <feather-ip>`. Problems? See the troubleshooting chapter in the manual.
+
+## Try it without hardware
+
+`dev-tools/simulator.py` imitates the bridge with modelled antennas and cables, so you can look at the app without a
+NanoVNA. See [dev-tools/](dev-tools/) and `docs/DECISIONS.md`.
+
+## Project layout
+
+- **firmware/** - ESP-IDF firmware (PlatformIO). Transparent WebSocket to USB-serial bridge, serves the web app,
+  WiFi setup page, over-the-air updates, stores the calibration. See [firmware/README.md](firmware/README.md).
+- **client/** - the web app (Vue 3, Vite). Based on cho45's
+  [NanoVNA-Web-Client](https://github.com/cho45/NanoVNA-WebClient) and extended with the views, the app-side
+  calibration and the cable tools above. See [client/README.md](client/README.md).
+- **manual/** - user manual, English and German.
+- **dev-tools/** - Python scripts for testing the bridge from a computer, the simulator and the screenshot script.
+- **site/** - the feature page (GitHub Pages).
+- **docs/** - project notes: [PROJECT.md](docs/PROJECT.md), [STATUS.md](docs/STATUS.md), [DECISIONS.md](docs/DECISIONS.md).
+  Contributor notes for Claude sessions: `CLAUDE.md`.
+
+## Contributing
+
+Ideas, bug reports and feature requests are welcome as [GitHub issues](https://github.com/ckonecny/nanovna-remote/issues).
 
 ## Licenses
 
@@ -43,4 +99,5 @@ Later firmware updates go over WiFi: `firmware/tools/ota.sh <feather-ip>`.
 
 ## Acknowledgements
 
-This project was motivated by [akarpf/nanovna-tuner](https://github.com/akarpf/nanovna-tuner).
+This project was motivated by [akarpf/nanovna-tuner](https://github.com/akarpf/nanovna-tuner). The web app is based on
+cho45's [NanoVNA-Web-Client](https://github.com/cho45/NanoVNA-WebClient).

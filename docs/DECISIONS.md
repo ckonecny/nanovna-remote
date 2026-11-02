@@ -125,6 +125,13 @@ Newest first within each section. Record new decisions here as they are made.
   publishes it to GitHub Pages. Pages has to be enabled in the repository settings (source: GitHub Actions) and needs a
   public repository on the free plan.
 
+## Build reproducibility (2026-11)
+- `client/dsp-wasm/web/` (the wasm DSP package of cho45's client, built by wasm-pack from `client/dsp-wasm/`) is tracked in
+  git although wasm-pack writes a `.gitignore` for it: without it a fresh clone cannot build or test the client (CI found
+  this). Rebuilding needs Rust and wasm-pack (`make -C client/dsp-wasm`); then `git add -f` the changed files.
+- `firmware/platformio.ini` pins `espressif32@6.11.0` (ESP-IDF 5.4.1). A newer platform failed to build (stricter
+  `gpio_num_t` and `-Werror=type-limits`); the code is fixed for both, the pin keeps builds the same everywhere. Raise it on purpose.
+
 ## NanoVNA-H behaviour (verified on hardware)
 
 - `resume` restarts the sweep. `data 0` returns immediately with the previous sweep's values

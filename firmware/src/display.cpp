@@ -18,13 +18,13 @@
 static const char *TAG = "display";
 
 // wiring of the Reverse TFT Feather
-#define PIN_MOSI 35
-#define PIN_SCLK 36
-#define PIN_CS 42
-#define PIN_DC 40
-#define PIN_RST 41
-#define PIN_BACKLIGHT 45
-#define PIN_TFT_POWER 7
+static constexpr gpio_num_t PIN_MOSI = GPIO_NUM_35;
+static constexpr gpio_num_t PIN_SCLK = GPIO_NUM_36;
+static constexpr gpio_num_t PIN_CS = GPIO_NUM_42;
+static constexpr gpio_num_t PIN_DC = GPIO_NUM_40;
+static constexpr gpio_num_t PIN_RST = GPIO_NUM_41;
+static constexpr gpio_num_t PIN_BACKLIGHT = GPIO_NUM_45;
+static constexpr gpio_num_t PIN_TFT_POWER = GPIO_NUM_7;
 
 static esp_lcd_panel_handle_t panel;
 static SemaphoreHandle_t done;
@@ -55,8 +55,8 @@ void display_init(bool flipped) {
     out.pin_bit_mask = (1ULL << PIN_TFT_POWER) | (1ULL << PIN_BACKLIGHT);
     out.mode = GPIO_MODE_OUTPUT;
     gpio_config(&out);
-    gpio_set_level((gpio_num_t)PIN_TFT_POWER, 1);  // powers the display and the Stemma QT connector
-    gpio_set_level((gpio_num_t)PIN_BACKLIGHT, 0);
+    gpio_set_level(PIN_TFT_POWER, 1);  // powers the display and the Stemma QT connector
+    gpio_set_level(PIN_BACKLIGHT, 0);
 
     done = xSemaphoreCreateBinary();
     buf = (uint16_t *)heap_caps_malloc(BUF_PIXELS * 2, MALLOC_CAP_DMA);
@@ -93,7 +93,7 @@ void display_init(bool flipped) {
     display_set_flipped(flipped);
     display_fill(0, 0, DISPLAY_W, DISPLAY_H, 0);
     ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(panel, true));
-    gpio_set_level((gpio_num_t)PIN_BACKLIGHT, 1);
+    gpio_set_level(PIN_BACKLIGHT, 1);
     ESP_LOGI(TAG, "display ready");
 }
 
