@@ -13,6 +13,7 @@ import Single from './components/Single.vue';
 import Ham from './components/Ham.vue';
 import Multi from './components/Multi.vue';
 import Cable from './components/Cable.vue';
+import Tdr from './components/Tdr.vue';
 import { HAM_BANDS, bandSweep } from './lib/bands';
 
 const menuVisible = ref(false);
@@ -22,6 +23,7 @@ const graphSelected = ref('frequency');
 watch(graphSelected, (g) => {
   store.multiActive = g === 'multi';
   store.cableActive = g === 'cable';
+  store.tdrActive = g === 'tdr';
 });
 
 const showKeypad = ref(false);
@@ -450,7 +452,7 @@ const quit = () => {
           <button class="tab-btn" :class="{ active: graphSelected === 'frequency' }" @click="graphSelected = 'frequency'">Freq</button>
           <button class="tab-btn" :class="{ active: graphSelected === 'tdr' }" @click="graphSelected = 'tdr'">TDR</button>
         </div>
-        <div class="input-panel" v-show="!['single', 'ham', 'multi', 'cable'].includes(graphSelected)">
+        <div class="input-panel" v-show="!['single', 'ham', 'multi', 'cable', 'tdr'].includes(graphSelected)">
           <div class="tabs-navigation">
             <button class="tab-btn" :class="{ active: freqInputSelect === 'start-stop' }" @click="freqInputSelect = 'start-stop'">Start/Stop</button>
             <button class="tab-btn" :class="{ active: freqInputSelect === 'center-span' }" @click="freqInputSelect = 'center-span'">Center/Span</button>
@@ -500,6 +502,7 @@ const quit = () => {
           <Ham v-else-if="graphSelected === 'ham'" @select-band="selectBand" />
           <Multi v-else-if="graphSelected === 'multi'" />
           <Cable v-else-if="graphSelected === 'cable'" />
+          <Tdr v-else-if="graphSelected === 'tdr'" />
           <Graph v-else :type="graphSelected" />
         </div>
       </div>

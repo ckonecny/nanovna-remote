@@ -83,7 +83,6 @@ const initChart = () => {
   const ctx = canvasRef.value.getContext('2d');
   let config;
   if (props.type === 'smith') config = getSmithConfig();
-  else if (props.type === 'tdr') config = getTdrConfig();
   else config = getFreqConfig();
   
   chart = new Chart(ctx, config);
@@ -143,43 +142,6 @@ const getFreqConfig = () => ({
   }
 });
 
-const getTdrConfig = () => ({
-  type: 'line',
-  data: { labels: [], datasets: [] },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: { duration: 0 },
-    scales: {
-      xAxes: [{
-        ticks: { callback: (value) => (value * 1e9).toFixed(1) + ' ns', fontColor: colors().dim },
-        gridLines: { color: colors().grid }
-      }],
-      yAxes: [{
-        ticks: { fontColor: colors().dim },
-        gridLines: { color: colors().grid },
-        scaleLabel: { display: true, labelString: 'Magnitude' }
-      }]
-    },
-    legend: { labels: { fontColor: colors().main } },
-    tooltips: {
-      callbacks: {
-        title: (tooltipItems) => {
-          if (tooltipItems.length > 0) {
-            return (tooltipItems[0].xLabel * 1e9).toFixed(1) + ' ns';
-          }
-          return '';
-        },
-        label: (tooltipItem, data) => {
-          const datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
-          const value = tooltipItem.yLabel;
-          return datasetLabel + ': ' + value.toFixed(4);
-        }
-      }
-    }
-  }
-});
-
 const getSmithConfig = () => ({
   type: 'smith',
   data: { datasets: [] },
@@ -211,33 +173,6 @@ const getSmithConfig = () => ({
 
 const updateChart = async () => {
   if (!chart) return;
-
-  if (props.type === 'tdr') {
-    const s11 = store.traces.find(t => t.channel === 0 && t.show);
-    const chData = store.data.ch0;
-    if (!s11 || !chData || chData.length === 0) return;
-
-    try {
-        const worker = await getWorker();
-        // Convert to plain array for Worker postMessage (Vue Proxy cannot be cloned)
-        const plainData = chData.map(d => ({ freq: d.freq, real: d.real, imag: d.imag }));
-        const tdrResult = await worker.calcTDR(plainData);
-        
-        chart.data.labels = Array.from(tdrResult.time);
-        chart.data.datasets = [{
-            label: 'TDR Impulse',
-            data: Array.from(tdrResult.complex.filter((_, i) => i % 2 === 0)),
-            borderColor: s11.color,
-            borderWidth: 2,
-            pointRadius: 2,
-            fill: false
-        }];
-        chart.update();
-    } catch (e) {
-        console.error('TDR calc failed', e);
-    }
-    return;
-  }
 
   const traces = store.traces.filter(t => t.show && (props.type === 'smith' ? t.format === 'smith' : t.format !== 'smith'));
   

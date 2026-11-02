@@ -79,6 +79,18 @@ Newest first within each section. Record new decisions here as they are made.
 - The NanoVNA has a delay of its own (measured 0.2 to 2 ns with nothing attached, varying between runs and not yet
   understood): the view has a Zero button that subtracts the delay measured with nothing attached, per sweep.
 
+## TDR view (2026-11)
+- Replaces the chart.js TDR of the original client (time axis only, no distance, no marker, window/DC handling for an
+  unsuitable sweep). New `lib/tdr.js`; the sweep runs on a harmonic grid (start = step, stop = 101 start) so that it
+  is a proper low-pass spectrum; the response is evaluated directly from the 101 points (no FFT).
+- Range = v / (2 step), resolution about 1.5 v / (2 bandwidth) (Hamming window). Three sweeps: 3-303 MHz, 1-101 MHz, 0.3-30.3 MHz.
+- No step response and no impedance profile: they need the reflection at 0 Hz, which the NanoVNA cannot measure and which
+  cannot be estimated from the first point (its phase has turned by up to a circle). Impulse response only.
+- The response repeats every `range`; the NanoVNA's own delay puts the connector slightly before 0 m, so the last
+  4 resolutions of the range are shown as negative distances. The marker starts 2 resolutions after 0 m and needs a
+  size of at least 0.05.
+- The worker's `calcTDR` (wasm FFT) is no longer used by the UI.
+
 ## NanoVNA-H behaviour (verified on hardware)
 
 - `resume` restarts the sweep. `data 0` returns immediately with the previous sweep's values

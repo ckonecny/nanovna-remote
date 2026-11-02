@@ -3,6 +3,7 @@ import * as Comlink from 'comlink';
 import { NanoVNA_WebSerial, NanoVNA_WebUSB, NanoVNA_WebSocket } from './lib/nanovna';
 import { HAM_BANDS, bandSweep } from './lib/bands';
 import { CABLE_RANGES } from './lib/cable';
+import { TDR_RANGES } from './lib/tdr';
 import { appCal, applyCal, solveOSL, pullFromDevice, pushToDevice } from './lib/oslcal';
 
 // The bridge address: ?host=<name or ip> in the URL, or the host the page itself was served from (when it is the ESP32)
@@ -58,6 +59,8 @@ const defaultState = {
     multiBands: ['40 m', '20 m', '2 m'], // bands shown in the Multi view
     multiActive: false, // the Multi view is open: the update loop sweeps the selected bands one after another
     cableActive: false, // the Cable view is open: the update loop sweeps the cable range and keeps the raw readings
+    tdrActive: false, // the TDR view is open: like the Cable view it keeps the raw readings of its own sweep in `cable`
+    tdrPreset: 'short', // key of TDR_RANGES
     cablePreset: 'long', // key of CABLE_RANGES
     cableZero: {}, // preset -> delay (s) measured with nothing attached, subtracted from the cable delay
     cableLength: 10, // known length in m for the velocity factor measurement
@@ -98,6 +101,7 @@ function loadState() {
             if (Array.isArray(parsed.multiBands)) state.multiBands = parsed.multiBands;
             if (Array.isArray(parsed.hamExtras)) state.hamExtras = parsed.hamExtras;
             if (CABLE_RANGES[parsed.cablePreset]) state.cablePreset = parsed.cablePreset;
+            if (TDR_RANGES[parsed.tdrPreset]) state.tdrPreset = parsed.tdrPreset;
             if (parsed.cableLength > 0) state.cableLength = parsed.cableLength;
             if (parsed.cableZero && typeof parsed.cableZero === 'object') state.cableZero = parsed.cableZero;
             if (parsed.theme !== undefined) state.theme = parsed.theme;
@@ -141,6 +145,7 @@ watch(store, (newState) => {
         multiBands: newState.multiBands,
         hamExtras: newState.hamExtras,
         cablePreset: newState.cablePreset,
+        tdrPreset: newState.tdrPreset,
         cableLength: newState.cableLength,
         cableZero: newState.cableZero,
         theme: newState.theme,
@@ -501,13 +506,13 @@ export async function startUpdateLoop() {
             }
         };
 
-        // Cable view: the raw reflection of a cable with an open or shorted far end over one wide sweep
+        // Cable and TDR views: the raw reflection of a cable over one wide sweep (the view's own preset)
         let cableRange = null;
         const updateCable = async () => {
             store.updating = true;
             try {
                 const worker = workerProxy || await getWorker();
-                const r = CABLE_RANGES[store.cablePreset];
+                const r = store.tdrActive ? TDR_RANGES[store.tdrPreset] : CABLE_RANGES[store.cablePreset];
                 const key = r.start + '-' + r.stop;
                 if (cableRange !== key) {
                     await setRange(worker, r.start, r.stop);
@@ -517,7 +522,7 @@ export async function startUpdateLoop() {
                 } else {
                     await new Promise(res => setTimeout(res, SWEEP_MS));
                 }
-                if (!store.cableActive || store.calibrationRunning) return;
+                if (!(store.cableActive || store.tdrActive) || store.calibrationRunning) return;
                 const freqs = await worker.getFrequencies();
                 const data0 = await worker.getData(0);
                 store.cable = { points: data0.map((d, i) => ({ freq: freqs[i], real: d[0], imag: d[1] })), at: Date.now() };
@@ -530,7 +535,7 @@ export async function startUpdateLoop() {
 
         let wasMulti = false;
         while (store.status === 'connected') {
-            if (wasMulti && !store.multiActive && !store.cableActive && !store.calibrationRunning) {
+            if (wasMulti && !store.multiActive && !store.cableActive && !store.tdrActive && !store.calibrationRunning) {
                 // the other views expect the device on the range of the store
                 wasMulti = false;
                 cableRange = null;
@@ -544,10 +549,10 @@ export async function startUpdateLoop() {
                 wasMulti = true;
                 cableRange = null; // the Multi view moves the sweep
                 await updateMultiBands();
-            } else if (store.cableActive && store.autoUpdate && !store.updating && !store.calibrationRunning) {
+            } else if ((store.cableActive || store.tdrActive) && store.autoUpdate && !store.updating && !store.calibrationRunning) {
                 wasMulti = true;
                 await updateCable();
-            } else if (!store.multiActive && !store.cableActive && store.autoUpdate && !store.updating && !store.calibrationRunning) {
+            } else if (!store.multiActive && !store.cableActive && !store.tdrActive && store.autoUpdate && !store.updating && !store.calibrationRunning) {
                 const segments = +store.frequencies.segments;
                 if (segments === 1) {
                     await updateSingleSegment();
