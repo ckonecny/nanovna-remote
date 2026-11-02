@@ -3,6 +3,7 @@
 Finished items, moved here from `docs/STATUS.md` (newest first).
 
 ## 2026-11
+- Return loss and R/X charts in the HAM view (#4).
 - Multi-band view (#3): one card per selected band, bands swept in turn, per-band calibration applied.
 - Display UI and buttons (status screen, WiFi list, menu, rotate display); English GUI texts.
 - Multi-network WiFi with `/wifi` page (scan, add, enable/disable, delete, connect).

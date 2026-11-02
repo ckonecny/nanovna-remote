@@ -58,7 +58,7 @@ Passwords are never shown again.
 Open `http://<address on the display>/` and press **Connect**.
 
 - **Single** — one frequency: SWR, return loss, impedance (R + jX), plus a chart around the frequency.
-- **HAM** — sweep over an amateur band with the band buttons; the SWR curve and the minimum are shown.
+- **HAM** — sweep over an amateur band with the band buttons; the SWR curve and the minimum are shown. Under the chart, **Also show** adds a return loss chart (dB) and an R / X chart (resistance and reactance in Ω); both share the frequency axis and the cursor of the SWR chart. The choice is remembered.
 - **Multi** — tick any number of bands; each gets a card with its SWR curve, minimum SWR and the range where SWR ≤ 2. The bands are swept one after another (about one second each), so the refresh slows down with every band added. Every card says whether its band is "calibrated" (green) or "not calibrated" (red, uncorrected values), and a banner at the top summarises the selection. The calibration panel sits at the bottom of the Multi view as well. The selection is remembered.
 - Switch light/dark mode with the button in the header.
 - If no data arrives for a while the page shows a notice (check the cable, restart the NanoVNA).

@@ -22,7 +22,7 @@ Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
 
 ## Next steps
 Feature backlog (Stick Pro parity) is in GitHub issues: cable tools, TDR, multi-band view,
-RL/RX charts, .s1p export, accuracy check of the calibration (issues #1, #2, #4-#6).
+export buttons in HAM/Multi, accuracy check of the calibration (issues #1, #2, #6, #7).
 
 ## Hints for the next session
 - Logs: `http://<ip>/log`. The Feather's IP is on its display.

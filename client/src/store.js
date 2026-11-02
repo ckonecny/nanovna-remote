@@ -53,6 +53,7 @@ const defaultState = {
     calibrationRunning: false,
     appCalCovered: 1, // share of the displayed points that the app-side calibration covers
     hamBand: '2 m',
+    hamExtras: [], // additional charts under the SWR chart of the HAM view: 'rl', 'rx'
     multiBands: ['40 m', '20 m', '2 m'], // bands shown in the Multi view
     multiActive: false, // the Multi view is open: the update loop sweeps the selected bands one after another
     multi: {}, // band name -> { points, calibrated, at } from the latest sweep of that band
@@ -89,6 +90,7 @@ function loadState() {
 
             if (parsed.hamBand !== undefined) state.hamBand = parsed.hamBand;
             if (Array.isArray(parsed.multiBands)) state.multiBands = parsed.multiBands;
+            if (Array.isArray(parsed.hamExtras)) state.hamExtras = parsed.hamExtras;
             if (parsed.theme !== undefined) state.theme = parsed.theme;
             if (parsed.singleFreq !== undefined) state.singleFreq = parsed.singleFreq;
             if (parsed.velocityFactor !== undefined) state.velocityFactor = parsed.velocityFactor;
@@ -128,6 +130,7 @@ watch(store, (newState) => {
         singleFreq: newState.singleFreq,
         hamBand: newState.hamBand,
         multiBands: newState.multiBands,
+        hamExtras: newState.hamExtras,
         theme: newState.theme,
     }));
 }, { deep: true });

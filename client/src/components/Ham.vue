@@ -4,7 +4,7 @@ import { store } from '../store';
 import CalStatus from './CalStatus.vue';
 import CalPanel from './CalPanel.vue';
 import { HAM_BANDS } from '../lib/bands';
-import { calcSWR, calcZ, formatFrequency } from '../lib/dsp';
+import { calcSWR, calcZ, calcLogMag, formatFrequency } from '../lib/dsp';
 
 const emit = defineEmits(['select-band']);
 
@@ -35,7 +35,10 @@ const band = computed(() => HAM_BANDS.find(b => b.name === store.hamBand) || HAM
 
 const points = computed(() => {
     store.dataVersion; // recompute on every sweep
-    return store.data.ch0.map(p => ({ ...p, swr: calcSWR(p) }));
+    return store.data.ch0.map((p) => {
+        const [r, xr] = calcZ(p);
+        return { ...p, swr: calcSWR(p), rl: -calcLogMag(p), r, xr };
+    });
 });
 
 const fmin = computed(() => points.value.length ? points.value[0].freq : band.value.start);
@@ -80,6 +83,33 @@ const onChartClick = (event) => {
     cursorFreq.value = fmin.value + (px - L) / (W.value - L - R) * (fmax.value - fmin.value);
 };
 
+// additional charts under the SWR chart; each has its own y scale but shares the frequency axis
+const EXTRAS = [['rl', 'Return loss'], ['rx', 'R / X']];
+const toggleExtra = (id) => {
+    const i = store.hamExtras.indexOf(id);
+    if (i >= 0) store.hamExtras.splice(i, 1);
+    else store.hamExtras.push(id);
+};
+const EH = 160;
+const extraCharts = computed(() => store.hamExtras.map((id) => {
+    const pts = points.value;
+    const line = (key, scale) => pts.map((p, i) => (i ? 'L' : 'M') + x(p.freq).toFixed(1) + ' ' + scale(p[key]).toFixed(1)).join(' ');
+    if (id === 'rl') {
+        const RL_MAX = 30; // dB, 0 at the top so that a notch dips like in the SWR chart
+        const yy = (v) => T + Math.min(Math.max(v, 0), RL_MAX) / RL_MAX * (EH - T - B);
+        return { id, title: 'Return loss (dB)', ticks: [0, 10, 20, 30].map(v => ({ y: yy(v), label: String(v) })), zero: null, curves: [{ d: line('rl', yy), cls: 'curve' }] };
+    }
+    const reach = Math.max(0, ...pts.flatMap(p => [Math.abs(p.r), Math.abs(p.xr)]).filter(isFinite));
+    const m = [50, 100, 200, 500].find(v => reach <= v) || 500; // symmetric scale, values beyond it are clipped
+    const yy = (v) => T + (1 - (Math.min(Math.max(v, -m), m) + m) / (2 * m)) * (EH - T - B);
+    return {
+        id, title: 'R (blue) / X (orange) in Ω',
+        ticks: [-m, -m / 2, 0, m / 2, m].map(v => ({ y: yy(v), label: String(v) })),
+        zero: yy(0),
+        curves: [{ d: line('r', yy), cls: 'curve' }, { d: line('xr', yy), cls: 'curve-x' }],
+    };
+}));
+
 const fmt = (v) => (isFinite(v) ? v.toFixed(2) : '∞');
 const grid = [1, 1.5, 2, 3, 5];
 const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * (fmax.value - fmin.value)));
@@ -117,6 +147,24 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
       </div>
     </div>
 
+    <div class="extras">
+      <span class="label">Also show</span>
+      <button v-for="[id, name] in EXTRAS" :key="id" class="band" :class="{ active: store.hamExtras.includes(id) }" @click="toggleExtra(id)">{{ name }}</button>
+    </div>
+    <div v-for="c in extraCharts" :key="c.id" class="extra">
+      <div class="label">{{ c.title }}</div>
+      <svg :viewBox="`0 0 ${W} ${EH}`" :width="W" :height="EH" class="chart" @click="onChartClick">
+        <rect :x="x(band.start)" :y="T" :width="Math.max(0, x(band.stop) - x(band.start))" :height="EH - T - B" class="band-area" />
+        <g v-for="t in c.ticks" :key="t.label">
+          <line :x1="L" :x2="W - R" :y1="t.y" :y2="t.y" class="grid" />
+          <text :x="L - 6" :y="t.y + 4" class="axis" text-anchor="end">{{ t.label }}</text>
+        </g>
+        <line v-if="c.zero !== null" :x1="L" :x2="W - R" :y1="c.zero" :y2="c.zero" class="grid2" />
+        <path v-for="(cv, i) in c.curves" :key="i" :d="cv.d" :class="cv.cls" />
+        <line v-if="cursor" :x1="x(cursor.p.freq)" :x2="x(cursor.p.freq)" :y1="T" :y2="EH - B" class="cursor" />
+      </svg>
+    </div>
+
     <CalPanel />
   </div>
 </template>
@@ -133,6 +181,9 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
 .axis { font-size: 12px; fill: var(--text-dim); }
 .curve { fill: none; stroke: var(--curve); stroke-width: 2; }
 .min { fill: #f44336; }
+.curve-x { fill: none; stroke: #ff9800; stroke-width: 2; }
+.extras { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.extra { display: flex; flex-direction: column; gap: 4px; }
 .cursor { stroke: var(--text-dim); stroke-width: 1; stroke-dasharray: 3 3; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
 .tile { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 8px; background: var(--tile-bg); }
