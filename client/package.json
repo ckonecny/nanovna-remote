@@ -13,7 +13,7 @@
     "build:demo": "vite build --mode demo --outDir dist-demo"
   },
   "dependencies": {
-    "chart.js": "^2.9.4",
+    "chart.js": "^4.6.1",
     "chartjs-chart-smith": "^0.3.0",
     "comlink": "^4.4.2",
     "material-design-icons-iconfont": "^6.7.0",
