@@ -127,7 +127,6 @@ Newest first within each section. Record new decisions here as they are made.
 
 ## Licenses
 
-- `firmware/` GPL-3.0-or-later. Started as a port of akarpf/nanovna-tuner (copyright
-  Andreas Karpf); that code was removed from the project.
+- `firmware/` GPL-3.0-or-later.
 - `client/` GPL-2.0, upstream cho45/NanoVNA-WebClient.
 - `firmware/src/font5x7.h`: Adafruit GFX 5x7 font, BSD license (Adafruit Industries).

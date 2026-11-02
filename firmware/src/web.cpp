@@ -1,5 +1,5 @@
 // NanoVNA Remote web server: serves the browser client, bridges its WebSocket to the NanoVNA, WiFi setup, OTA
-// Copyright (C) 2026 Andreas Karpf, SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Christian Konecny, SPDX-License-Identifier: GPL-3.0-or-later
 #include "web.h"
 
 #include <cstdio>

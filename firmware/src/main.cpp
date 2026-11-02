@@ -1,5 +1,5 @@
 // NanoVNA Remote firmware for the ESP32-S3: WiFi, web server, NanoVNA USB bridge
-// Copyright (C) 2026 Andreas Karpf, SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Christian Konecny, SPDX-License-Identifier: GPL-3.0-or-later
 #include <cstring>
 
 #include "buttons.h"

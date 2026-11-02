@@ -1,5 +1,5 @@
 // USB host side of the NanoVNA bridge: keeps the NanoVNA's CDC-ACM port open and passes bytes through
-// Copyright (C) 2026 Andreas Karpf, SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Christian Konecny, SPDX-License-Identifier: GPL-3.0-or-later
 #include <memory>
 #include <mutex>
 #include "vna.h"

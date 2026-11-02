@@ -1,4 +1,4 @@
-// USB host side of the NanoVNA bridge - Copyright (C) 2026 Andreas Karpf, SPDX-License-Identifier: GPL-3.0-or-later
+// USB host side of the NanoVNA bridge - Copyright (C) 2026 Christian Konecny, SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include <cstddef>
 #include <cstdint>

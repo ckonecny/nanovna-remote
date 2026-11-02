@@ -1,4 +1,4 @@
-// WiFi networks stored in flash, edited through the setup page (/wifi) - Copyright (C) 2026 Andreas Karpf, SPDX-License-Identifier: GPL-3.0-or-later
+// WiFi networks stored in flash, edited through the setup page (/wifi) - Copyright (C) 2026 Christian Konecny, SPDX-License-Identifier: GPL-3.0-or-later
 #pragma once
 #include <string>
 #include <vector>

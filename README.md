@@ -35,7 +35,10 @@ Later firmware updates go over WiFi: `firmware/tools/ota.sh <feather-ip>`.
 
 ## Licenses
 
-- `firmware/` is GPL-3.0-or-later. It started as a port of [akarpf/nanovna-tuner](https://github.com/akarpf/nanovna-tuner)
-  (copyright Andreas Karpf); the original tuner code is no longer part of this project.
+- `firmware/` is GPL-3.0-or-later.
 - `client/` is GPL-2.0 (see `client/COPYING`, upstream cho45/NanoVNA-WebClient). It is built separately and only
   embedded into the firmware image as data, so both licenses stay apart.
+
+## Acknowledgements
+
+This project was motivated by [akarpf/nanovna-tuner](https://github.com/akarpf/nanovna-tuner).
