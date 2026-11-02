@@ -64,6 +64,12 @@ Newest first within each section. Record new decisions here as they are made.
 - Source of the display/button wiring and polarity: the user's morserino-32-nano project
   (Arduino/LovyanGFX there, ESP-IDF here, so only pins and logic are reused).
 
+## Multi-band view (2026-11)
+- Done in the client only: the update loop sweeps the selected bands one after another (`bandSweep` range,
+  `setRange`, `resume`, wait `SWEEP_MS`, read), because the NanoVNA-H has one sweep range at a time.
+- Each band is corrected with its own OSL calibration; a band without one is shown uncorrected and flagged.
+- Leaving the view restores the device to the range held in the store.
+
 ## NanoVNA-H behaviour (verified on hardware)
 
 - `resume` restarts the sweep. `data 0` returns immediately with the previous sweep's values

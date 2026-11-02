@@ -53,6 +53,9 @@ const defaultState = {
     calibrationRunning: false,
     appCalCovered: 1, // share of the displayed points that the app-side calibration covers
     hamBand: '2 m',
+    multiBands: ['40 m', '20 m', '2 m'], // bands shown in the Multi view
+    multiActive: false, // the Multi view is open: the update loop sweeps the selected bands one after another
+    multi: {}, // band name -> { points, calibrated, at } from the latest sweep of that band
     theme: 'auto', // 'auto' follows the system, 'light' / 'dark' are the user's choice
     themeEffective: 'light',
     lastDataAt: 0, // when the last measurement arrived
@@ -85,6 +88,7 @@ function loadState() {
             if (parsed.autoUpdate !== undefined) state.autoUpdate = parsed.autoUpdate;
 
             if (parsed.hamBand !== undefined) state.hamBand = parsed.hamBand;
+            if (Array.isArray(parsed.multiBands)) state.multiBands = parsed.multiBands;
             if (parsed.theme !== undefined) state.theme = parsed.theme;
             if (parsed.singleFreq !== undefined) state.singleFreq = parsed.singleFreq;
             if (parsed.velocityFactor !== undefined) state.velocityFactor = parsed.velocityFactor;
@@ -123,6 +127,7 @@ watch(store, (newState) => {
         wsHost: newState.wsHost,
         singleFreq: newState.singleFreq,
         hamBand: newState.hamBand,
+        multiBands: newState.multiBands,
         theme: newState.theme,
     }));
 }, { deep: true });
@@ -449,8 +454,53 @@ export async function startUpdateLoop() {
             }
         };
 
+        // Multi view: one sweep per selected band, each corrected with that band's calibration
+        const updateMultiBands = async () => {
+            store.updating = true;
+            try {
+                const worker = workerProxy || await getWorker();
+                if (appCal.enabled && !appCalDeviceOff) {
+                    await worker.doCal('off');
+                    appCalDeviceOff = true;
+                }
+                for (const name of [...store.multiBands]) {
+                    if (!store.multiActive || store.status !== 'connected' || store.calibrationRunning || !store.autoUpdate) break;
+                    const band = HAM_BANDS.find(b => b.name === name);
+                    if (!band) continue;
+                    const { start, stop } = bandSweep(band);
+                    await setRange(worker, start, stop);
+                    await worker.resume();
+                    await new Promise(r => setTimeout(r, SWEEP_MS)); // `data` does not wait for the sweep to finish
+                    if (!store.multiActive || store.calibrationRunning) break;
+                    const freqs = await worker.getFrequencies();
+                    const data0 = await worker.getData(0);
+                    let points = data0.map((d, i) => ({ freq: freqs[i], real: d[0], imag: d[1] }));
+                    const cal = appCal.enabled ? appCal.bands[name] : null;
+                    if (cal) points = applyCal(points, { [name]: cal }).points;
+                    store.multi[name] = { points, calibrated: !!cal, at: Date.now() };
+                    store.lastDataAt = Date.now();
+                    store.dataVersion++;
+                }
+            } finally {
+                store.updating = false;
+            }
+        };
+
+        let wasMulti = false;
         while (store.status === 'connected') {
-            if (store.autoUpdate && !store.updating && !store.calibrationRunning) {
+            if (wasMulti && !store.multiActive && !store.calibrationRunning) {
+                // the other views expect the device on the range of the store
+                wasMulti = false;
+                try {
+                    await setRange(worker, +store.frequencies.start, +store.frequencies.stop);
+                } catch (e) { /* the range is re-applied on the next change anyway */ }
+                rangeEpoch++;
+                sweepStale = true;
+            }
+            if (store.multiActive && store.autoUpdate && !store.updating && !store.calibrationRunning) {
+                wasMulti = true;
+                await updateMultiBands();
+            } else if (!store.multiActive && store.autoUpdate && !store.updating && !store.calibrationRunning) {
                 const segments = +store.frequencies.segments;
                 if (segments === 1) {
                     await updateSingleSegment();

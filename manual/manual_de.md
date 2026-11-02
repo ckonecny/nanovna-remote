@@ -61,6 +61,7 @@ Später wechselst du das Netz mit den Tasten (Abschnitt 3) oder auf der Seite `/
 
 - **Single** — eine Frequenz: SWR, Rückflussdämpfung, Impedanz (R + jX) und ein Diagramm um die Frequenz.
 - **HAM** — Sweep über ein Amateurfunkband mit den Bandtasten; SWR-Kurve und Minimum werden angezeigt.
+- **Multi** — beliebig viele Bänder antippen; jedes bekommt eine Karte mit SWR-Kurve, minimalem SWR und dem Bereich mit SWR ≤ 2. Die Bänder werden nacheinander gemessen (etwa eine Sekunde pro Band), die Aktualisierung wird also mit jedem Band langsamer. Eine Karte mit „not calibrated" zeigt unkorrigierte Werte. Die Auswahl wird gemerkt.
 - Hell/Dunkel schaltest du mit der Taste in der Kopfzeile um.
 - Kommen längere Zeit keine Daten, zeigt die Seite einen Hinweis (Kabel prüfen, NanoVNA neu starten).
 
