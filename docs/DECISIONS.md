@@ -20,6 +20,16 @@ Newest first within each section. Record new decisions here as they are made.
   localStorage and pushed to `/api/appcal` (SPIFFS `/spiffs/appcal.json`, max 400 KB); the
   device copy wins on connect, so any browser sees the same calibration.
   Rationale: the NanoVNA's own 5-slot calibration cannot cover all bands at full accuracy.
+- **Calibration check with the kit standards only (2026-11, issue #6 stays open).** After
+  the 14-band calibration the same open, short and load were measured again in Multi, all
+  bands. Load: min SWR 1.00 (160/80 m), 1.01 (60-12 m), 1.02 (10/6 m), 1.03 (4 m), 1.04 (2 m),
+  1.07 (70 cm), i.e. |G| <= 0.034 (return loss >= 29 dB) at 70 cm. Open: SWR > 99 (|G| >= 0.98)
+  on 160-40 m, "infinite" from 30 m up. Short: "infinite" in all bands. This only shows that
+  the calibration reproduces its own standards (repeatability, residual directivity); it says
+  nothing about a real mismatch because the standards are assumed ideal. The SWR display
+  rounds to two decimals and caps at 99, so open/short deviations below about 1 % are not
+  visible. A real accuracy figure needs an independent known mismatch (25/100 ohm resistor
+  or a 75 ohm load).
 - **Partitions**: nvs, otadata, phy_init, ota_0/ota_1 (0x180000 each), storage (SPIFFS,
   0xE0000). Firmware is about 1.3 MB (85 % of a slot) after the display UI.
 

@@ -24,7 +24,7 @@ Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
 - The old Feather (still on the pre-display firmware): update over WiFi.
 
 ## Next steps
-Feature backlog (Stick Pro parity) is in GitHub issues: single-stub matching, accuracy check of the calibration (issues #6, #8).
+Feature backlog (Stick Pro parity) is in GitHub issues: accuracy check of the calibration against an independent mismatch (#6; kit-only check done, see DECISIONS), single-stub matching (#8).
 
 ## Hints for the next session
 - Logs: `http://<ip>/log`. The Feather's IP is on its display.
