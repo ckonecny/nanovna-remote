@@ -8,6 +8,7 @@ import ScaleDialog from './components/ScaleDialog.vue';
 import CalibrationDialog from './components/CalibrationDialog.vue';
 import AboutDialog from './components/AboutDialog.vue';
 import MarkerDialog from './components/MarkerDialog.vue';
+import MarkerReadout from './components/MarkerReadout.vue';
 import CaptureDialog from './components/CaptureDialog.vue';
 import Single from './components/Single.vue';
 import Ham from './components/Ham.vue';
@@ -595,6 +596,7 @@ const quit = () => {
           <Tdr v-else-if="graphSelected === 'tdr'" />
           <Graph v-else :type="graphSelected" />
         </div>
+        <MarkerReadout v-if="graphSelected === 'smith' || graphSelected === 'frequency'" />
       </div>
     </main>
 
@@ -724,6 +726,7 @@ const quit = () => {
 
 .graph-wrapper {
   flex: 1;
+  min-height: 320px;
   position: relative;
   background: var(--surface-color);
 }
@@ -805,7 +808,7 @@ const quit = () => {
   .graph-area.has-inputs {
     display: grid;
     grid-template-columns: minmax(240px, 36%) 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto 1fr auto;
     column-gap: 8px;
     flex: 1;
   }

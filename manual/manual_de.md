@@ -212,6 +212,12 @@ Der Menüknopf öffnet es. Einträge, die eine Verbindung brauchen, sind bis zum
 **Graph**
 - **Setup Markers**: listet die Marker; das Häkchen blendet einen ein oder aus, der Papierkorb löscht ihn, **Add Marker** fragt
   nach einer Frequenz. Marker erscheinen als Beschriftungen in den Diagrammen **Smith** und **Freq**.
+- **Marker-Auswertung**: Unter den Diagrammen **Smith** und **Freq** hat jeder sichtbare Marker eine Spalte mit Impedanz
+  (R ± jX), SWR, Rückflussdämpfung, Phase, Q (|X| / R), Serien-Ersatzschaltung (R mit L oder C) und Parallel-Ersatzschaltung
+  (R parallel zu L oder C), genommen vom nächstgelegenen Messpunkt der ersten sichtbaren Kurve. Tippe auf einen Spaltenkopf, um
+  diesen Marker zum aktiven zu machen. **Delta** zeigt alle anderen Marker relativ zum aktiven (Differenzen statt Werte). **Min**
+  und **Max** setzen den aktiven Marker auf das Minimum oder Maximum der ersten sichtbaren Kurve. **→ Start**, **→ Stop** und
+  **→ Center** setzen den Sweep-Bereich vom aktiven Marker; **→ Span** sweept vom niedrigsten bis zum höchsten sichtbaren Marker.
 - **Setup Scales**: Minimum und Maximum der senkrechten Achsen für LogMag (dB), SWR, Phase (°) und Linear.
 - **Add Trace**: siehe 5.8.
 - **Resolution...**: die Anzahl der Segmente mit je 101 Punkten pro Sweep. 1 bedeutet 101 Punkte; mehr Segmente geben einen

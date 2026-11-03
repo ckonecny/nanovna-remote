@@ -204,6 +204,12 @@ The menu button opens it. Entries that need a connection are greyed out until yo
 **Graph**
 - **Setup Markers**: lists the markers; the tick shows or hides one, the bin deletes it, **Add Marker** asks for a frequency.
   Markers appear as labels in the **Smith** and **Freq** charts.
+- **Marker readout**: under the **Smith** and **Freq** charts, each shown marker has a column with the impedance (R ± jX), SWR,
+  return loss, phase, Q (|X| / R), the series equivalent (R with L or C) and the parallel equivalent (R in parallel with L or
+  C), taken from the nearest measured point of the first visible trace. Tap a column head to make that marker the active one.
+  **Delta** shows every other marker relative to the active one (differences instead of values). **Min** and **Max** move the
+  active marker to the minimum or maximum of the first visible trace. **→ Start**, **→ Stop** and **→ Center** set the sweep
+  range from the active marker; **→ Span** sweeps from the lowest to the highest shown marker.
 - **Setup Scales**: minimum and maximum of the vertical axes for LogMag (dB), SWR, Phase (°) and Linear.
 - **Add Trace**: see 5.8.
 - **Resolution...**: the number of 101-point segments per sweep. 1 means 101 points; more segments give a finer sweep but take

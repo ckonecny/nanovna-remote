@@ -238,3 +238,10 @@ installer page on https cannot call a http device (mixed content); the installer
 - Sweep time measured on the NanoVNA-H (`scan` with data, 101 points): 0.23 s at 1000 Hz, 0.44 s at 333 Hz, 1.15 s at 100 Hz,
   3.5 s at 30 Hz, 10.2 s at 10 Hz, i.e. about 0.15 s + 101 / bandwidth. The client reads the bandwidth on connect (and when the
   dialog changes it) and lengthens the `SWEEP_MS` waits by 101 / bandwidth - 0.1 s (`sweepMs()` in `store.js`).
+
+## Marker readout (2026-11)
+- The readout (`MarkerReadout.vue`, maths in `lib/marker.js`) is computed in the client from the corrected sweep, like all other
+  values; it does not use the device's `marker` command. A marker shows the nearest measured point, not an interpolation.
+- Q = |X| / R. Series equivalent: R with L (X > 0) or C (X < 0). Parallel equivalent from the admittance: Rp = 1 / G, with L or C
+  from the susceptance. Delta compares against the active marker; infinite values give no delta.
+- Min / Max act on the first visible trace (Smith, SWR and Linear order like |Gamma|). Applies to Smith and Freq only.

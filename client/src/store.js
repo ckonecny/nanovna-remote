@@ -42,6 +42,8 @@ const defaultState = {
         { id: 0, show: true, freq: 1e6, data: [] }
     ],
     activeMarker: 0,
+    activeMarkerId: 0, // marker that the search and the range buttons act on, and the delta reference
+    markerDelta: false,
     updating: false,
     requestStop: false, // Added for Stop button
     progress: { value: 0, total: 0 },
@@ -102,6 +104,8 @@ function loadState() {
             const parsed = JSON.parse(saved);
             // Merge primitives
             if (parsed.activeMarker !== undefined) state.activeMarker = parsed.activeMarker;
+            if (parsed.activeMarkerId !== undefined) state.activeMarkerId = parsed.activeMarkerId;
+            if (typeof parsed.markerDelta === 'boolean') state.markerDelta = parsed.markerDelta;
             if (parsed.autoUpdate !== undefined) state.autoUpdate = parsed.autoUpdate;
 
             if (parsed.hamBand !== undefined) state.hamBand = parsed.hamBand;
@@ -147,6 +151,8 @@ watch(store, (newState) => {
         traces: newState.traces.map(t => ({ ...t, data: [] })),
         markers: newState.markers.map(m => ({ ...m, data: [] })),
         activeMarker: newState.activeMarker,
+        activeMarkerId: newState.activeMarkerId,
+        markerDelta: newState.markerDelta,
         scales: newState.scales,
         velocityFactor: newState.velocityFactor,
         portExtLength: newState.portExtLength,
