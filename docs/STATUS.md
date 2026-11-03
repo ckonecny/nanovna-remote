@@ -23,8 +23,7 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
-- Feature backlog in GitHub issues (#6, #8-#24, #26-#29). #27 (firmware update from the web app) is partly done by the
-  device's `/update` page; decide whether to close it. #29: screenshots in the manual (the user has not decided).
+- Feature backlog in GitHub issues (#6, #8-#24, #26, #28, #29). #27 is closed (device page `/update`). #29: screenshots in the manual (the user has not decided).
 - OSV ignore list (`client/osv-scanner.toml`, 3 build-tool findings in vite-plugin-pwa/workbox-build) expires 2027-02-02:
   check for a workbox-build update before then and drop the entries.
 - Optional: `dev-tools/screenshots/shots.mjs` could use the JS simulator (`client/src/lib/demo.js`) instead of
