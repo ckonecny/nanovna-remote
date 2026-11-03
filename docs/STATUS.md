@@ -17,6 +17,7 @@ This file holds only the current state and hints for the next session.
 ## Open checks
 - Port extension (#44, S11 only), firmware note (#52) and sweep quality dialog (#45): flashed; the first two looked at by the user.
 - Marker readout (#46: delta, search, range from markers, Q, series/parallel): flashed and tried on the device.
+- Trace formats (#47: Rp, Xp, Q, group delay, Y Smith, Polar): built and flashed; not yet tried on the device.
 - #16 touch operation, #18 light scheme and the HAM cursor (Manual/Min/Max, RL and R/X readouts at the cursor): flashed on the
   user's Feather via OTA and tried there (works). Not yet checked: light scheme outdoors in sunlight, iPhone Safari.
 - iPhone: does it open the setup page by itself after joining the setup WiFi (DHCP option 114)? The second QR code is the fallback.
@@ -27,7 +28,7 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
-- Feature backlog in GitHub issues (#6, #8-#15, #17, #19-#24, #26, #28, #29, #44-#51; #16 and #18 are closed by the touch/theme commit). #27 is closed (device page `/update`). #29: screenshots in the manual (the user has not decided).
+- Feature backlog in GitHub issues (#6, #8-#15, #17, #19-#24, #26, #28, #29, #44, #45, #47-#51 (#46, #47 done); #16 and #18 are closed by the touch/theme commit). #27 is closed (device page `/update`). #29: screenshots in the manual (the user has not decided).
 - OSV ignore list (`client/osv-scanner.toml`, 3 build-tool findings in vite-plugin-pwa/workbox-build) expires 2027-02-02:
   check for a workbox-build update before then and drop the entries.
 - Optional: `dev-tools/screenshots/shots.mjs` could use the JS simulator (`client/src/lib/demo.js`) instead of

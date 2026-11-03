@@ -83,3 +83,45 @@ describe('DSP utilities', () => {
         expect(dsp.formatImag(1)).toBe('1.0000');
     });
 });
+
+describe('more trace formats', () => {
+    // Γ of Z = 50 + j50: (z - 50) / (z + 50)
+    const g = { freq: 1e6, real: 0.2, imag: 0.4 };
+
+    it('series and parallel values, Q', () => {
+        const [r, x] = dsp.calcZ(g);
+        expect(r).toBeCloseTo(50);
+        expect(x).toBeCloseTo(50);
+        expect(dsp.calcQ(g)).toBeCloseTo(1);
+        expect(dsp.calcRp(g)).toBeCloseTo(100);
+        expect(dsp.calcXp(g)).toBeCloseTo(100);
+    });
+
+    it('admittance Smith mirrors Γ: y = 1 / z', () => {
+        const z = dsp.calcZr(g);
+        const y = dsp.calcYr(g);
+        const d = z.real ** 2 + z.imag ** 2;
+        expect(y.real).toBeCloseTo(z.real / d);
+        expect(y.imag).toBeCloseTo(-z.imag / d);
+    });
+
+    it('group delay of a pure delay is constant, also across phase wraps', () => {
+        const tau = 5e-9;
+        const pts = [];
+        for (let k = 0; k < 40; k++) {
+            const freq = 100e6 + k * 20e6;
+            const a = -2 * Math.PI * freq * tau;
+            pts.push({ freq, real: Math.cos(a), imag: Math.sin(a) });
+        }
+        const gd = dsp.calcGroupDelay(pts);
+        gd.forEach(v => expect(v).toBeCloseTo(5, 3));
+        expect(dsp.traceValues(pts, 'gd')).toEqual(gd);
+    });
+
+    it('traceValues gives one value per point; formatting', () => {
+        expect(dsp.traceValues([g, g], 'Q').length).toBe(2);
+        expect(dsp.formatTraceValue('gd', 5)).toBe('5.00 ns');
+        expect(dsp.formatTraceValue('R', 50)).toBe('50.000 Ω');
+        expect(dsp.formatTraceValue('Q', 120)).toBe('120.0');
+    });
+});

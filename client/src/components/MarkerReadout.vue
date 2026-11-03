@@ -23,13 +23,14 @@ const sgn = (v, digits, unit = '') => (v === null ? '-' : (v >= 0 ? '+' : '') + 
 const reactive = (r) => (r.ls !== null ? eng(r.ls, 'H') : r.cs !== null ? eng(r.cs, 'F') : '-');
 const parallel = (r) => eng(r.rp, 'Ω') + ' ‖ ' + (r.lp !== null ? eng(r.lp, 'H') : r.cp !== null ? eng(r.cp, 'F') : '-');
 
-const valueOf = (t) => (p) => {
-  if (!t) return NaN;
-  if (t.format === 'logmag') return dsp.calcLogMag(p);
-  if (t.format === 'phase') return dsp.calcPhase(p);
-  if (t.format === 'real') return dsp.calcReal(p);
-  if (t.format === 'imag') return dsp.calcImag(p);
-  return dsp.calcLinear(p); // smith, swr, linear: ordered like |Γ|
+// value of the trace at a point; smith, ysmith and polar are ordered like |Γ|
+const valueOf = (t) => {
+  if (!t) return () => NaN;
+  const format = dsp.SMITH_FORMATS.includes(t.format) ? 'linear' : t.format;
+  const values = new Map();
+  const pts = points.value;
+  dsp.traceValues(pts, format).forEach((v, i) => values.set(pts[i], v));
+  return (p) => values.get(p);
 };
 
 const active = () => store.markers.find((m) => m.id === store.activeMarkerId) || shown.value[0];
@@ -60,6 +61,7 @@ const setRange = (what) => {
       <button class="btn mr-btn" @click="find('min')" title="Move the active marker to the minimum of the first trace">Min</button>
       <button class="btn mr-btn" @click="find('max')" title="Move the active marker to the maximum of the first trace">Max</button>
       <span class="mr-sep"></span>
+      <span class="mr-cap">Sweep range from marker:</span>
       <button class="btn mr-btn" @click="setRange('start')">→ Start</button>
       <button class="btn mr-btn" @click="setRange('stop')">→ Stop</button>
       <button class="btn mr-btn" @click="setRange('center')">→ Center</button>
@@ -92,6 +94,7 @@ const setRange = (what) => {
 .mr-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 2px 0 4px; }
 .mr-delta { display: flex; align-items: center; gap: 4px; }
 .mr-sep { flex: 1; }
+.mr-cap { color: var(--text-dim); }
 .mr-btn { padding: 2px 8px; min-height: 0; font-size: 12px; }
 table { border-collapse: collapse; width: 100%; font-family: monospace; }
 th, td { text-align: right; padding: 1px 6px; white-space: nowrap; }
@@ -99,6 +102,6 @@ td:first-child, th:first-child { text-align: left; color: var(--text-dim); }
 th { cursor: pointer; }
 th.act { color: var(--primary); }
 @media (orientation: landscape) and (max-height: 500px) {
-  .marker-readout { grid-column: 2; max-height: 45vh; overflow-y: auto; }
+  .marker-readout { grid-column: 1; grid-row: 3; align-self: start; min-width: 0; }
 }
 </style>

@@ -185,7 +185,11 @@ A trace is one curve in the **Freq** or **Smith** view. In the settings you choo
 
 - **Show**: show or hide the curve.
 - **Channel**: CH0 Reflect (the reflection at the measurement port) or CH1 Through (the transmission between the two ports).
-- **Trace Format**: Smith Chart, LogMag, Phase, SWR, Linear, Real, Imag, R, X or |Z|.
+- **Trace Format**: Smith Chart (Z), Smith Chart (Y), Polar (Γ), LogMag, Phase, SWR, Linear, Real, Imag, R, X, |Z|, Rp, Xp, Q or
+  Group delay. The Smith, Y Smith and Polar formats are drawn in the **Smith** view, all others in **Freq**. The Y Smith chart
+  reads admittance on the usual grid; Polar plots the reflection coefficient on a plain Γ plane (−1 to 1). Rp and Xp are the
+  parallel resistance and reactance, Q is |X| / R, group delay is −dφ/dω in ns (taken from the phase between neighbouring
+  points, so use enough points). R, X, |Z|, Rp, Xp, Q and Group delay share an automatic axis on the right.
 - **Trace Type**: Clear (live), Freeze (hold the current curve), Max Hold, Min Hold, Video Average or Power Average (with the
   **Average Count**).
 - **Change Color** and the bin symbol to delete the trace.

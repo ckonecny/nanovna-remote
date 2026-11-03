@@ -192,7 +192,11 @@ Ein Trace ist eine Kurve in der Ansicht **Freq** oder **Smith**. In den Einstell
 
 - **Show**: Kurve ein- oder ausblenden.
 - **Channel**: CH0 Reflect (die Reflexion am Messanschluss) oder CH1 Through (die Übertragung zwischen den beiden Anschlüssen).
-- **Trace Format**: Smith Chart, LogMag, Phase, SWR, Linear, Real, Imag, R, X oder |Z|.
+- **Trace Format**: Smith Chart (Z), Smith Chart (Y), Polar (Γ), LogMag, Phase, SWR, Linear, Real, Imag, R, X, |Z|, Rp, Xp, Q oder
+  Group delay. Smith, Y Smith und Polar werden in der Ansicht **Smith** gezeichnet, alle anderen in **Freq**. Das Y-Smith-Diagramm
+  zeigt die Admittanz im üblichen Gitter; Polar zeigt den Reflexionsfaktor in einer einfachen Γ-Ebene (−1 bis 1). Rp und Xp sind
+  der Parallelwiderstand und die Parallelreaktanz, Q ist |X| / R, die Gruppenlaufzeit ist −dφ/dω in ns (aus der Phase zwischen
+  benachbarten Punkten, also genug Punkte wählen). R, X, |Z|, Rp, Xp, Q und Group delay teilen sich eine automatische Achse rechts.
 - **Trace Type**: Clear (live), Freeze (aktuelle Kurve festhalten), Max Hold, Min Hold, Video Average oder Power Average (mit dem
   **Average Count**).
 - **Change Color** und das Papierkorb-Symbol, um den Trace zu löschen.

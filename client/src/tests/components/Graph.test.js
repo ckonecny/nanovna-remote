@@ -69,7 +69,8 @@ vi.mock('../../store', async () => {
 });
 
 // Mock dsp
-vi.mock('../../lib/dsp', () => ({
+vi.mock('../../lib/dsp', async (importOriginal) => ({
+    ...(await importOriginal()),
     formatFrequency: (val) => val + ' Hz',
     calcLogMag: () => -20,
     calcSWR: () => 1.5,

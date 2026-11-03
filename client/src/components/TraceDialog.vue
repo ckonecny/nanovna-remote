@@ -11,7 +11,9 @@ const emit = defineEmits(['close', 'update', 'save', 'delete']);
 const localTrace = ref({ ...props.trace });
 
 const formats = [
-  { value: 'smith', label: 'Smith Chart' },
+  { value: 'smith', label: 'Smith Chart (Z)' },
+  { value: 'ysmith', label: 'Smith Chart (Y)' },
+  { value: 'polar', label: 'Polar (Γ)' },
   { value: 'logmag', label: 'LogMag' },
   { value: 'phase', label: 'Phase' },
   { value: 'swr', label: 'SWR' },
@@ -20,7 +22,11 @@ const formats = [
   { value: 'imag', label: 'Image' },
   { value: 'R', label: 'R (Resistance)' },
   { value: 'X', label: 'X (Reactance)' },
-  { value: 'Z', label: '|Z| (Impedance)' }
+  { value: 'Z', label: '|Z| (Impedance)' },
+  { value: 'Rp', label: 'Rp (Parallel resistance)' },
+  { value: 'Xp', label: 'Xp (Parallel reactance)' },
+  { value: 'Q', label: 'Q (Quality factor)' },
+  { value: 'gd', label: 'Group delay' }
 ];
 
 const traceTypes = [

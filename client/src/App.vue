@@ -180,6 +180,8 @@ const formatFrequency = (freq) => {
 const nameOfFormat = (format) => {
   const formats = {
     smith: 'Smith',
+    ysmith: 'Y Smith',
+    polar: 'Polar',
     logmag: 'LogMag',
     phase: 'Phase',
     swr: 'SWR',
@@ -188,7 +190,11 @@ const nameOfFormat = (format) => {
     imag: 'Imag',
     R: 'R',
     X: 'X',
-    Z: '|Z|'
+    Z: '|Z|',
+    Rp: 'Rp',
+    Xp: 'Xp',
+    Q: 'Q',
+    gd: 'Delay'
   };
   return formats[format] || format;
 };
@@ -727,6 +733,8 @@ const quit = () => {
 .graph-wrapper {
   flex: 1;
   min-height: 320px;
+  min-width: 0; /* the canvas keeps its old pixel width after a turn; it must not hold the box open */
+  overflow: hidden;
   position: relative;
   background: var(--surface-color);
 }
@@ -807,8 +815,8 @@ const quit = () => {
 
   .graph-area.has-inputs {
     display: grid;
-    grid-template-columns: minmax(240px, 36%) 1fr;
-    grid-template-rows: auto 1fr auto;
+    grid-template-columns: minmax(240px, 36%) minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
     column-gap: 8px;
     flex: 1;
   }
@@ -818,12 +826,20 @@ const quit = () => {
   }
 
   .graph-area.has-inputs > .input-panel {
+    grid-column: 1;
+    grid-row: 2;
     margin: 4px 0;
-    overflow-y: auto;
+    overflow: visible;
+    min-height: min-content;
   }
 
+  /* the chart spans the inputs and the readout column; min-width 0 lets it follow the window when the phone is turned */
   .graph-area.has-inputs > .graph-wrapper {
-    min-height: 0;
+    grid-column: 2;
+    grid-row: 2 / span 2;
+    min-height: 70vh;
+    min-width: 0;
+    overflow: hidden;
   }
 }
 </style>
