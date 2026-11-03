@@ -58,6 +58,9 @@ Die Anzeige am Gerät und die Webseiten sind englisch.
    Der Feather verbindet sich mit dem Netz, das Display zeigt die neue Adresse, das Handy kehrt in dein normales
    WLAN zurück. Öffne die Adresse vom Display.
 
+**Android 17:** Kann Chrome die Adresse nicht öffnen (`ERR_TOO_MANY_RETRIES`), ein anderer Browser aber schon, erlaube Chrome einmal
+das lokale Netz: **Einstellungen → Apps → Chrome → Berechtigungen → Geräte in der Nähe → Zulassen** (geprüft an einem Pixel 9a).
+
 Du kannst bis zu **8 Netze** speichern, zum Beispiel Heim-WLAN und einen Handy-Hotspot. Beim Start probiert der
 Feather die gespeicherten Netze in Reichweite, das zuletzt benutzte zuerst. Klappt keins, öffnet er wieder das
 Setup-WLAN (und sucht dort jede Minute erneut nach den gespeicherten Netzen, solange niemand damit verbunden ist).

@@ -32,9 +32,7 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
-- Chrome on the user's Android 17 phone: `ERR_TOO_MANY_RETRIES` for the whole local network until Chrome gets "Nearby devices"
-  (DECISIONS); the user still has to allow it and confirm. The Feather photo on the feature page shows the old button order.
-- Status screen: the button hints follow the physical button order (D1 above D2, reversed when the display is turned), USB line above them; flashed, checked by the user.
+- The Feather photo on the feature page shows the old button order (new photo needed).
 - Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
   "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first
   trace and its title names it ("Max CH0 swr · 250.2 MHz"). Not looked at on the iPhone.

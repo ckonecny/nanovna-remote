@@ -327,6 +327,6 @@ installer page on https cannot call a http device (mixed content); the installer
 - Chrome (156) on an Android 17 phone failed with `ERR_TOO_MANY_RETRIES` for every address in the home network (the Feather, the
   router, a test server on the computer), while Firefox worked. Cause: Android 17 has the runtime permission
   `ACCESS_LOCAL_NETWORK` (shown as "Nearby devices"); Chrome had it only compat-revoked, Firefox had it set by the user. Not a
-  firmware problem: the Feather answers Chrome-like requests correctly. Fix is on the phone (manual, troubleshooting table).
+  firmware problem: the Feather answers Chrome-like requests correctly. Fix is on the phone (manual, section 4 and troubleshooting table); confirmed: after allowing "Nearby devices" Chrome loads the Feather.
 - `dev-tools/simulator.py` now answers `scan_bin` (binary record format of the NanoVNA-H firmware), because the app reads
   Multi, Cable, TDR and the app-side calibration with it; `shots.mjs` follows the guided calibration.

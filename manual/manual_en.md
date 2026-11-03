@@ -54,6 +54,9 @@ Restart, About (the firmware version, for example `v1.1.0`), Back.
    **Connect**. The Feather joins that network and the display shows the new address; the phone returns to
    your normal WiFi. Open the address shown on the display.
 
+**Android 17:** if Chrome cannot open the address (`ERR_TOO_MANY_RETRIES`) while another browser can, allow Chrome the
+local network once: **Settings → Apps → Chrome → Permissions → Nearby devices → Allow** (checked on a Pixel 9a).
+
 You can save up to **8 networks**, for example your home WiFi and a phone hotspot. On start the Feather
 tries the saved networks that are in range, the one used last first. If none works it opens the setup WiFi
 again (and looks for the saved networks again every minute while nobody is connected to it).
