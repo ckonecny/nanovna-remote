@@ -1,8 +1,8 @@
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, onUnmounted, watch } from 'vue';
 import { store } from '../store';
 import * as dsp from '../lib/dsp';
-import { nearestIndex, readout, delta, search, eng } from '../lib/marker';
+import { nearestIndex, readout, delta, eng, follow, retrack, release } from '../lib/marker';
 
 const props = defineProps({ view: { type: String, default: 'frequency' } }); // 'smith' or 'frequency'
 
@@ -41,19 +41,13 @@ const active = () => store.markers.find((m) => m.id === store.activeMarkerId) ||
 const find = (kind) => {
   const m = active();
   if (!m) return;
-  if (m.track === kind) { m.track = null; return; }
-  const fr = search(points.value, valueOf(trace.value), kind);
-  if (fr !== null) { m.freq = fr; m.track = kind; store.activeMarkerId = m.id; }
+  if (follow(m, kind, points.value, valueOf(trace.value))) store.activeMarkerId = m.id;
 };
 const following = computed(() => (active() ? active().track : null));
-const retrack = () => {
-  for (const m of store.markers) {
-    if (!m.track) continue;
-    const fr = search(points.value, valueOf(trace.value), m.track);
-    if (fr !== null && fr !== m.freq) m.freq = fr;
-  }
-};
-watch(() => [store.dataVersion, trace.value && trace.value.format, trace.value && trace.value.channel], retrack);
+watch(() => [store.dataVersion, trace.value && trace.value.format, trace.value && trace.value.channel], () => retrack(store.markers, points.value, valueOf(trace.value)));
+// the trace that a marker follows belongs to this view: another view (or none) must not move it, nor label it
+watch(() => props.view, () => release(store.markers));
+onUnmounted(() => release(store.markers));
 
 // frequency range from the markers: start/stop from the lowest and highest shown marker, centre from the active one
 const setRange = (what) => {

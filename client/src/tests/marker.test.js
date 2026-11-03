@@ -49,3 +49,31 @@ describe('marker readout', () => {
         expect(eng(Infinity, 'Ω')).toBe('∞ Ω');
     });
 });
+
+describe('markers that follow an extremum', () => {
+    const pts = [{ freq: 1, v: 5 }, { freq: 2, v: 1 }, { freq: 3, v: 9 }];
+    const value = (p) => p.v;
+    it('follow moves the marker and a second tap releases it', async () => {
+        const { follow } = await import('../lib/marker');
+        const m = { freq: 1, track: null };
+        expect(follow(m, 'min', pts, value)).toBe(true);
+        expect(m).toMatchObject({ freq: 2, track: 'min' });
+        expect(follow(m, 'min', pts, value)).toBe(false);
+        expect(m).toMatchObject({ freq: 2, track: null });
+        expect(follow(m, 'max', pts, value)).toBe(true);
+        expect(m).toMatchObject({ freq: 3, track: 'max' });
+    });
+    it('retrack follows a new sweep, leaves other markers alone and release lets go', async () => {
+        const { follow, retrack, release } = await import('../lib/marker');
+        const a = { freq: 1, track: null }, b = { freq: 1, track: null };
+        follow(a, 'max', pts, value);
+        const next = [{ freq: 1, v: 20 }, { freq: 2, v: 1 }, { freq: 3, v: 9 }];
+        retrack([a, b], next, value);
+        expect(a.freq).toBe(1);
+        expect(b.freq).toBe(1);
+        release([a, b]);
+        expect(a.track).toBeNull();
+        retrack([a], pts, value);
+        expect(a.freq).toBe(1);
+    });
+});

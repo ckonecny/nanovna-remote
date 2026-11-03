@@ -40,31 +40,6 @@ Chart.pluginService.register({
           }, chart));
         }
       }
-
-      // a marker is a larger diamond with a ring in the text colour, so that it shows on the curve in every theme
-      const marked = new Set(indexes);
-      const ring = colors().main;
-      for (let dataset of chart.data.datasets) {
-        const per = (on, off) => Array.from({ length: dataset.data.length }, (_, i) => (marked.has(i) ? on : off));
-        dataset.pointRadius = per(7, 2);
-        dataset.pointStyle = per('rectRot', 'circle');
-        dataset.pointBackgroundColor = dataset.borderColor;
-        dataset.pointBorderColor = per(ring, dataset.borderColor);
-        dataset.pointBorderWidth = per(2, 1);
-      }
-      // the elements were built before this hook ran, so set the marked ones directly as well
-      chart.data.datasets.forEach((dataset, i) => {
-        const meta = chart.getDatasetMeta(i);
-        for (let target of indexes) {
-          const model = meta && meta.data && meta.data[target] && meta.data[target]._model;
-          if (!model) continue;
-          model.radius = 7;
-          model.pointStyle = 'rectRot';
-          model.borderColor = ring;
-          model.borderWidth = 2;
-          model.backgroundColor = dataset.borderColor;
-        }
-      });
     }
   },
   afterDraw: function (chart, easing) {
@@ -102,9 +77,22 @@ const colors = () => {
 };
 
 // marker and hover labels: a border and a background that differ from the plot in every theme
-const tipStyle = () => ({
-  backgroundColor: colors().tipBg, borderColor: colors().tipBorder, borderWidth: 1,
-  titleFontColor: colors().main, bodyFontColor: colors().main, cornerRadius: 6,
+const tipStyle = () => {
+  const c = colors();
+  return { backgroundColor: c.tipBg, borderColor: c.tipBorder, borderWidth: 1, titleFontColor: c.main, bodyFontColor: c.main, cornerRadius: 6 };
+};
+
+// A marker is a larger diamond with a ring in the text colour, so that it shows on the curve in every theme. The options are
+// scriptable: Chart.js asks per point while it builds the elements, so nothing is stored in the datasets. `marked` and `ring`
+// are set in update() before each chart.update().
+let marked = new Set();
+let ring = '';
+const markerOptions = (color) => ({
+  pointRadius: (c) => (marked.has(c.dataIndex) ? 7 : 2),
+  pointStyle: (c) => (marked.has(c.dataIndex) ? 'rectRot' : 'circle'),
+  pointBackgroundColor: color,
+  pointBorderColor: (c) => (marked.has(c.dataIndex) ? ring : color),
+  pointBorderWidth: (c) => (marked.has(c.dataIndex) ? 2 : 1),
 });
 
 // "Min" or "Max" for a marker that follows the minimum or maximum of the first trace
@@ -244,6 +232,10 @@ const updateChart = async () => {
 
   const traces = store.traces.filter(t => t.show && (props.type === 'smith' ? dsp.SMITH_FORMATS.includes(t.format) : dsp.FREQ_FORMATS.includes(t.format)));
   const channelData = (t) => (t.channel === 0 ? store.data.ch0 : store.data.ch1);
+  const shownMarkers = store.markers.filter(m => m.show);
+  const labels = chartKind === 'frequency' ? (store.frequencies.data || []) : [];
+  marked = new Set(shownMarkers.map(m => labels.findIndex(f => f >= m.freq)).filter(i => i >= 0));
+  ring = colors().main;
 
   if (chartKind === 'frequency') {
     chart.data.labels = store.frequencies.data || [];
@@ -255,7 +247,7 @@ const updateChart = async () => {
       backgroundColor: t.color, // fills the colour boxes of legend and tooltip
       fill: false,
       borderWidth: 2,
-      pointRadius: 2,
+      ...markerOptions(t.color),
       yAxisID: AXES[t.format] || 'y-axis-auto'
     }));
     // formats without a fixed scale share one automatic axis on the right
@@ -273,7 +265,7 @@ const updateChart = async () => {
       backgroundColor: t.color,
       showLine: true,
       borderWidth: 2,
-      pointRadius: 2,
+      ...markerOptions(t.color),
       fill: false
     }));
   } else {
@@ -283,13 +275,13 @@ const updateChart = async () => {
       data: channelData(t).map(d => (t.format === 'ysmith' ? dsp.calcYr(d) : dsp.calcZr(d))),  // {freq, real, imag}
       borderColor: t.color,
       borderWidth: 2,
-      pointRadius: 2,
+      ...markerOptions(t.color),
       fill: false
     }));
   }
 
   // Set marker positions for pinnedTooltips plugin
-  chart.config.options.pinnedTooltips = store.markers.filter(m => m.show).map(m => m.freq);
+  chart.config.options.pinnedTooltips = shownMarkers.map(m => m.freq);
   
   chart.update();
 };

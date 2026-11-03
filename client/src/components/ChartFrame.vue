@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 
 // Wraps a chart with a button that lets it fill the whole screen and go back. The frame only moves its box over the window
 // (position: fixed), so the chart keeps its state and its own handlers (cursor, zoom, pan). A chart drawn at a pixel size
@@ -18,19 +18,25 @@ const report = () => {
     emit('change', { full: full.value, w: Math.round(body.value.clientWidth), h: Math.round(body.value.clientHeight) });
 };
 
+// Leaving full screen while the browser is still entering it: exit as soon as it has entered
+let pendingExit = false;
+const leaveNative = () => {
+    native = false;
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => { });
+    else pendingExit = true;
+};
+
 const set = (on) => {
     if (full.value === on) return;
     full.value = on;
     if (on) {
+        pendingExit = false;
         if (root.value && root.value.requestFullscreen) {
             native = true;
-            root.value.requestFullscreen().catch(() => { native = false; });
+            root.value.requestFullscreen().then(() => { if (pendingExit) { pendingExit = false; document.exitFullscreen().catch(() => { }); } }, () => { native = false; });
         }
-    } else if (native && document.fullscreenElement) {
-        native = false;
-        document.exitFullscreen().catch(() => { });
-    }
-    report(); // the size follows from the observer once the box has moved
+    } else if (native) leaveNative();
+    nextTick(report); // the box has moved once Vue has applied the class; the observer follows later changes
 };
 
 const onKey = (e) => { if (e.key === 'Escape' && full.value) set(false); };
@@ -50,7 +56,7 @@ onUnmounted(() => {
     document.removeEventListener('fullscreenchange', onFullscreenChange);
     if (full.value) { // the view goes away while the chart is full
         full.value = false;
-        if (native && document.fullscreenElement) document.exitFullscreen().catch(() => { });
+        if (native) leaveNative();
         emit('change', { full: false, w: 0, h: 0 });
     }
 });
@@ -105,6 +111,16 @@ onUnmounted(() => {
   overscroll-behavior: contain;
 }
 .chart-frame.full .fs-btn { top: max(8px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); }
-.fs-title { flex: none; min-height: 28px; padding-right: 40px; font-size: 14px; font-weight: 500; }
-.chart-frame.full .chart-body { flex: 1; min-height: 0; overflow: hidden; }
+/* A phone: the page may reach under the camera cut-out and the rounded corners without reporting a safe area (no viewport-fit).
+   The chart uses the whole width; only the title and the button, which sit in the rounded top corners, move in. In portrait the
+   cut-out is at the top, so everything starts lower. */
+@media (hover: none) and (pointer: coarse) {
+  .chart-frame.full .fs-btn { top: max(18px, env(safe-area-inset-top)); right: max(24px, env(safe-area-inset-right)); }
+  .chart-frame.full .fs-title { padding-left: 28px; padding-right: 56px; padding-top: 6px; }
+}
+@media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  .chart-frame.full { padding-top: max(56px, env(safe-area-inset-top)); }
+  .chart-frame.full .fs-btn { top: max(56px, env(safe-area-inset-top)); }
+  .chart-frame.full .fs-title { padding-left: 0; padding-top: 0; }
+}
 </style>

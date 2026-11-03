@@ -66,6 +66,31 @@ export function search(points, value, kind) {
     return best;
 }
 
+// Min / Max make a marker follow the minimum or maximum of a trace with every sweep. The same kind again releases it.
+// Returns true when the marker follows afterwards.
+export function follow(marker, kind, points, value) {
+    if (marker.track === kind) { marker.track = null; return false; }
+    const fr = search(points, value, kind);
+    if (fr === null) return false;
+    marker.freq = fr;
+    marker.track = kind;
+    return true;
+}
+
+// move every following marker to the extremum of the new sweep; `value` is built once for all of them
+export function retrack(markers, points, value) {
+    for (const m of markers) {
+        if (!m.track) continue;
+        const fr = search(points, value, m.track);
+        if (fr !== null && fr !== m.freq) m.freq = fr;
+    }
+}
+
+// let go of all markers (the view that evaluates them is gone)
+export function release(markers) {
+    for (const m of markers) m.track = null;
+}
+
 // compact engineering notation: 4.7 nH, 12.3 pF
 export function eng(v, unit, digits = 3) {
     if (v === null || v === undefined || Number.isNaN(v)) return '-';

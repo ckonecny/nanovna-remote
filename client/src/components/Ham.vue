@@ -107,13 +107,13 @@ const toggleExtra = (id) => {
     if (i >= 0) store.hamExtras.splice(i, 1);
     else store.hamExtras.push(id);
 };
-const EH = computed(() => (fc.current.value && fc.current.value.id !== 'swr' ? fc.current.value.h : 160));
+const ehOf = (id) => fc.sizeOf(id, 0, 160)[1]; // only the chart that is full gets the height of the screen
 const extraCharts = computed(() => store.hamExtras.map((id) => {
     const pts = points.value;
     const line = (key, scale) => pts.map((p, i) => (i ? 'L' : 'M') + x(p.freq).toFixed(1) + ' ' + scale(p[key]).toFixed(1)).join(' ');
     if (id === 'rl') {
         const RL_MAX = 30; // dB, 0 at the top so that a notch dips like in the SWR chart
-        const yy = (v) => T + Math.min(Math.max(v, 0), RL_MAX) / RL_MAX * (EH.value - T - B);
+        const yy = (v) => T + Math.min(Math.max(v, 0), RL_MAX) / RL_MAX * (ehOf(id) - T - B);
         const p = cursor.value && cursor.value.p;
         return {
             id, title: 'Return loss (dB)', ticks: [0, 10, 20, 30].map(v => ({ y: yy(v), label: String(v) })), zero: null, curves: [{ d: line('rl', yy), cls: 'curve' }],
@@ -124,7 +124,7 @@ const extraCharts = computed(() => store.hamExtras.map((id) => {
     const cp = cursor.value && cursor.value.p;
     const reach = Math.max(0, ...pts.flatMap(p => [Math.abs(p.r), Math.abs(p.xr)]).filter(isFinite));
     const m = [50, 100, 200, 500].find(v => reach <= v) || 500; // symmetric scale, values beyond it are clipped
-    const yy = (v) => T + (1 - (Math.min(Math.max(v, -m), m) + m) / (2 * m)) * (EH.value - T - B);
+    const yy = (v) => T + (1 - (Math.min(Math.max(v, -m), m) + m) / (2 * m)) * (ehOf(id) - T - B);
     return {
         id, title: 'R (blue) / X (orange) in Ω',
         ticks: [-m, -m / 2, 0, m / 2, m].map(v => ({ y: yy(v), label: String(v) })),
@@ -197,15 +197,15 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
     <div v-for="c in extraCharts" :key="c.id" class="extra">
       <div class="label">{{ c.title }}<span v-if="c.readout" class="readout"> · {{ c.readout }}</span></div>
       <ChartFrame :title="c.title" @change="(s) => fc.onFrame(c.id, s)">
-      <svg :viewBox="`0 0 ${W} ${EH}`" :width="W" :height="EH" class="chart" @click="onChartClick">
-        <rect :x="x(band.start)" :y="T" :width="Math.max(0, x(band.stop) - x(band.start))" :height="EH - T - B" class="band-area" />
+      <svg :viewBox="`0 0 ${W} ${ehOf(c.id)}`" :width="W" :height="ehOf(c.id)" class="chart" @click="onChartClick">
+        <rect :x="x(band.start)" :y="T" :width="Math.max(0, x(band.stop) - x(band.start))" :height="ehOf(c.id) - T - B" class="band-area" />
         <g v-for="t in c.ticks" :key="t.label">
           <line :x1="L" :x2="W - R" :y1="t.y" :y2="t.y" class="grid" />
           <text :x="L - 6" :y="t.y + 4" class="axis" text-anchor="end">{{ t.label }}</text>
         </g>
         <line v-if="c.zero !== null" :x1="L" :x2="W - R" :y1="c.zero" :y2="c.zero" class="grid2" />
         <path v-for="(cv, i) in c.curves" :key="i" :d="cv.d" :class="cv.cls" />
-        <line v-if="cursor" :x1="x(cursor.p.freq)" :x2="x(cursor.p.freq)" :y1="T" :y2="EH - B" class="cursor" />
+        <line v-if="cursor" :x1="x(cursor.p.freq)" :x2="x(cursor.p.freq)" :y1="T" :y2="ehOf(c.id) - B" class="cursor" />
         <g v-if="cursor">
           <circle v-for="m in c.marks" :key="m.text" :cx="x(cursor.p.freq)" :cy="m.y" r="5" :class="['cursor-dot', m.cls]" />
           <text v-for="(m, i) in c.marks" :key="'t' + m.text" :x="x(cursor.p.freq) + (x(cursor.p.freq) > W / 2 ? -10 : 10)" :y="T + 14 + i * 16" class="cursor-label" :text-anchor="x(cursor.p.freq) > W / 2 ? 'end' : 'start'">{{ m.text }}</text>

@@ -35,6 +35,9 @@ This file holds only the current state and hints for the next session.
 - Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
   "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first
   trace and its title names it ("Max CH0 swr · 250.2 MHz"). Not looked at on the iPhone.
+- Code review (2026-11-03) of the 1.2 changes: findings fixed and flashed (full-screen race and size timing, Min/Max released
+  when the view goes away, marker look via Chart.js scriptable options instead of `_model`, per-chart height in HAM, tests
+  for follow/retrack).  Full screen on a phone: title and button moved out of the rounded corners (checked on an iPhone, both orientations).
 - Chart full screen (button top right of every chart): built, tested in the demo (desktop, 390x800), flashed. Not yet looked at on
   the iPhone (Safari has no Fullscreen API: the fixed box covers the page but not the address bar).
 - Open: the NanoVNA dropped off USB once while the Short step of the calibration ran (`NanoVNA gone` in `/log`). Cause unknown
