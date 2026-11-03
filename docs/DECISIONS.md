@@ -250,3 +250,8 @@ installer page on https cannot call a http device (mixed content); the installer
 - Added Rp, Xp, Q, group delay (Freq view) and Y Smith, Polar (Smith view); R, X and |Z| were listed in the trace dialog but drew zeros.
 - All values are computed in the client from the corrected sweep (`traceValues` in `lib/dsp.js`). Y Smith = Smith of the mirrored Γ (y = 1/z on the z grid). Polar is a Chart.js scatter on -1..1; it is shown instead of the Smith chart when only polar traces are visible. Group delay = -dφ/dω with unwrapped phase and central differences, in ns.
 - Formats without a fixed scale share one automatic right axis (no scale dialog entry).
+
+## Pinch zoom on the Freq chart (2026-11)
+- Two fingers on the Freq chart: horizontal pinch/drag changes the sweep range, vertical pinch/drag the scale of the first trace with a fixed axis (LogMag/SWR/Phase). Maths in `lib/zoom.js`, touch events in `Graph.vue`.
+- The page cannot zoom through a gesture the chart takes: `touch-action: pan-x pan-y` on the canvas drops browser pinch-zoom there, one finger still scrolls. The `viewport` meta is not used (iOS ignores `user-scalable=no`).
+- The frequency range is applied on release (a new sweep per finger move would flood the NanoVNA); a hint shows the target range meanwhile. The Y scale follows live. Limits 50 kHz .. 900 MHz. Smith/Polar are not zoomed.

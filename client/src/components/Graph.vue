@@ -1,9 +1,10 @@
 <script setup>
-import { onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
+import { nextTick, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import Chart from 'chart.js';
 import 'chartjs-chart-smith';
 import { store, getWorker } from '../store';
 import * as dsp from '../lib/dsp';
+import { transformRange, clampRange, pinchFactor } from '../lib/zoom';
 
 // Register Chart.js plugin for pinned tooltips (markers)
 Chart.pluginService.register({
@@ -278,10 +279,93 @@ watch(() => store.status, (status) => {
     if (status === 'connected') updateChart();
 });
 
+// Two fingers on the Freq chart: horizontal pinch/drag = frequency range (applied on release, it starts a new sweep),
+// vertical pinch/drag = scale of the first trace with a fixed axis (live). One finger still scrolls the page.
+const hint = ref('');
+const SCALE_OF = { logmag: 'logmag', linear: 'logmag', real: 'logmag', imag: 'logmag', swr: 'swr', phase: 'phase' };
+const F_MIN = 50e3;
+const F_MAX = 900e6;
+let gesture = null;
+
+const touchGeometry = (e) => {
+  const [a, b] = [e.touches[0], e.touches[1]];
+  const r = canvasRef.value.getBoundingClientRect();
+  const area = chart.chartArea;
+  return {
+    dx: Math.abs(a.clientX - b.clientX),
+    dy: Math.abs(a.clientY - b.clientY),
+    mx: (a.clientX + b.clientX) / 2 - r.left,
+    my: (a.clientY + b.clientY) / 2 - r.top,
+    area
+  };
+};
+
+const zoomStart = (e) => {
+  if (!chart || chartKind !== 'frequency' || e.touches.length !== 2 || !chart.chartArea) return;
+  const g = touchGeometry(e);
+  const trace = store.traces.find(t => t.show && SCALE_OF[t.format]);
+  const key = trace ? SCALE_OF[trace.format] : null;
+  gesture = {
+    ...g,
+    key,
+    y: key ? { ...store.scales[key] } : null,
+    lo: +store.frequencies.start,
+    hi: +store.frequencies.stop,
+    range: null
+  };
+  e.preventDefault();
+};
+
+const zoomMove = (e) => {
+  if (!gesture || e.touches.length !== 2) return;
+  e.preventDefault();
+  const g = touchGeometry(e);
+  const s = gesture;
+  const w = s.area.right - s.area.left;
+  const h = s.area.bottom - s.area.top;
+  const ax = Math.min(1, Math.max(0, (s.mx - s.area.left) / w));
+  const fx = pinchFactor(s.dx, g.dx);
+  const [lo, hi] = clampRange(...transformRange(s.lo, s.hi, ax, fx, (g.mx - s.mx) / w), F_MIN, Math.max(F_MAX, s.hi));
+  s.range = [lo, hi];
+  hint.value = dsp.formatFrequency(lo, 3) + ' – ' + dsp.formatFrequency(hi, 3);
+  if (s.key) {
+    const ay = Math.min(1, Math.max(0, (s.area.bottom - s.my) / h));
+    const fy = pinchFactor(s.dy, g.dy);
+    const [min, max] = transformRange(s.y.min, s.y.max, ay, fy, (s.my - g.my) / h);
+    const round = (v) => +v.toPrecision(4);
+    store.scales[s.key].min = round(min);
+    store.scales[s.key].max = round(max);
+  }
+};
+
+const zoomEnd = (e) => {
+  if (!gesture || e.touches.length >= 2) return;
+  const r = gesture.range;
+  gesture = null;
+  hint.value = '';
+  if (r && (Math.abs(r[0] - +store.frequencies.start) > 1 || Math.abs(r[1] - +store.frequencies.stop) > 1)) {
+    const fr = store.frequencies;
+    fr.start = Math.round(r[0]);
+    fr.stop = Math.round(r[1]);
+    fr.center = (fr.start + fr.stop) / 2;
+    fr.span = fr.stop - fr.start;
+    if (!store.autoUpdate) { // paused: one sweep of the new range, started once the range switch is under way
+      nextTick(() => { store.sweepOnce = true; store.autoUpdate = true; });
+    }
+  }
+};
+
 // chart.js only follows window resizes; a turned phone changes the box without the canvas noticing
 let observer = null;
 onMounted(() => {
   initChart();
+  const el = canvasRef.value;
+  if (el) {
+    el.addEventListener('touchstart', zoomStart, { passive: false });
+    el.addEventListener('touchmove', zoomMove, { passive: false });
+    el.addEventListener('touchend', zoomEnd);
+    el.addEventListener('touchcancel', zoomEnd);
+  }
   if (typeof ResizeObserver === 'function' && canvasRef.value) {
     observer = new ResizeObserver(() => { if (chart && chart.resize) chart.resize(); });
     observer.observe(canvasRef.value.parentElement);
@@ -294,6 +378,13 @@ const settle = () => {
 };
 onUnmounted(() => {
   window.removeEventListener('orientationchange', settle);
+  const el = canvasRef.value;
+  if (el) {
+    el.removeEventListener('touchstart', zoomStart);
+    el.removeEventListener('touchmove', zoomMove);
+    el.removeEventListener('touchend', zoomEnd);
+    el.removeEventListener('touchcancel', zoomEnd);
+  }
   if (observer) observer.disconnect();
   if (chart) chart.destroy();
 });
@@ -302,6 +393,7 @@ onUnmounted(() => {
 <template>
   <div class="graph-container">
     <canvas ref="canvasRef" :data-graph-type="props.type"></canvas>
+    <div v-if="hint" class="zoom-hint">{{ hint }}</div>
   </div>
 </template>
 
@@ -312,6 +404,20 @@ onUnmounted(() => {
   position: relative;
   min-width: 0;
   overflow: hidden;
+}
+/* a pinch on the chart is the app's, not the page's; one finger still scrolls */
+.graph-container canvas { touch-action: pan-x pan-y; }
+.zoom-hint {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  pointer-events: none;
 }
 /* chart.js sets pixel sizes on the canvas; after a turn the box is what counts */
 .graph-container canvas {

@@ -55,6 +55,7 @@ const defaultState = {
         z: { min: -100, max: 100 }
     },
     autoUpdate: true,
+    sweepOnce: false, // paused: take one sweep (a changed range) and pause again
     calibrationRunning: false,
     appCalCovered: 1, // share of the displayed points that the app-side calibration covers
     hamBand: '2 m',
@@ -596,11 +597,14 @@ export async function startUpdateLoop() {
                 await updateCable();
             } else if (!store.multiActive && !store.cableActive && !store.tdrActive && store.autoUpdate && !store.updating && !store.calibrationRunning) {
                 const segments = +store.frequencies.segments;
+                const versionBefore = store.dataVersion;
                 if (segments === 1) {
                     await updateSingleSegment();
                 } else {
                     await updateMultiSegments();
                 }
+                // paused with a changed range: stop again once a sweep has actually delivered data (readings of a half-switched range are discarded)
+                if (store.sweepOnce && store.dataVersion !== versionBefore) { store.sweepOnce = false; store.autoUpdate = false; }
             }
             if (store.requestStop) {
                 store.autoUpdate = false;

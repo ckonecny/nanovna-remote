@@ -196,6 +196,8 @@ A trace is one curve in the **Freq** or **Smith** view. In the settings you choo
 
 **Add Trace** in the side menu creates a new one.
 
+**Zooming the Freq chart.** Put two fingers on the chart: spreading them horizontally zooms the frequency range in (pinching zooms it out), moving both sideways shifts it. The new range is applied when you lift the fingers and starts a new sweep. Spreading vertically zooms the value scale (LogMag, SWR or Phase, whichever the first trace uses) and moving both fingers up or down shifts it; this follows live. One finger still scrolls the page.
+
 **Firmware note.** If a newer firmware exists for the connected NanoVNA (NanoVNA-H or -H4 of the hugen79 project), a note with a link
 to the release page appears under the header; **Dismiss** hides it for that release. It needs internet access on the phone or computer.
 
