@@ -208,6 +208,10 @@ The menu button opens it. Entries that need a connection are greyed out until yo
 - **Add Trace**: see 5.8.
 - **Resolution...**: the number of 101-point segments per sweep. 1 means 101 points; more segments give a finer sweep but take
   longer, and the header button changes to Update/Stop.
+- **Sweep quality...** (needs a connection): the NanoVNA's IF bandwidth (2000 Hz down to 10 Hz; narrower means less noise but a
+  slower sweep), smoothing (off or averaging 1-8) and output power (automatic or four levels). The dialog shows what the device
+  has now. The settings stay in the NanoVNA until it is switched off. They apply to every view and to the calibration. A sweep of
+  101 points takes about 0.2 s at 1000 Hz, 1 s at 100 Hz and 10 s at 10 Hz; the app waits accordingly. Calibrate at the bandwidth you measure with.
 - **Port extension...**: the length of cable or adapter between the NanoVNA and the device under test, in metres (0 switches it
   off). The app turns the measured reflection back by the delay of that line (length and the velocity factor of the Cable
   view), so Smith chart, impedance and SWR refer to the end of the line. It applies to the reflection in Single, HAM, Multi,

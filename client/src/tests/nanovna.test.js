@@ -189,7 +189,7 @@ describe('NanoVNA_Base (Step-by-Step)', () => {
             expect(vna.sendCommand).toHaveBeenCalledWith('offset 100\r');
 
             await vna.setPower(3);
-            expect(vna.sendCommand).toHaveBeenCalledWith('power 3\r');
+            expect(vna.sendCommand).toHaveBeenCalledWith('power 3\r', expect.any(Function));
 
             await vna.resume();
             expect(vna.sendCommand).toHaveBeenCalledWith('resume\r');

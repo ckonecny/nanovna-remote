@@ -227,3 +227,14 @@ installer page on https cannot call a http device (mixed content); the installer
 - Firmware note (`lib/fwcheck.js`): only for `Board: NanoVNA-H` / `NanoVNA-H 4` (projects hugen79/NanoVNA-H and -H4, tag =
   `version` output, e.g. 1.2.50); other forks use their own numbering. GitHub API from the browser; silent on any error, never in
   the demo build. A device with 1.2.50 / build 2026-05-16 was the latest release when this was written.
+
+## Sweep quality settings (2026-11)
+- NanoVNA-H 1.2.50 shell: `bandwidth <n>` takes a divider, bandwidth = 4000 Hz / (n + 1) (3 = 1000 Hz, 399 = 10 Hz) and
+  answers with a line; `smooth 0-8` and `power 0-3|255` answer with nothing; a query without argument prints the current value
+  (`smooth`: `current: n`, `power`: `power: n`). A bandwidth value out of range is accepted and clamped (99999 gave 159).
+  The settings are not saved to the device (no `saveconfig`).
+- `readline` returned one character too many when the reply was empty (`read(0)` reads one character); fixed, since a command
+  without output leaves the prompt at the start of the buffer.
+- Sweep time measured on the NanoVNA-H (`scan` with data, 101 points): 0.23 s at 1000 Hz, 0.44 s at 333 Hz, 1.15 s at 100 Hz,
+  3.5 s at 30 Hz, 10.2 s at 10 Hz, i.e. about 0.15 s + 101 / bandwidth. The client reads the bandwidth on connect (and when the
+  dialog changes it) and lengthens the `SWEEP_MS` waits by 101 / bandwidth - 0.1 s (`sweepMs()` in `store.js`).

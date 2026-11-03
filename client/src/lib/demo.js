@@ -101,6 +101,7 @@ class Vna {
         this.stop = 900000000;
         this.points = 101;
         this.slots = {};
+        this.sweepSettings = { bandwidth: 3, smooth: 0, power: 255 };
     }
 
     freqs() {
@@ -155,6 +156,12 @@ class Vna {
         const [cmd, ...args] = parts;
         if (cmd === 'version') return enc('1.2.0\r\n');
         if (cmd === 'info') return enc('Kernel: simulator\r\nBoard: NanoVNA-H (simulated)\r\nVersion: 1.2.0\r\nPlatform: simulated\r\n');
+        if (cmd === 'bandwidth' || cmd === 'smooth' || cmd === 'power') {
+            if (args.length) this.sweepSettings[cmd] = parseInt(args[0], 10);
+            const v = this.sweepSettings[cmd];
+            if (cmd === 'bandwidth') return enc(`bandwidth ${v} (${Math.round(4000 / (v + 1))}Hz)\r\n`);
+            return enc(args.length ? '' : cmd === 'smooth' ? `usage: smooth {0-8}\r\ncurrent: ${v}\r\n` : `usage: power {0-3}|{255 - auto}\r\npower: ${v}\r\n`);
+        }
         if (cmd === 'frequencies') return enc(this.freqs().join('\r\n') + '\r\n');
         if (cmd === 'data') return enc(this.data(args.length ? parseInt(args[0], 10) : 0).join('\r\n') + '\r\n');
         if (cmd === 'sweep' && args.length === 2) {

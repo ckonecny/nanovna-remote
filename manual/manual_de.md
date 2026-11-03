@@ -216,6 +216,11 @@ Der Menüknopf öffnet es. Einträge, die eine Verbindung brauchen, sind bis zum
 - **Add Trace**: siehe 5.8.
 - **Resolution...**: die Anzahl der Segmente mit je 101 Punkten pro Sweep. 1 bedeutet 101 Punkte; mehr Segmente geben einen
   feineren Sweep, dauern aber länger, und der Knopf in der Kopfzeile wechselt zu Update/Stop.
+- **Sweep quality...** (braucht eine Verbindung): die ZF-Bandbreite des NanoVNA (2000 Hz bis 10 Hz; schmaler heißt weniger Rauschen,
+  aber ein langsamerer Sweep), die Glättung (aus oder Mittelung 1-8) und die Ausgangsleistung (automatisch oder vier Stufen). Der
+  Dialog zeigt, was das Gerät gerade eingestellt hat. Die Einstellungen bleiben im NanoVNA, bis es ausgeschaltet wird.
+  Sie gelten für alle Ansichten und für die Kalibrierung. Ein Sweep mit 101 Punkten dauert bei 1000 Hz etwa 0,2 s, bei 100 Hz 1 s und
+  bei 10 Hz 10 s; die App wartet entsprechend. Kalibriere mit der Bandbreite, mit der du misst.
 - **Port extension...**: die Länge von Kabel oder Adapter zwischen NanoVNA und Messobjekt in Metern (0 schaltet es aus). Die
   App dreht die gemessene Reflexion um die Laufzeit dieser Leitung zurück (Länge und Verkürzungsfaktor der Ansicht Cable),
   sodass Smith-Diagramm, Impedanz und SWR sich auf das Leitungsende beziehen. Es gilt für die Reflexion in Single, HAM, Multi,

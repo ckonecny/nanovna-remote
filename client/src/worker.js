@@ -145,6 +145,16 @@ class NanoVNAWorker {
         };
     }
 
+    async getSweepSettings() {
+        return await this.nanovna.getSweepSettings();
+    }
+
+    async setSweepSetting(name, value) {
+        if (name === 'bandwidth') await this.nanovna.setBandwidth(value);
+        else if (name === 'smooth') await this.nanovna.setSmooth(value);
+        else if (name === 'power') await this.nanovna.setPower(value);
+    }
+
     async getInfo() {
         return await this.nanovna.getInfo();
     }

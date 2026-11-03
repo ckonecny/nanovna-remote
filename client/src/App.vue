@@ -14,6 +14,7 @@ import Ham from './components/Ham.vue';
 import Multi from './components/Multi.vue';
 import Cable from './components/Cable.vue';
 import Tdr from './components/Tdr.vue';
+import SweepDialog from './components/SweepDialog.vue';
 import DemoPanel from './components/DemoPanel.vue';
 import { HAM_BANDS, bandSweep } from './lib/bands';
 import { bandFileName, chartsToPng, download, hamChartItems, multiChartItems, saveTouchstone } from './lib/export';
@@ -38,6 +39,7 @@ const showTraceDialog = ref(false);
 const currentTrace = ref(null);
 
 const showScaleDialog = ref(false);
+const showSweepDialog = ref(false);
 const showCalibrationDialog = ref(false);
 const showAboutDialog = ref(false);
 const showMarkerDialog = ref(false);
@@ -460,6 +462,9 @@ const quit = () => {
         </button>
 
         <div class="nav-subheader">Device</div>
+        <button class="btn-nav" @click="showSweepDialog = true; menuVisible = false" :disabled="store.status !== 'connected'">
+          <span class="icon">tune</span> Sweep quality...
+        </button>
         <button class="btn-nav" @click="handleConnect" v-if="store.status === 'disconnected'">
           <span class="icon">usb</span> Connect
         </button>
@@ -608,6 +613,7 @@ const quit = () => {
                  @delete="handleTraceDelete"
                  @close="showTraceDialog = false" />
     
+    <SweepDialog v-if="showSweepDialog" @close="showSweepDialog = false" />
     <ScaleDialog v-if="showScaleDialog" 
                  :show="showScaleDialog"
                  @close="showScaleDialog = false" />

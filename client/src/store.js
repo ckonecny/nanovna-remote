@@ -78,6 +78,7 @@ const defaultState = {
     velocityFactor: 0.66, // Default for RG58 etc
     portExtLength: 0, // m of line (at velocityFactor) between the NanoVNA and the device under test, removed from the reflection
     version: '',
+    bandwidthHz: 1000, // IF bandwidth of the NanoVNA, read from the device; sets how long a sweep takes, not saved
     fwNew: null, // { tag, url } of a newer firmware release for the connected NanoVNA, not saved
     fwDismissed: '', // release tag whose note the user closed
     info: '',
@@ -210,6 +211,16 @@ export async function getWorker() {
     return workerProxy;
 }
 
+// the sweep time depends on the IF bandwidth of the device
+export async function refreshBandwidth() {
+    try {
+        const b = (await (await getWorker()).getSweepSettings()).bandwidth;
+        if (b !== null) store.bandwidthHz = 4000 / (b + 1);
+    } catch (e) {
+        log('Cannot read the IF bandwidth: ' + e);
+    }
+}
+
 export function detectBestConnectionType() {
     if (import.meta.env.VITE_ESP) return 'ws'; // served by the ESP32 itself: always use its bridge
     if (new URLSearchParams(location.search).get('host')) return 'ws';
@@ -298,6 +309,7 @@ export async function connect() {
         store.version = await workerProxy.getVersion();
         store.info = await workerProxy.getInfo();
         store.fwNew = null;
+        refreshBandwidth();
         if (!import.meta.env.VITE_DEMO) newerFirmware(store.version, store.info).then((r) => { store.fwNew = r; });
         startUpdateLoop();
     } catch (e) {
@@ -327,7 +339,9 @@ export async function disconnect() {
 }
 
 let loopRunning = false;
-const SWEEP_MS = 900; // a 101 point sweep of the NanoVNA-H takes about 0.6 s
+const SWEEP_MS = 900; // a 101 point sweep of the NanoVNA-H takes about 0.6 s at the usual IF bandwidth of 1000 Hz
+// measured on the NanoVNA-H: about 0.15 s + 101 / bandwidth (0.23 s at 1000 Hz, 1.15 s at 100 Hz, 10.2 s at 10 Hz); the wait grows with the narrower bandwidth
+const sweepMs = () => SWEEP_MS + Math.max(0, Math.round(101000 * (1 / store.bandwidthHz - 1 / 1000)));
 let lastSignature = null;
 let sameReadings = 0;
 let sweepStale = true; // true until a sweep has been started and completed for the current range
@@ -349,7 +363,7 @@ export async function startUpdateLoop() {
                     if (import.meta.env.VITE_ESP) {
                         // `resume` restarts the sweep and `data` answers at once with the old sweep for the points not measured yet:
                         // let one sweep finish, and otherwise leave the device sweeping so that all points keep being refreshed
-                        await new Promise(r => setTimeout(r, SWEEP_MS));
+                        await new Promise(r => setTimeout(r, sweepMs()));
                         sweepStale = false;
                     }
                 }
@@ -511,7 +525,7 @@ export async function startUpdateLoop() {
                     const { start, stop } = bandSweep(band);
                     await setRange(worker, start, stop);
                     await worker.resume();
-                    await new Promise(r => setTimeout(r, SWEEP_MS)); // `data` does not wait for the sweep to finish
+                    await new Promise(r => setTimeout(r, sweepMs())); // `data` does not wait for the sweep to finish
                     if (!store.multiActive || store.calibrationRunning) break;
                     const freqs = await worker.getFrequencies();
                     const data0 = await worker.getData(0);
@@ -539,10 +553,10 @@ export async function startUpdateLoop() {
                 if (cableRange !== key) {
                     await setRange(worker, r.start, r.stop);
                     await worker.resume();
-                    await new Promise(res => setTimeout(res, SWEEP_MS * 2));
+                    await new Promise(res => setTimeout(res, sweepMs() * 2));
                     cableRange = key;
                 } else {
-                    await new Promise(res => setTimeout(res, SWEEP_MS));
+                    await new Promise(res => setTimeout(res, sweepMs()));
                 }
                 if (!(store.cableActive || store.tdrActive) || store.calibrationRunning) return;
                 const freqs = await worker.getFrequencies();
@@ -648,10 +662,10 @@ async function setRange(worker, start, stop) {
 async function measureRaw(worker, start, stop) {
     await setRange(worker, start, stop);
     await worker.resume();
-    await new Promise(r => setTimeout(r, SWEEP_MS)); // `data` does not wait for the sweep to finish
+    await new Promise(r => setTimeout(r, sweepMs())); // `data` does not wait for the sweep to finish
     const freqs = await worker.getFrequencies();
     const a = await worker.getData(0);
-    await new Promise(r => setTimeout(r, SWEEP_MS));
+    await new Promise(r => setTimeout(r, sweepMs()));
     const b = await worker.getData(0);
     return { freqs, data: a.map((d, i) => [(d[0] + b[i][0]) / 2, (d[1] + b[i][1]) / 2]) };
 }

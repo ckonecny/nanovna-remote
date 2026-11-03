@@ -126,7 +126,8 @@ export class NanoVNA_Base {
 
     async readline(eol = '\n', removeEol = true) {
         const index = await this.waitUntil(eol);
-        return await this.read(index + (removeEol ? eol.length : 0));
+        const n = index + (removeEol ? eol.length : 0);
+        return n ? await this.read(n) : ''; // read(0) would take one character: a command without output leaves the prompt first
     }
 
     async waitUntil(string) {
@@ -180,8 +181,28 @@ export class NanoVNA_Base {
         await this.sendCommand(`offset ${offset}\r`);
     }
 
+    // these commands answer with a line (bandwidth: the new value), which has to be read so that it does not end up in the next reply
     async setPower(power) {
-        await this.sendCommand(`power ${power}\r`);
+        await this.sendCommand(`power ${power}\r`, async () => await this.getMultiline());
+    }
+
+    // current IF bandwidth divider, smoothing and output power of the device; a value is null when the reply is not understood
+    async getSweepSettings() {
+        const ask = async (cmd) => await this.sendCommand(`${cmd}\r`, async () => await this.getMultiline());
+        const num = (text, re) => { const m = re.exec(text); return m ? +m[1] : null; };
+        return {
+            bandwidth: num(await ask('bandwidth'), /bandwidth\s+(\d+)/),
+            smooth: num(await ask('smooth'), /current:\s*(\d+)/),
+            power: num(await ask('power'), /power:\s*(\d+)/),
+        };
+    }
+
+    async setBandwidth(divider) {
+        await this.sendCommand(`bandwidth ${divider}\r`, async () => await this.getMultiline());
+    }
+
+    async setSmooth(n) {
+        await this.sendCommand(`smooth ${n}\r`, async () => await this.getMultiline());
     }
 
     async getMultiline() {
