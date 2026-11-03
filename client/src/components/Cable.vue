@@ -207,7 +207,7 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
 .tile { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 8px; background: var(--tile-bg); }
 .tile.bad { border-left: 4px solid #f44336; }
-.label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; }
+.label { font-size: 12px; color: var(--text-dim); }
 .value { font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .value.small { font-size: 16px; }
 .sub { font-size: 12px; color: var(--text-dim); }

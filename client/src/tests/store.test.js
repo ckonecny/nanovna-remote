@@ -566,7 +566,7 @@ describe('colour scheme', () => {
         expect(store.theme).toBe('dark');
         await Promise.resolve();
         expect(document.documentElement.dataset.theme).toBe('dark');
-        expect(metaColor.content).toBe('#1e1e1e');
+        expect(metaColor.content).toBe('#151b27');
 
         cycleTheme();
         expect(store.theme).toBe('auto');

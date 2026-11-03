@@ -336,7 +336,7 @@ const saveAsPng = (graphType) => {
 
 // Add new trace
 const addTrace = () => {
-  const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#cddc39', '#ffeb3b', '#ffc107', '#ff9800', '#ff5722'];
+  const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#f57c00', '#ff9800', '#ff5722'];
   const usedColors = store.traces.map(t => t.color);
   const availableColor = colors.find(c => !usedColors.includes(c)) || colors[Math.floor(Math.random() * colors.length)];
   
@@ -483,7 +483,7 @@ const quit = () => {
         </button>
 
         <div style="padding: 0 16px; margin: 8px 0;">
-          <label style="font-size: 11px; color: var(--text-dim); display: block; margin-bottom: 4px; text-transform: uppercase;">Connection Type</label>
+          <label style="font-size: 11px; color: var(--text-dim); display: block; margin-bottom: 4px;">Connection Type</label>
           <select v-model="store.connectionType" class="field-input" style="width: 100%;">
             <option value="auto">Auto (Default)</option>
             <option value="serial">WebSerial</option>
@@ -659,7 +659,6 @@ const quit = () => {
   padding: 16px;
   font-size: 12px;
   color: var(--text-dim);
-  text-transform: uppercase;
 }
 
 .btn-nav {
@@ -737,6 +736,8 @@ const quit = () => {
   overflow: hidden;
   position: relative;
   background: var(--surface-color);
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
 }
 
 .slot-row {

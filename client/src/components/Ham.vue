@@ -212,7 +212,7 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
 <style scoped>
 .ham { flex: 1; min-width: 0; padding: 8px 12px; display: flex; flex-direction: column; gap: 10px; }
 .bands { display: flex; flex-wrap: wrap; gap: 6px; }
-.band.active { background: #3f51b5; color: #fff; border-color: #3f51b5; }
+.band.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 .chart { display: block; max-width: 100%; touch-action: manipulation; }
 .band-area { fill: var(--band-area); }
 .grid { stroke: var(--swr-grid); stroke-width: 1; }
@@ -235,7 +235,7 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
 .tile { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 8px; background: var(--tile-bg); }
 .tile.wide { grid-column: 1 / -1; }
-.label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; }
+.label { font-size: 12px; color: var(--text-dim); }
 .value { font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .value.small { font-size: 16px; }
 .sub { font-size: 12px; color: var(--text-dim); }

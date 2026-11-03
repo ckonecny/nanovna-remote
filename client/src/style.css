@@ -1,39 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 :root {
   /* Light theme, tuned for contrast so it stays readable in sunlight */
   color-scheme: light;
-  --primary: #0b3fb8;
-  --accent: #c62828;
-  --bg-color: #ffffff;
+  --primary: #1d4ed8;
+  --accent: #dc2626;
+  --bg-color: #f3f5f9;
   --surface-color: #ffffff;
-  --text-main: #000000;
-  --text-dim: rgba(0, 0, 0, 0.72);
+  --text-main: #0f172a;
+  --text-dim: #475569;
   --text-inverse: #ffffff;
-  --border-color: rgba(0, 0, 0, 0.35);
-  --divider: rgba(0, 0, 0, 0.3);
+  --border-color: #b6c0cf;
+  --divider: #dde3ec;
+  --radius: 12px;
+  --radius-s: 8px;
 
   /* minimum size of a tappable control; larger on touch screens */
   --tap: 36px;
 
   --header-height: 64px;
   --drawer-width: 280px;
-  --transition: .4s cubic-bezier(.4, 0, .2, 1);
-  --shadow-1: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
+  --transition: .25s cubic-bezier(.4, 0, .2, 1);
+  --shadow-1: 0 1px 2px rgba(15, 23, 42, .08), 0 1px 3px rgba(15, 23, 42, .06);
 
-  --tile-bg: rgba(0, 0, 0, 0.07);
-  --hover-bg: rgba(0, 0, 0, 0.1);
-  --surface-2: #f0f0f0;
-  --surface-3: #d6d6d6;
-  --chart-grid: rgba(0, 0, 0, 0.2);
+  --tile-bg: #eaeef5;
+  --hover-bg: rgba(29, 78, 216, 0.08);
+  --surface-2: #f1f4f9;
+  --surface-3: #dfe5ee;
+  --chart-grid: rgba(15, 23, 42, 0.16);
   --swr-grid: rgba(0, 0, 0, 0.28);
   --band-area: rgba(46, 125, 50, 0.2);
   --notice-bg: rgba(255, 152, 0, 0.3);
-  --curve: #1a237e;
-  --good-bg: #a5d6a7;
-  --warn-bg: #ffcc80;
-  --bad-bg: #ef9a9a;
+  --curve: #1e3a8a;
+  --good-bg: #bbf7d0;
+  --warn-bg: #fde68a;
+  --bad-bg: #fecaca;
 }
 
 @media (pointer: coarse) {
@@ -49,25 +50,26 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --primary: #82b1ff;
-  --bg-color: #121212;
-  --surface-color: #1e1e1e;
-  --text-main: rgba(255, 255, 255, 0.87);
-  --text-dim: rgba(255, 255, 255, 0.6);
-  --border-color: rgba(255, 255, 255, 0.14);
-  --divider: rgba(255, 255, 255, 0.14);
-  --shadow-1: 0 1px 4px rgba(0, 0, 0, .7);
-  --tile-bg: rgba(255, 255, 255, 0.07);
-  --hover-bg: rgba(255, 255, 255, 0.1);
-  --surface-2: #2a2a2a;
-  --surface-3: #424242;
+  --primary: #7aa2ff;
+  --accent: #f87171;
+  --bg-color: #0b0f17;
+  --surface-color: #151b27;
+  --text-main: #e6eaf2;
+  --text-dim: #9aa6bb;
+  --border-color: #2c374a;
+  --divider: #232d3e;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .5);
+  --tile-bg: #1d2636;
+  --hover-bg: rgba(122, 162, 255, 0.12);
+  --surface-2: #1b2332;
+  --surface-3: #2a3547;
   --chart-grid: rgba(255, 255, 255, 0.12);
   --swr-grid: rgba(255, 255, 255, 0.16);
   --band-area: rgba(102, 187, 106, 0.16);
   --notice-bg: rgba(255, 152, 0, 0.25);
-  --curve: #8c9eff;
-  --good-bg: #1b5e20;
-  --warn-bg: #7a4a00;
+  --curve: #93b4ff;
+  --good-bg: #14532d;
+  --warn-bg: #78450a;
   --bad-bg: #7f1d1d;
 }
 
@@ -80,8 +82,9 @@ body {
   margin: 0;
   background-color: var(--bg-color);
   color: var(--text-main);
-  font-family: 'Roboto', sans-serif;
-  line-height: normal;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Material Typography */
@@ -92,13 +95,13 @@ h4,
 h5,
 h6 {
   margin: 0;
-  font-weight: 400;
+  font-weight: 600;
 }
 
 .md-title {
   font-size: 20px;
-  letter-spacing: .005em;
-  font-weight: 500;
+  letter-spacing: -.01em;
+  font-weight: 600;
 }
 
 /* Layout Shell - Faithfully replicating md-app */
@@ -117,7 +120,7 @@ h6 {
   display: flex;
   align-items: center;
   padding: 0 16px;
-  box-shadow: var(--shadow-1);
+  border-bottom: 1px solid var(--divider);
   z-index: 10;
   flex-shrink: 0;
   gap: 4px;
@@ -129,7 +132,7 @@ h6 {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(15, 23, 42, 0.45);
   z-index: 20;
   transition: opacity var(--transition);
 }
@@ -141,7 +144,8 @@ h6 {
   bottom: 0;
   width: var(--drawer-width);
   background: var(--surface-color);
-  box-shadow: var(--shadow-1);
+  box-shadow: 0 0 32px rgba(15, 23, 42, .25);
+  border-radius: 0 var(--radius) var(--radius) 0;
   z-index: 30;
   transform: translateX(-100%);
   transition: transform var(--transition);
@@ -169,11 +173,10 @@ h6 {
   background: transparent;
   padding: 0 16px;
   height: var(--tap);
-  border-radius: 2px;
+  border-radius: var(--radius-s);
   font-family: inherit;
   font-size: 14px;
-  font-weight: 500;
-  text-transform: uppercase;
+  font-weight: 600;
   cursor: pointer;
   transition: background var(--transition);
   color: var(--text-main);
@@ -192,12 +195,12 @@ h6 {
 }
 
 .btn-raised {
-  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
+  box-shadow: var(--shadow-1);
 }
 
 .btn-raised.btn-primary {
   background: var(--primary);
-  color: var(--text-inverse);
+  color: #fff;
 }
 
 .btn-raised.btn-accent {
@@ -235,7 +238,8 @@ h6 {
 .card {
   background: var(--surface-color);
   box-shadow: var(--shadow-1);
-  border-radius: 2px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius);
 }
 
 .divider {
@@ -267,8 +271,7 @@ h6 {
   background: transparent;
   color: var(--text-dim);
   font-size: 14px;
-  font-weight: 500;
-  text-transform: uppercase;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -286,7 +289,8 @@ h6 {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 2px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
   background: var(--primary);
 }
 
@@ -297,7 +301,8 @@ h6 {
   height: max(32px, calc(var(--tap) - 4px));
   padding: 0 12px;
   border-radius: 16px;
-  background: var(--surface-3);
+  background: var(--tile-bg);
+  border: 1px solid var(--divider);
   color: var(--text-main);
   font-size: 13px;
   margin: 4px;
@@ -312,7 +317,8 @@ h6 {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -321,16 +327,16 @@ h6 {
 
 .dialog {
   background: var(--surface-color);
-  box-shadow: 0 11px 15px -7px rgba(0, 0, 0, .2), 0 24px 38px 3px rgba(0, 0, 0, .14), 0 9px 46px 8px rgba(0, 0, 0, .12);
-  border-radius: 2px;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, .3);
+  border-radius: 16px;
   min-width: 280px;
   max-width: calc(100% - 32px);
 }
 
 .dialog-title {
-  padding: 24px 24px 20px;
+  padding: 24px 24px 16px;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .dialog-content {

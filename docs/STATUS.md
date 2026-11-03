@@ -15,9 +15,10 @@ This file holds only the current state and hints for the next session.
   the site with the installer manifest (about 10 min, Pages caches 10 min). Tagging needs the user's explicit OK.
 
 ## Open checks
+- Modern look (system font, new colours, rounded shapes; light and dark): built and flashed; not yet looked at on the phone. Yellow trace colour replaced by orange.
 - Port extension (#44, S11 only), firmware note (#52) and sweep quality dialog (#45): flashed; the first two looked at by the user.
 - Marker readout (#46: delta, search, range from markers, Q, series/parallel): flashed and tried on the device.
-- Pinch zoom on the Freq chart (phone: tried, works live and paused). Desktop wheel/drag/double-click zoom: built and flashed, not yet tried on the computer.
+- Pinch zoom on the Freq chart (phone: tried, works live and paused). Desktop wheel/drag/double-click zoom: tried, works.
 - Trace formats (#47: Rp, Xp, Q, group delay, Y Smith, Polar): built and flashed; not yet tried on the device.
 - #16 touch operation, #18 light scheme and the HAM cursor (Manual/Min/Max, RL and R/X readouts at the cursor): flashed on the
   user's Feather via OTA and tried there (works). Not yet checked: light scheme outdoors in sunlight, iPhone Safari.

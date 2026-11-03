@@ -75,7 +75,7 @@ function fmtInductance(l) {
 .single { padding: 12px; display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 900px; margin: 0 auto; }
 .freq { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: transparent; color: var(--text-main); cursor: pointer; }
 .freq .value { font-size: 32px; font-weight: 500; font-variant-numeric: tabular-nums; }
-.label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; }
+.label { font-size: 12px; color: var(--text-dim); }
 .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .tile { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 8px; background: var(--tile-bg); }
 .tile .value { font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }

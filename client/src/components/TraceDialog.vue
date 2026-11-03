@@ -45,7 +45,7 @@ const save = () => {
 };
 
 const changeColor = () => {
-  const colors = ['#448aff', '#ff5252', '#4caf50', '#ffeb3b', '#9c27b0', '#00bcd4'];
+  const colors = ['#448aff', '#ff5252', '#4caf50', '#f57c00', '#9c27b0', '#00bcd4'];
   const currentIndex = colors.indexOf(localTrace.value.color);
   localTrace.value.color = colors[(currentIndex + 1) % colors.length];
 };

@@ -28,7 +28,7 @@ const resetCal = () => { if (confirm('Delete the calibration of all bands?')) ap
 <style scoped>
 .cal { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 8px; background: var(--tile-bg); }
 .cal-steps { display: flex; flex-wrap: wrap; gap: 6px; }
-.label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; }
+.label { font-size: 12px; color: var(--text-dim); }
 .sub { font-size: 12px; color: var(--text-dim); }
 .err { color: #f44336; }
 </style>

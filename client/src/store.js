@@ -32,7 +32,7 @@ const defaultState = {
         { id: 0, show: true, channel: 0, format: 'smith', scale: 1.0, offset: 0, color: '#f44336', type: 'clear', avgCount: 2 },
         { id: 1, show: true, channel: 0, format: 'logmag', scale: 10.0, offset: 0, color: '#4caf50', type: 'clear', avgCount: 2 },
         { id: 2, show: false, channel: 1, format: 'logmag', scale: 10.0, offset: 0, color: '#2196f3', type: 'clear', avgCount: 2 },
-        { id: 3, show: false, channel: 1, format: 'phase', scale: 90.0, offset: 0, color: '#ffeb3b', type: 'clear', avgCount: 2 }
+        { id: 3, show: false, channel: 1, format: 'phase', scale: 90.0, offset: 0, color: '#f57c00', type: 'clear', avgCount: 2 }
     ],
     data: {
         ch0: [],  // Array of {freq, real, imag}
@@ -179,7 +179,7 @@ function applyTheme() {
     store.themeEffective = store.theme === 'auto' ? (darkQuery && darkQuery.matches ? 'dark' : 'light') : store.theme;
     document.documentElement.dataset.theme = store.themeEffective;
     // the browser bar of a phone takes the colour of the page
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', store.themeEffective === 'dark' ? '#1e1e1e' : '#ffffff');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', store.themeEffective === 'dark' ? '#151b27' : '#ffffff');
 }
 watch(() => store.theme, applyTheme, { immediate: true });
 if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener('change', applyTheme);

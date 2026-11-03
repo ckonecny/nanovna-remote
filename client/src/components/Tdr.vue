@@ -107,7 +107,7 @@ const pickType = (e) => {
 .row label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--text-dim); flex: 1; min-width: 180px; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
 .tile { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 8px; background: var(--tile-bg); }
-.label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; }
+.label { font-size: 12px; color: var(--text-dim); }
 .value { font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .value.small { font-size: 16px; }
 .sub { font-size: 12px; color: var(--text-dim); }

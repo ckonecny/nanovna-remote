@@ -93,7 +93,7 @@ const grid = [1, 2, 3, 5];
 <style scoped>
 .multi { flex: 1; min-width: 0; padding: 8px 12px; display: flex; flex-direction: column; gap: 10px; }
 .bands { display: flex; flex-wrap: wrap; gap: 6px; }
-.band.active { background: #3f51b5; color: #fff; border-color: #3f51b5; }
+.band.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px; }
 .card { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 8px; background: var(--tile-bg); border-left: 4px solid var(--border-color); }
 .card.good { border-left-color: #4caf50; }

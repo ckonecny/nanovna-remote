@@ -256,3 +256,11 @@ installer page on https cannot call a http device (mixed content); the installer
 - The page cannot zoom through a gesture the chart takes: `touch-action: pan-x pan-y` on the canvas drops browser pinch-zoom there, one finger still scrolls. The `viewport` meta is not used (iOS ignores `user-scalable=no`).
 - The frequency range is applied on release (a new sweep per finger move would flood the NanoVNA); a hint shows the target range meanwhile. The Y scale follows live. Limits 50 kHz .. 900 MHz. Smith/Polar are not zoomed.
 - Desktop: wheel / trackpad pinch (ctrl + wheel) zooms the range around the pointer (steps collected 300 ms), Shift + wheel the Y scale, mouse drag shifts (from 5 px, so plain clicks stay clicks), double click or double tap resets to 50 kHz..900 MHz and the default scale. While paused a changed range takes one sweep (`store.sweepOnce`), which ends only after a sweep delivered data.
+
+## Modern look (2026-11)
+- Fonts: system font stack (`system-ui`, SF Pro / Roboto / Segoe UI) instead of the Roboto web font from Google Fonts, so
+  the text looks native on every device and loads without internet and without flash cost. Material Icons still come from Google.
+- Colours: slate/indigo palette (light: `#f3f5f9` page, white cards, `#0f172a` text, `#1d4ed8` primary; dark: `#0b0f17` page,
+  `#151b27` surface, `#7aa2ff` primary). Text contrast stays high for sunlight.
+- Shapes: larger radii (8/12/16 px), hairline borders instead of heavy shadows, sentence-case buttons, tabs and labels (no upper case).
+- Trace colours: no yellow or lime (white chip text is unreadable on them); the default trace 4 and the choices use dark orange `#f57c00`.
