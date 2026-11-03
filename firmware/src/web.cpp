@@ -514,22 +514,31 @@ void web_start() {
     };
     ESP_ERROR_CHECK(httpd_start(&server, &config));
 
+    // every field is set, so the compiler has nothing to complain about
+    auto route = [](const char *uri, httpd_method_t method, esp_err_t (*handler)(httpd_req_t *), bool websocket = false) {
+        httpd_uri_t r = {};
+        r.uri = uri;
+        r.method = method;
+        r.handler = handler;
+        r.is_websocket = websocket;
+        return r;
+    };
     const httpd_uri_t routes[] = {
-        {.uri = "/api/appcal", .method = HTTP_GET, .handler = appcal_get_handler, .user_ctx = nullptr},
-        {.uri = "/api/appcal", .method = HTTP_PUT, .handler = appcal_put_handler, .user_ctx = nullptr},
-        {.uri = "/api/ota", .method = HTTP_POST, .handler = ota_handler, .user_ctx = nullptr},
-        {.uri = "/ws", .method = HTTP_GET, .handler = ws_handler, .user_ctx = nullptr, .is_websocket = true},
-        {.uri = "/log", .method = HTTP_GET, .handler = log_handler, .user_ctx = nullptr},
-        {.uri = "/wifi", .method = HTTP_GET, .handler = wifi_page_handler, .user_ctx = nullptr},
-        {.uri = "/update", .method = HTTP_GET, .handler = update_page_handler, .user_ctx = nullptr},
-        {.uri = "/api/wifi", .method = HTTP_POST, .handler = wifi_save_handler, .user_ctx = nullptr},
-        {.uri = "/api/wifi/nets", .method = HTTP_GET, .handler = wifi_nets_handler, .user_ctx = nullptr},
-        {.uri = "/api/wifi/scan", .method = HTTP_GET, .handler = wifi_scan_handler, .user_ctx = nullptr},
-        {.uri = "/api/wifi/connect", .method = HTTP_POST, .handler = wifi_connect_handler, .user_ctx = nullptr},
-        {.uri = "/api/wifi/toggle", .method = HTTP_POST, .handler = wifi_toggle_handler, .user_ctx = nullptr},
-        {.uri = "/api/wifi/delete", .method = HTTP_POST, .handler = wifi_delete_handler, .user_ctx = nullptr},
-        {.uri = "/api/info", .method = HTTP_GET, .handler = info_handler, .user_ctx = nullptr},
-        {.uri = "/*", .method = HTTP_GET, .handler = asset_handler, .user_ctx = nullptr},
+        route("/api/appcal", HTTP_GET, appcal_get_handler),
+        route("/api/appcal", HTTP_PUT, appcal_put_handler),
+        route("/api/ota", HTTP_POST, ota_handler),
+        route("/ws", HTTP_GET, ws_handler, true),
+        route("/log", HTTP_GET, log_handler),
+        route("/wifi", HTTP_GET, wifi_page_handler),
+        route("/update", HTTP_GET, update_page_handler),
+        route("/api/wifi", HTTP_POST, wifi_save_handler),
+        route("/api/wifi/nets", HTTP_GET, wifi_nets_handler),
+        route("/api/wifi/scan", HTTP_GET, wifi_scan_handler),
+        route("/api/wifi/connect", HTTP_POST, wifi_connect_handler),
+        route("/api/wifi/toggle", HTTP_POST, wifi_toggle_handler),
+        route("/api/wifi/delete", HTTP_POST, wifi_delete_handler),
+        route("/api/info", HTTP_GET, info_handler),
+        route("/*", HTTP_GET, asset_handler),
     };
     for (const auto &route : routes) ESP_ERROR_CHECK(httpd_register_uri_handler(server, &route));
     ESP_ERROR_CHECK(httpd_register_err_handler(server, HTTPD_404_NOT_FOUND, redirect_handler));

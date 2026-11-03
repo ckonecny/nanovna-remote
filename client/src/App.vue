@@ -549,6 +549,7 @@ const quit = () => {
         <div class="tabs-navigation view-tabs">
           <button v-for="[id, name] in VIEWS" :key="id" class="tab-btn" :class="{ active: graphSelected === id }" @click="selectView(id)">{{ name }}</button>
         </div>
+        <div class="side-column">
         <div class="input-panel" v-show="!['single', 'ham', 'multi', 'cable', 'tdr'].includes(graphSelected)">
           <div class="tabs-navigation">
             <button class="tab-btn" :class="{ active: freqInputSelect === 'start-stop' }" @click="freqInputSelect = 'start-stop'">Start/Stop</button>
@@ -594,6 +595,8 @@ const quit = () => {
             </button>
           </div>
         </div>
+          <MarkerReadout v-if="graphSelected === 'smith' || graphSelected === 'frequency'" />
+        </div>
         <div class="graph-wrapper">
           <Single v-if="graphSelected === 'single'" @edit-frequency="openKeypad('Frequency', 'single.freq', store.singleFreq)" />
           <Ham v-else-if="graphSelected === 'ham'" @select-band="selectBand" @edit-cursor="(f) => openKeypad('Cursor frequency', 'ham.cursor', f)" />
@@ -602,7 +605,6 @@ const quit = () => {
           <Tdr v-else-if="graphSelected === 'tdr'" />
           <Graph v-else :type="graphSelected" />
         </div>
-        <MarkerReadout v-if="graphSelected === 'smith' || graphSelected === 'frequency'" />
       </div>
     </main>
 
@@ -687,6 +689,16 @@ const quit = () => {
 .input-panel {
   margin: 16px 0 24px;
 }
+
+/* portrait: the wrapper vanishes and the order is tabs, inputs, chart, readout */
+.side-column {
+  display: contents;
+}
+
+.graph-area > .view-tabs { order: 0; }
+.side-column > .input-panel { order: 1; }
+.graph-area > .graph-wrapper { order: 2; }
+.side-column > .marker-readout { order: 3; }
 
 .freq-inputs {
   display: flex;
@@ -817,7 +829,7 @@ const quit = () => {
   .graph-area.has-inputs {
     display: grid;
     grid-template-columns: minmax(240px, 36%) minmax(0, 1fr);
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: auto 1fr;
     column-gap: 8px;
     flex: 1;
   }
@@ -826,18 +838,22 @@ const quit = () => {
     grid-column: 1 / -1;
   }
 
-  .graph-area.has-inputs > .input-panel {
+  /* inputs and readout share one column, so no row has to be sized from the other column (Safari got that wrong) */
+  .graph-area.has-inputs > .side-column {
+    display: block;
     grid-column: 1;
     grid-row: 2;
+    min-width: 0;
+  }
+
+  .side-column > .input-panel {
     margin: 4px 0;
-    overflow: visible;
-    min-height: min-content;
   }
 
   /* the chart spans the inputs and the readout column; min-width 0 lets it follow the window when the phone is turned */
   .graph-area.has-inputs > .graph-wrapper {
     grid-column: 2;
-    grid-row: 2 / span 2;
+    grid-row: 2;
     min-height: 70vh;
     min-width: 0;
     overflow: hidden;

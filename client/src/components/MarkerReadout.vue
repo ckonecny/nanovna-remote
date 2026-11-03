@@ -102,7 +102,4 @@ th, td { text-align: right; padding: 1px 6px; white-space: nowrap; }
 td:first-child, th:first-child { text-align: left; color: var(--text-dim); }
 th { cursor: pointer; }
 th.act { color: var(--primary); }
-@media (orientation: landscape) and (max-height: 500px) {
-  .marker-readout { grid-column: 1; grid-row: 3; align-self: start; min-width: 0; }
-}
 </style>

@@ -39,14 +39,6 @@ static void dns_task(void *) {
         while (p < n && buf[p]) p += buf[p] + 1;
         p += 1 + 4;  // terminating 0, type, class
         if (p > n) continue;
-        {
-            char name[64] = {};
-            for (int q = 12, o = 0; q < n && buf[q] && o < 60; q += buf[q] + 1) {
-                for (int k = 1; k <= buf[q] && o < 60; k++) name[o++] = buf[q + k];
-                name[o++] = '.';
-            }
-            ESP_LOGI(TAG, "query %s", name);
-        }
         bool is_a = buf[p - 4] == 0 && buf[p - 3] == 1;
 
         buf[2] = 0x81;  // response, recursion desired

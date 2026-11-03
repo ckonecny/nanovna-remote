@@ -15,6 +15,8 @@ This file holds only the current state and hints for the next session.
   the site with the installer manifest (about 10 min, Pages caches 10 min). Tagging needs the user's explicit OK.
 
 ## Open checks
+- iPhone Safari in landscape: the readout overlapped the inputs and chips (user screenshot). Fixed by putting inputs and readout in one `.side-column` grid cell; Chromium checked at 844x390 and portrait, flashed; the user still has to look at it in Safari.
+- Compiler warnings in `web.cpp` fixed (route helper) and `dns.cpp` no longer logs every query: flashed, device runs.
 - Modern look (system font, new colours, rounded shapes; light and dark): built and flashed; not yet looked at on the phone. Yellow trace colour replaced by orange.
 - Port extension (#44, S11 only), firmware note (#52) and sweep quality dialog (#45): flashed; the first two looked at by the user.
 - Marker readout (#46: delta, search, range from markers, Q, series/parallel): flashed and tried on the device.
@@ -35,7 +37,6 @@ This file holds only the current state and hints for the next session.
   check for a workbox-build update before then and drop the entries.
 - Optional: `dev-tools/screenshots/shots.mjs` could use the JS simulator (`client/src/lib/demo.js`) instead of
   `dev-tools/simulator.py`, removing the duplicate model. No flash saving (neither simulator is in the firmware).
-- Known warnings: 3 `-Wmissing-field-initializers` in `web.cpp` (route table); `dns.cpp` still logs every query.
 
 ## Hints for the next session
 - Chat with the user in German; repo content English (CLAUDE.md).
