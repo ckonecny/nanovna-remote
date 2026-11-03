@@ -137,3 +137,14 @@ export function stubLength({ freq, vf, x, z0, type }) {
     if (angle < 0) angle += Math.PI;
     return angle / b;
 }
+
+// Port extension: a line of delay tau (s) between the instrument and the device under test turns the reflection by
+// -4 * pi * f * tau; turning it back by the same angle moves the reference plane to the end of the line.
+export function portExtend(points, tau) {
+    if (!tau) return points;
+    return points.map((p) => {
+        const a = 4 * Math.PI * p.freq * tau;
+        const c = Math.cos(a), s = Math.sin(a);
+        return { ...p, real: p.real * c - p.imag * s, imag: p.real * s + p.imag * c };
+    });
+}

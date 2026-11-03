@@ -69,6 +69,8 @@ const handleKeypadSubmit = (value) => {
     if (key === 'center' || key === 'span') updateCenterSpan();
   } else if (keypadTarget.value === 'single.freq') {
     applySingleFreq(value);
+  } else if (keypadTarget.value === 'portext') {
+    store.portExtLength = value > 0 ? value : 0;
   } else if (keypadTarget.value === 'ham.cursor') {
     store.hamCursor = value;
   } else if (keypadTarget.value === 'marker.add') {
@@ -419,6 +421,12 @@ const quit = () => {
 
     <DemoPanel v-if="isDemo" />
 
+    <div class="stale fw-note" v-if="store.status === 'connected' && store.fwNew && store.fwNew.tag !== store.fwDismissed">
+      <span>A newer NanoVNA firmware is available: {{ store.fwNew.tag }} (installed: {{ store.version.trim() }}).
+        <a :href="store.fwNew.url" target="_blank" rel="noopener">Release page</a></span>
+      <button class="btn" @click="store.fwDismissed = store.fwNew.tag">Dismiss</button>
+    </div>
+
     <div class="stale" v-if="store.status === 'connected' && store.autoUpdate && (store.deviceFrozen || store.silentSecs > 6)">
       <template v-if="store.deviceFrozen">The NanoVNA delivers no new measurements (the values no longer change). Please restart the NanoVNA.</template>
       <template v-else>No data from the NanoVNA for {{ store.silentSecs }} s. Check the connection or restart the NanoVNA.</template>
@@ -445,6 +453,10 @@ const quit = () => {
         </button>
         <button class="btn-nav" @click="openKeypad('Segments', 'frequencies.segments', store.frequencies.segments, '')">
           <span class="icon">gradient</span> Resolution...
+        </button>
+
+        <button class="btn-nav" @click="openKeypad('Port extension (m of line, VF ' + store.velocityFactor + ')', 'portext', store.portExtLength, 'm')">
+          <span class="icon">straighten</span> Port extension{{ store.portExtLength > 0 ? ': ' + store.portExtLength + ' m' : '...' }}
         </button>
 
         <div class="nav-subheader">Device</div>
@@ -618,6 +630,8 @@ const quit = () => {
 </template>
 
 <style scoped>
+.fw-note { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.fw-note a { color: var(--primary); }
 .stale { padding: 8px 16px; background: var(--notice-bg); color: var(--text-main); font-size: 14px; flex-shrink: 0; }
 
 /* .btn-inverse removed */

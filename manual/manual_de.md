@@ -199,6 +199,10 @@ Ein Trace ist eine Kurve in der Ansicht **Freq** oder **Smith**. In den Einstell
 
 **Add Trace** im Seitenmenü legt einen neuen an.
 
+**Firmware-Hinweis.** Gibt es für das verbundene NanoVNA (NanoVNA-H oder -H4 des Projekts von hugen79) eine neuere Firmware,
+erscheint unter der Kopfzeile ein Hinweis mit Link auf die Release-Seite; **Dismiss** blendet ihn für dieses Release aus. Dafür
+braucht das Handy oder der Computer Internetzugang.
+
 ### 5.9 Das Seitenmenü
 
 <img src="../site/img/phone-menu.png" width="280" alt="Das Seitenmenü">
@@ -212,6 +216,10 @@ Der Menüknopf öffnet es. Einträge, die eine Verbindung brauchen, sind bis zum
 - **Add Trace**: siehe 5.8.
 - **Resolution...**: die Anzahl der Segmente mit je 101 Punkten pro Sweep. 1 bedeutet 101 Punkte; mehr Segmente geben einen
   feineren Sweep, dauern aber länger, und der Knopf in der Kopfzeile wechselt zu Update/Stop.
+- **Port extension...**: die Länge von Kabel oder Adapter zwischen NanoVNA und Messobjekt in Metern (0 schaltet es aus). Die
+  App dreht die gemessene Reflexion um die Laufzeit dieser Leitung zurück (Länge und Verkürzungsfaktor der Ansicht Cable),
+  sodass Smith-Diagramm, Impedanz und SWR sich auf das Leitungsende beziehen. Es gilt für die Reflexion in Single, HAM, Multi,
+  Smith und den Diagrammen, nicht für die Ansichten Cable und TDR und nicht für die Transmission (CH1). Kalibriert wird am Anschluss des NanoVNA, nicht am Leitungsende.
 
 **Device**
 - **Connect** / **Disconnect**.

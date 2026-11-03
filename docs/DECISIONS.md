@@ -218,3 +218,12 @@ installer page on https cannot call a http device (mixed content); the installer
 - `firmware/` GPL-3.0-or-later.
 - `client/` GPL-2.0, upstream cho45/NanoVNA-WebClient.
 - `firmware/src/font5x7.h`: Adafruit GFX 5x7 font, BSD license (Adafruit Industries).
+
+## Port extension and firmware note (2026-11)
+- The device's `edelay` / `s21offset` do not apply: the app switches the device calibration off and corrects the raw readings
+  itself (see app-side OSL). So the port extension is done in the client (`portExtend` in `lib/cable.js`): the corrected
+  reflection is turned by +4 pi f tau, tau = length / (c * VF), applied to the main sweep and to Multi. Not to Cable/TDR
+  (own delay maths) and not yet to CH1 (#44 stays open for S21).
+- Firmware note (`lib/fwcheck.js`): only for `Board: NanoVNA-H` / `NanoVNA-H 4` (projects hugen79/NanoVNA-H and -H4, tag =
+  `version` output, e.g. 1.2.50); other forks use their own numbering. GitHub API from the browser; silent on any error, never in
+  the demo build. A device with 1.2.50 / build 2026-05-16 was the latest release when this was written.

@@ -2,8 +2,9 @@ import { reactive, watch } from 'vue';
 import * as Comlink from 'comlink';
 import { NanoVNA_WebSerial, NanoVNA_WebUSB, NanoVNA_WebSocket } from './lib/nanovna';
 import { HAM_BANDS, bandSweep } from './lib/bands';
-import { CABLE_RANGES } from './lib/cable';
+import { CABLE_RANGES, portExtend, C } from './lib/cable';
 import { TDR_RANGES } from './lib/tdr';
+import { newerFirmware } from './lib/fwcheck';
 import { appCal, applyCal, solveOSL, pullFromDevice, pushToDevice } from './lib/oslcal';
 
 // The bridge address: ?host=<name or ip> in the URL, or the host the page itself was served from (when it is the ESP32)
@@ -75,7 +76,10 @@ const defaultState = {
     deviceFrozen: false, // the NanoVNA keeps returning exactly the same values
     singleFreq: 145e6, // frequency of the Single view
     velocityFactor: 0.66, // Default for RG58 etc
+    portExtLength: 0, // m of line (at velocityFactor) between the NanoVNA and the device under test, removed from the reflection
     version: '',
+    fwNew: null, // { tag, url } of a newer firmware release for the connected NanoVNA, not saved
+    fwDismissed: '', // release tag whose note the user closed
     info: '',
     dataVersion: 0, // Increment to force reactive updates
     debugLogs: [],
@@ -109,6 +113,8 @@ function loadState() {
             if (parsed.theme !== undefined) state.theme = parsed.theme;
             if (parsed.singleFreq !== undefined) state.singleFreq = parsed.singleFreq;
             if (parsed.velocityFactor !== undefined) state.velocityFactor = parsed.velocityFactor;
+            if (typeof parsed.fwDismissed === 'string') state.fwDismissed = parsed.fwDismissed;
+            if (parsed.portExtLength >= 0) state.portExtLength = parsed.portExtLength;
             if (parsed.connectionType !== undefined) state.connectionType = parsed.connectionType;
             if (parsed.wsHost && !new URLSearchParams(location.search).get('host')) state.wsHost = parsed.wsHost;
 
@@ -131,6 +137,9 @@ function loadState() {
 
 export const store = reactive(loadState());
 
+// delay (s) of the port extension line
+export const portDelay = () => (store.portExtLength > 0 ? store.portExtLength / (C * store.velocityFactor) : 0);
+
 watch(store, (newState) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
         frequencies: newState.frequencies,
@@ -139,6 +148,8 @@ watch(store, (newState) => {
         activeMarker: newState.activeMarker,
         scales: newState.scales,
         velocityFactor: newState.velocityFactor,
+        portExtLength: newState.portExtLength,
+        fwDismissed: newState.fwDismissed,
         autoUpdate: newState.autoUpdate,
         connectionType: newState.connectionType,
         wsHost: newState.wsHost,
@@ -286,6 +297,8 @@ export async function connect() {
         store.autoUpdate = true;
         store.version = await workerProxy.getVersion();
         store.info = await workerProxy.getInfo();
+        store.fwNew = null;
+        if (!import.meta.env.VITE_DEMO) newerFirmware(store.version, store.info).then((r) => { store.fwNew = r; });
         startUpdateLoop();
     } catch (e) {
         log('Connect function caught error: ' + e);
@@ -393,6 +406,7 @@ export async function startUpdateLoop() {
                     ch0 = corrected.points;
                     store.appCalCovered = ch0.length ? corrected.covered / ch0.length : 0;
                 }
+                ch0 = portExtend(ch0, portDelay());
                 store.data.ch0 = ch0;
 
                 if (needsCh1) {
@@ -504,6 +518,7 @@ export async function startUpdateLoop() {
                     let points = data0.map((d, i) => ({ freq: freqs[i], real: d[0], imag: d[1] }));
                     const cal = appCal.enabled ? appCal.bands[name] : null;
                     if (cal) points = applyCal(points, { [name]: cal }).points;
+                    points = portExtend(points, portDelay());
                     store.multi[name] = { points, calibrated: !!cal, at: Date.now() };
                     store.lastDataAt = Date.now();
                     store.dataVersion++;
