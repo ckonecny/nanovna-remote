@@ -61,7 +61,9 @@ calibration, runs in the browser.
 
 ## Quick start
 
-1. **Flash the firmware** (it has the web app inside). Download `nanovna-remote-<version>-first-flash.bin` from the
+1. **Flash the firmware** (it has the web app inside). Easiest, from the browser (Chrome or Edge): open the
+   **[installer](https://ckonecny.github.io/nanovna-remote/install/)**, put the Feather in the bootloader (hold **D0**, tap
+   **RESET**, release D0), click Connect, pick the port and choose Install. Or with a tool: download `nanovna-remote-<version>-first-flash.bin` from the
    [latest release](https://github.com/ckonecny/nanovna-remote/releases/latest), connect the Feather over USB-C to the computer,
    hold **D0**, tap **RESET**, release D0, and run (needs Python):
    ```sh
@@ -110,6 +112,8 @@ Ideas, bug reports and feature requests are welcome as [GitHub issues](https://g
 - `firmware/` is GPL-3.0-or-later.
 - `client/` is GPL-2.0 (see `client/COPYING`, upstream cho45/NanoVNA-WebClient). It is built separately and only
   embedded into the firmware image as data, so both licenses stay apart.
+
+- The browser installer vendors [ESP Web Tools](https://github.com/esphome/esp-web-tools) (Apache-2.0, `site/install/vendor/`).
 
 ## Acknowledgements
 

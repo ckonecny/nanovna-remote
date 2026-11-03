@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install NanoVNA Remote</title>
+<meta name="description" content="Install the NanoVNA Remote firmware on an Adafruit ESP32-S3 Reverse TFT Feather from the browser, no tools needed.">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+<style>
+:root {
+  --bg: #0a0e13; --surface: #121923; --surface-2: #1a2330; --line: #243040; --text: #e8eef5; --dim: #93a1b3;
+  --accent: #4fd1a5; --accent-ink: #062018; --blue: #6ea8ff; --warn: #f0b429; --radius: 16px;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+html[lang="en"] [lang="de"], html[lang="de"] [lang="en"] { display: none !important; }
+header { border-bottom: 1px solid var(--line); }
+header .wrap { display: flex; align-items: center; height: 60px; gap: 16px; }
+.lang { display: flex; gap: 4px; margin-left: auto; }
+.lang button { background: none; border: 1px solid var(--line); color: var(--dim); border-radius: 8px; padding: 3px 9px; font: inherit; font-size: 12px; cursor: pointer; }
+.lang button[aria-pressed="true"] { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+h1 { font-size: 32px; line-height: 1.2; margin: 40px 0 8px; }
+.lead { color: var(--dim); margin: 0 0 28px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; margin: 0 0 18px; }
+.card h2 { font-size: 18px; margin: 0 0 10px; }
+ol { margin: 0; padding-left: 22px; }
+li { margin: 6px 0; }
+.install { text-align: center; padding: 26px 22px; }
+.install esp-web-install-button { --esp-tools-button-color: var(--accent); --esp-tools-button-text-color: var(--accent-ink); }
+.version { color: var(--dim); font-size: 14px; margin-top: 10px; }
+.warn { border-color: #5c4a14; background: #1d1a0e; }
+.warn b { color: var(--warn); }
+.dim { color: var(--dim); font-size: 14px; }
+code { background: var(--surface-2); padding: 1px 6px; border-radius: 6px; font-size: 14px; }
+footer { color: var(--dim); font-size: 14px; padding: 24px 0 48px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a href="../">&larr; NanoVNA Remote</a>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-set="en" aria-pressed="true">EN</button>
+      <button type="button" data-set="de" aria-pressed="false">DE</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1><span lang="en">Install the firmware</span><span lang="de">Firmware installieren</span></h1>
+  <p class="lead">
+    <span lang="en">Straight from the browser, no tools to install. For the Adafruit ESP32-S3 Reverse TFT Feather (product 5691).</span>
+    <span lang="de">Direkt aus dem Browser, ohne Programme. F&uuml;r das Adafruit ESP32-S3 Reverse TFT Feather (Produkt 5691).</span>
+  </p>
+
+  <section class="card">
+    <h2><span lang="en">What you need</span><span lang="de">Was du brauchst</span></h2>
+    <ul>
+      <li><span lang="en">The Feather and a USB-C data cable to your computer (the NanoVNA is not connected yet).</span><span lang="de">Das Feather und ein USB-C-Datenkabel zum Computer (das NanoVNA ist noch nicht angeschlossen).</span></li>
+      <li><span lang="en"><b>Chrome</b> or <b>Edge</b> on a computer (or Chrome on Android with a USB-OTG cable). Firefox, Safari and iPhones cannot do this.</span><span lang="de"><b>Chrome</b> oder <b>Edge</b> am Computer (oder Chrome auf Android mit USB-OTG-Kabel). Firefox, Safari und iPhones k&ouml;nnen das nicht.</span></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2><span lang="en">1. Put the Feather in the bootloader</span><span lang="de">1. Feather in den Bootloader versetzen</span></h2>
+    <p style="margin:0">
+      <span lang="en">Hold the <b>D0</b> button, tap <b>RESET</b>, then let go of D0. The display stays dark.</span>
+      <span lang="de"><b>D0</b> gedr&uuml;ckt halten, <b>RESET</b> kurz dr&uuml;cken, dann D0 loslassen. Das Display bleibt dunkel.</span>
+    </p>
+  </section>
+
+  <section class="card install">
+    <h2><span lang="en">2. Install</span><span lang="de">2. Installieren</span></h2>
+    <esp-web-install-button manifest="manifest.json">
+      <span slot="unsupported"><span lang="en">This browser cannot flash. Use Chrome or Edge on a computer, or <a href="https://github.com/ckonecny/nanovna-remote/releases/latest">download the files</a>.</span><span lang="de">Dieser Browser kann nicht flashen. Nimm Chrome oder Edge am Computer, oder <a href="https://github.com/ckonecny/nanovna-remote/releases/latest">lade die Dateien herunter</a>.</span></span>
+      <span slot="not-allowed"><span lang="en">Open this page over https.</span><span lang="de">&Ouml;ffne diese Seite &uuml;ber https.</span></span>
+    </esp-web-install-button>
+    <div class="version" id="version"></div>
+    <p class="dim" style="margin-bottom:0">
+      <span lang="en">Click <b>Connect</b>, pick the port of the Feather in the list (named like &ldquo;USB JTAG/serial debug unit&rdquo; or &ldquo;ESP32-S3&rdquo;), then choose <b>Install</b> in the window that opens. It takes about a minute.</span>
+      <span lang="de"><b>Connect</b> klicken, in der Liste den Port des Feathers w&auml;hlen (hei&szlig;t etwa &bdquo;USB JTAG/serial debug unit&ldquo; oder &bdquo;ESP32-S3&ldquo;), dann im ge&ouml;ffneten Fenster <b>Install</b> w&auml;hlen. Das dauert etwa eine Minute.</span>
+    </p>
+  </section>
+
+  <section class="card">
+    <h2><span lang="en">3. Start</span><span lang="de">3. Starten</span></h2>
+    <ol>
+      <li><span lang="en">When it says done, press <b>RESET</b> once. The display shows the WiFi <code>NanoVNA-Remote</code> (password <code>nanovna-remote</code>).</span><span lang="de">Wenn &bdquo;fertig&ldquo; erscheint, einmal <b>RESET</b> dr&uuml;cken. Das Display zeigt das WLAN <code>NanoVNA-Remote</code> (Passwort <code>nanovna-remote</code>).</span></li>
+      <li><span lang="en">Join that WiFi, open <code>http://192.168.4.1/wifi</code> and pick your network.</span><span lang="de">Mit diesem WLAN verbinden, <code>http://192.168.4.1/wifi</code> &ouml;ffnen und dein Netz w&auml;hlen.</span></li>
+      <li><span lang="en">Connect the NanoVNA to the Feather&rsquo;s USB-C port and open the address shown on the display. More in the <a href="https://github.com/ckonecny/nanovna-remote/blob/main/manual/manual_en.md">manual</a>.</span><span lang="de">Das NanoVNA an den USB-C-Anschluss des Feathers h&auml;ngen und die Adresse vom Display &ouml;ffnen. Mehr im <a href="https://github.com/ckonecny/nanovna-remote/blob/main/manual/manual_de.md">Handbuch</a>.</span></li>
+    </ol>
+  </section>
+
+  <section class="card warn">
+    <span lang="en"><b>Note:</b> installing writes the whole device and <b>clears the saved WiFi networks</b> (the calibration is not touched). For later updates no cable is needed: see chapter 7 of the manual.</span>
+    <span lang="de"><b>Hinweis:</b> Die Installation beschreibt das ganze Ger&auml;t und <b>l&ouml;scht die gespeicherten WLAN-Netze</b>. F&uuml;r sp&auml;tere Updates braucht es kein Kabel: siehe Kapitel 7 im Handbuch.</span>
+  </section>
+
+  <footer>
+    <span lang="en">Browser flasher: <a href="https://github.com/esphome/esp-web-tools">ESP Web Tools</a> (Apache-2.0).</span>
+    <span lang="de">Flash-Werkzeug im Browser: <a href="https://github.com/esphome/esp-web-tools">ESP Web Tools</a> (Apache-2.0).</span>
+    <a href="https://github.com/ckonecny/nanovna-remote/releases">Releases</a>
+  </footer>
+</main>
+
+<script type="module" src="vendor/esp-web-tools/install-button.js"></script>
+<script>
+(function () {
+  var html = document.documentElement;
+  function set(l) {
+    html.lang = l;
+    document.querySelectorAll('.lang button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.set === l)); });
+    try { localStorage.setItem('lang', l); } catch (e) {}
+  }
+  var saved = null;
+  try { saved = localStorage.getItem('lang'); } catch (e) {}
+  set(saved || ((navigator.language || '').toLowerCase().indexOf('de') === 0 ? 'de' : 'en'));
+  document.querySelectorAll('.lang button').forEach(function (b) { b.addEventListener('click', function () { set(b.dataset.set); }); });
+  fetch('manifest.json').then(function (r) { return r.json(); }).then(function (m) {
+    document.getElementById('version').textContent = 'NanoVNA Remote ' + m.version;
+  }).catch(function () {});
+})();
+</script>
+</body>
+</html>

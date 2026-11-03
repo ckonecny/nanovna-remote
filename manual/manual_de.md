@@ -229,6 +229,11 @@ die Seite eine Warnung; HAM und Multi zeigen für jedes Band, ob es kalibriert i
 
 ## 7. Firmware aktualisieren
 
+Am einfachsten geht es mit dem **[Installer im Browser](https://ckonecny.github.io/nanovna-remote/install/)** (Chrome oder
+Edge am Computer): Feather in den Bootloader versetzen (D0 halten, RESET tippen, D0 loslassen), **Connect** klicken, den
+Port wählen und **Install** wählen. Er installiert das neueste Release und löscht, wie die First-Flash-Datei unten, die gespeicherten WLAN-Netze.
+Die Kalibrierung bleibt erhalten.
+
 Jedes [Release](https://github.com/ckonecny/nanovna-remote/releases) enthält zwei fertige Dateien:
 
 - **`...-first-flash.bin`** für die erste Installation (oder zum Neustart von null) per USB: D0 halten, RESET tippen, D0

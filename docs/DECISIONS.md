@@ -143,6 +143,13 @@ Newest first within each section. Record new decisions here as they are made.
   `*-first-flash.bin` (checked byte for byte against the single files; 4 MB, dio, 80 MHz). `*-update.bin` is the plain app
   for `/api/ota`. `SHA256SUMS` is attached; the release notes carry the flash commands. The merged image also erases NVS
   (stored WiFi networks), so the notes say it is for the first installation.
+- Browser installer: `site/install/` uses ESP Web Tools 10.4.0 (Apache-2.0), vendored unmodified in
+  `site/install/vendor/esp-web-tools/` (pinned, no CDN at runtime). `pages.yml` downloads the first-flash image of the latest
+  release into `_site/install/firmware.bin` and writes `manifest.json` (same origin: GitHub release assets send no CORS
+  headers); `release.yml` starts `pages.yml` after publishing (a release made with the workflow token does not trigger
+  `on: release`). The Feather's USB port is not a serial port while the firmware runs, so the page tells the user to enter
+  the ROM bootloader first (D0 + RESET). Web Serial: Chrome/Edge only, not Firefox/Safari/iOS. The image overwrites NVS
+  (WiFi networks) but not the `storage` partition (calibration, 0x320000).
 - Not tested yet: flashing the merged image on the device and a real tag run of the workflow.
 
 ## Build reproducibility (2026-11)

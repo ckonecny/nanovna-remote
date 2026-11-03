@@ -61,6 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     steps:
       - uses: actions/download-artifact@v8
         with:
@@ -87,3 +88,7 @@ jobs:
           Checksums in \`SHA256SUMS\`. Source of exactly this build: the tag \`$TAG\` of https://github.com/$REPO. Licences: firmware GPL-3.0-or-later, embedded web app GPL-2.0.
           NOTES
           gh release create "$TAG" release/* --repo "$REPO" --title "$TAG" --notes-file notes.md
+      - name: Update the browser installer on the Pages site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo "${{ github.repository }}"

@@ -225,6 +225,10 @@ it is calibrated.
 
 ## 7. Updating the firmware
 
+The easiest way is the **[browser installer](https://ckonecny.github.io/nanovna-remote/install/)** (Chrome or Edge on a
+computer): put the Feather in the bootloader (hold D0, tap RESET, release D0), click **Connect**, pick the port and choose **Install**. It
+installs the latest release and, like the first-flash file below, clears the stored WiFi networks. The calibration stays.
+
 Every [release](https://github.com/ckonecny/nanovna-remote/releases) has two ready-made files:
 
 - **`...-first-flash.bin`** for the first installation (or to start over) over USB: hold D0, tap RESET, release D0, then
