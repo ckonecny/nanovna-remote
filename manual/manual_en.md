@@ -305,5 +305,6 @@ PlatformIO. See `firmware/README.md`.
 | The display stays dark | Press RESET. If it stays dark, reflash over USB. |
 | No setup WiFi visible | Hold D0 while pressing RESET. Look for **NanoVNA-Remote** (not an older name). |
 | The page does not open | Use the IP address from the display; `nanovna.local` does not work everywhere. |
+| Chrome on Android 17 shows `ERR_TOO_MANY_RETRIES` for every address in your home network (Firefox works) | Android 17 blocks apps from the local network until you allow it: **Settings → Apps → Chrome → Permissions → Nearby devices → Allow**. |
 | "USB: no device" | Check the USB cable between Feather and NanoVNA; the NanoVNA must be switched on. |
 | Data stops, NanoVNA frozen | Restart the NanoVNA (it can hang after a Feather reset during a transfer). |

@@ -62,6 +62,9 @@ async function connect(page) {
     await page.evaluate(() => [...document.querySelectorAll('header button')].find((b) => /connect$/.test(b.textContent.trim()))?.click());
     await page.waitForFunction(() => [...document.querySelectorAll('header button')].some((b) => /Pause|Resume/.test(b.textContent)), { timeout: 20000 });
     await sleep(1500);
+    // the simulated device reports an old firmware version: hide the update notice
+    await page.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'Dismiss')?.click());
+    await sleep(300);
 }
 
 async function shot(page, name) {
@@ -70,16 +73,24 @@ async function shot(page, name) {
     console.log(name);
 }
 
-// calibrates all bands with the simulated standards
+// calibrates all bands with the simulated standards (guided calibration of the app)
 async function calibrate(page) {
     await tab(page, 'HAM');
-    for (const [name, standard] of [['Open', 'open'], ['Short', 'short'], ['Load', 'load']]) {
+    await click(page, 'button.band', 'Calibrate...');
+    const steps = [['Open', 'open', 'Measure Short'], ['Short', 'short', 'Measure Load'], ['Load', 'load', 'Done']];
+    for (const [name, standard, after] of steps) {
         await dut(standard);
         await sleep(800);
         await click(page, 'button.band', `Measure ${name}`);
-        await page.waitForFunction((n) => [...document.querySelectorAll('button.band')].some((b) => b.textContent.includes(`Measure ${n}`) && !b.disabled), { timeout: 90000 }, name);
-        await sleep(1000);
+        const deadline = Date.now() + 240000;
+        while (!(await page.evaluate((t) => [...document.querySelectorAll('button.band')].some((b) => b.textContent.trim() === t && !b.disabled), after))) {
+            if (Date.now() > deadline) throw new Error(`calibration stuck after ${name}: ${await page.evaluate(() => document.querySelector('.cal')?.innerText)}`);
+            await page.evaluate(() => [...document.querySelectorAll('button.band')].find((b) => b.textContent.trim() === 'Use anyway')?.click());
+            await sleep(1000);
+        }
+        await sleep(800);
     }
+    await click(page, 'button.band', 'Done');
     await page.waitForFunction(() => /14 of 14/.test(document.body.textContent), { timeout: 30000 });
     await dut('antenna');
     await sleep(1500);
@@ -132,7 +143,11 @@ await tab(page, 'Smith');
 await setRange(page, '3', '30');
 await shot(page, 'phone-smith');
 await tab(page, 'Freq');
+await click(page, 'button.mr-btn', 'Max');
 await shot(page, 'phone-freq');
+await page.evaluate(() => document.querySelector('.fs-btn').click());
+await shot(page, 'phone-freq-full');
+await page.evaluate(() => document.querySelector('.fs-btn').click());
 
 await tab(page, 'HAM');
 await page.evaluate(() => document.querySelector('header button.btn-icon').click());

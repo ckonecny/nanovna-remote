@@ -126,6 +126,18 @@ ul.points li span { color: var(--dim); }
 footer { border-top: 1px solid var(--line); padding: 36px 0 60px; color: var(--dim); font-size: 14px; }
 footer .links { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 16px; }
 footer p { margin: 8px 0; max-width: 780px; }
+
+/* next level + what's new */
+.level { background: linear-gradient(180deg, rgba(79, 209, 165, .07), transparent 70%); }
+.level h2 { font-size: clamp(28px, 4.2vw, 46px); }
+.level h2 em { font-style: normal; color: var(--accent); }
+.level .sub { font-size: 18px; max-width: 760px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 8px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; }
+.card b { display: block; color: var(--accent); margin-bottom: 6px; font-size: 16px; }
+.card span { color: var(--dim); font-size: 15px; }
+.banner { margin-top: 28px; padding: 18px 22px; border: 1px solid var(--accent); border-radius: var(--radius); font-weight: 600; }
+.banner span { color: var(--text); }
 </style>
 </head>
 <body>
@@ -137,6 +149,7 @@ footer p { margin: 8px 0; max-width: 780px; }
       NanoVNA Remote
     </a>
     <nav>
+      <a href="#level"><span lang="en">New level</span><span lang="de">Neues Level</span></a>
       <a href="#views"><span lang="en">Views</span><span lang="de">Ansichten</span></a>
       <a href="#calibration"><span lang="en">Calibration</span><span lang="de">Kalibrierung</span></a>
       <a href="#cable"><span lang="en">Cables</span><span lang="de">Kabel</span></a>
@@ -174,6 +187,65 @@ footer p { margin: 8px 0; max-width: 780px; }
       </div>
     </div>
     <div class="phone"><img src="img/phone-ham.png" alt="HAM view: SWR curve of the 20 m band" width="780" height="1688"></div>
+  </div>
+</section>
+
+<section id="level" class="level">
+  <div class="wrap">
+    <div class="eyebrow"><span lang="en">Why it matters</span><span lang="de">Warum das wichtig ist</span></div>
+    <h2><span lang="en">The NanoVNA, taken to <em>a whole new level.</em></span><span lang="de">Das NanoVNA auf <em>ein ganz neues Level gehoben.</em></span></h2>
+    <p class="sub">
+      <span lang="en">The small display and the few buttons of a NanoVNA are made for a quick look. With a phone in your hand the same device becomes a proper antenna workbench: bigger, faster to operate, free of cables to the computer, and with functions the device itself does not offer.</span>
+      <span lang="de">Das kleine Display und die wenigen Tasten eines NanoVNA sind für einen schnellen Blick gemacht. Mit dem Handy in der Hand wird dasselbe Gerät zu einer richtigen Antennen-Werkbank: größer, schneller zu bedienen, ohne Kabel zum Rechner und mit Funktionen, die das Gerät selbst nicht bietet.</span>
+    </p>
+    <div class="cards">
+      <div class="card"><b><span lang="en">Operate it from your phone</span><span lang="de">Bedienung per Handy</span></b>
+        <span lang="en">Touch, pinch to zoom, full-screen charts, keypad entry of frequencies. No more hunting through tiny menus with the jog switch.</span>
+        <span lang="de">Touch, Zoomen mit zwei Fingern, Diagramme im Vollbild, Frequenzeingabe über ein Tastenfeld. Schluss mit dem Suchen in winzigen Menüs mit dem Drehschalter.</span></div>
+      <div class="card"><b><span lang="en">Wireless, at the antenna</span><span lang="de">Drahtlos, direkt an der Antenne</span></b>
+        <span lang="en">The NanoVNA hangs on the antenna, you stand where you can see it. Phone, tablet or laptop, over your WiFi or a hotspot. No USB cable to the computer.</span>
+        <span lang="de">Das NanoVNA hängt an der Antenne, du stehst dort, wo du es sehen kannst. Handy, Tablet oder Laptop, über dein WLAN oder einen Hotspot. Kein USB-Kabel zum Rechner.</span></div>
+      <div class="card"><b><span lang="en">More than the built-in display</span><span lang="de">Mehr als das eingebaute Display</span></b>
+        <span lang="en">All 14 ham bands calibrated once and measured one tap each, several bands compared side by side, markers with delta, minimum and maximum search, Q and equivalent circuits, group delay, cable length and loss, and a time-domain view that finds the fault in a cable.</span>
+        <span lang="de">Alle 14 Amateurfunkbänder einmal kalibriert und mit einem Tipp gemessen, mehrere Bänder nebeneinander, Marker mit Delta sowie Minimum- und Maximumsuche, Q und Ersatzschaltbilder, Gruppenlaufzeit, Kabellänge und Dämpfung und eine Zeitbereichsansicht, die den Fehler im Kabel findet.</span></div>
+      <div class="card"><b><span lang="en">The NanoVNA stays untouched</span><span lang="de">Das NanoVNA bleibt unangetastet</span></b>
+        <span lang="en">Its original firmware stays exactly as it is. Nothing is flashed, nothing is opened, and you do not have to heat up a soldering iron for the extra hardware: the Feather connects to the NanoVNA's USB port with an ordinary cable.</span>
+        <span lang="de">Die originale Firmware bleibt, wie sie ist. Es wird nichts geflasht, nichts geöffnet, und für die zusätzliche Hardware musst du nicht einmal den Lötkolben anheizen: Der Feather wird mit einem gewöhnlichen Kabel an den USB-Anschluss des NanoVNA angeschlossen.</span></div>
+      <div class="card"><b><span lang="en">Calibrate once, use anywhere</span><span lang="de">Einmal kalibrieren, überall nutzen</span></b>
+        <span lang="en">A guided open, short and load calibration checks every standard. It is stored in the Feather, so a second phone or a computer uses it right away.</span>
+        <span lang="de">Eine geführte Open-, Short- und Load-Kalibrierung prüft jeden Abschluss. Sie liegt im Feather, ein zweites Handy oder ein Computer nutzt sie sofort.</span></div>
+      <div class="card"><b><span lang="en">Free and open</span><span lang="de">Frei und offen</span></b>
+        <span lang="en">Open source, nothing to install on the phone, updates over WiFi, results as .s1p and .png.</span>
+        <span lang="de">Open Source, nichts auf dem Handy zu installieren, Updates per WLAN, Ergebnisse als .s1p und .png.</span></div>
+    </div>
+    <p class="banner">
+      <span lang="en">Same NanoVNA, same original firmware: a different way of working.</span>
+      <span lang="de">Dasselbe NanoVNA, dieselbe Original-Firmware: eine ganz andere Art zu arbeiten.</span>
+    </p>
+  </div>
+</section>
+
+<section id="new">
+  <div class="wrap">
+    <div class="eyebrow"><span lang="en">What is new</span><span lang="de">Neu</span></div>
+    <h2><span lang="en">Version 1.2: sharper, faster, easier to read.</span><span lang="de">Version 1.2: übersichtlicher, schneller, besser lesbar.</span></h2>
+    <div class="split">
+      <ul class="points">
+        <li><span lang="en"><b>Full-screen charts.</b> One button blows any chart up to the whole screen.</span><span lang="de"><b>Diagramme im Vollbild.</b> Ein Knopf zieht jedes Diagramm auf den ganzen Bildschirm.</span></li>
+        <li><span lang="en"><b>Markers that follow the extremum.</b> Min and Max track the lowest or highest value on every sweep and say so in the label; with several curves the label names the first trace, which decides.</span><span lang="de"><b>Marker, die dem Extremum folgen.</b> Min und Max verfolgen bei jedem Sweep den tiefsten oder höchsten Wert und stehen so im Label; bei mehreren Kurven nennt das Label die erste Kurve, die entscheidet.</span></li>
+        <li><span lang="en"><b>Marker readout.</b> Delta, search, sweep range from markers, Q, series and parallel circuit.</span><span lang="de"><b>Marker-Anzeige.</b> Delta, Suche, Sweep-Bereich aus Markern, Q, Reihen- und Parallelersatzschaltung.</span></li>
+        <li><span lang="en"><b>More trace formats.</b> Rp, Xp, Q, group delay, Y Smith and polar.</span><span lang="de"><b>Mehr Kurvenformate.</b> Rp, Xp, Q, Gruppenlaufzeit, Y-Smith und Polar.</span></li>
+        <li><span lang="en"><b>Guided calibration.</b> Step by step, with a check that warns when the wrong standard is attached.</span><span lang="de"><b>Geführte Kalibrierung.</b> Schritt für Schritt, mit einer Prüfung, die warnt, wenn der falsche Abschluss angesteckt ist.</span></li>
+        <li><span lang="en"><b>Faster sweeps.</b> Multi, Cable, TDR and the calibration read the data in binary.</span><span lang="de"><b>Schnellere Sweeps.</b> Multi, Kabel, TDR und die Kalibrierung lesen die Daten binär.</span></li>
+        <li><span lang="en"><b>Zoom and a modern look.</b> Two-finger zoom, mouse wheel and drag on the desktop, a new colour scheme in dark and light.</span><span lang="de"><b>Zoom und modernes Aussehen.</b> Zoomen mit zwei Fingern, am Desktop mit Mausrad und Ziehen, ein neues Farbschema in Dunkel und Hell.</span></li>
+        <li><span lang="en"><b>More tools.</b> Port extension, sweep quality dialog (bandwidth, smoothing, power) and a note when the NanoVNA firmware is out of date.</span><span lang="de"><b>Mehr Werkzeuge.</b> Port-Extension, Sweep-Qualität (Bandbreite, Glättung, Leistung) und ein Hinweis, wenn die NanoVNA-Firmware veraltet ist.</span></li>
+        <li><span lang="en"><b>Robust.</b> The app recovers when the connection to the NanoVNA drops, and the Feather's display lists its buttons in the order they sit on the board.</span><span lang="de"><b>Robust.</b> Die App erholt sich, wenn die Verbindung zum NanoVNA abbricht, und das Display des Feathers nennt die Tasten in der Reihenfolge, in der sie auf der Platine sitzen.</span></li>
+      </ul>
+      <div class="phone"><img loading="lazy" src="img/phone-freq.png" alt="Freq view with a marker following the maximum" width="780" height="1688"></div>
+    </div>
+    <div class="themes">
+      <div class="phone"><img loading="lazy" src="img/phone-freq-full.png" alt="The Freq chart in full screen" width="780" height="1688"></div>
+    </div>
   </div>
 </section>
 

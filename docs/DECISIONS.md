@@ -322,3 +322,11 @@ installer page on https cannot call a http device (mixed content); the installer
   `firstPoint` (tip on the first trace's point); the marker diamond is set on every trace's element (`_model`) in `beforeRender`, because
   the dataset arrays alone were not picked up with several traces. With several traces the title names the first trace
   ("Max CH0 swr · 250.2 MHz"): it alone decides Min / Max.
+
+## Chrome on Android 17 and the local network (2026-11)
+- Chrome (156) on an Android 17 phone failed with `ERR_TOO_MANY_RETRIES` for every address in the home network (the Feather, the
+  router, a test server on the computer), while Firefox worked. Cause: Android 17 has the runtime permission
+  `ACCESS_LOCAL_NETWORK` (shown as "Nearby devices"); Chrome had it only compat-revoked, Firefox had it set by the user. Not a
+  firmware problem: the Feather answers Chrome-like requests correctly. Fix is on the phone (manual, troubleshooting table).
+- `dev-tools/simulator.py` now answers `scan_bin` (binary record format of the NanoVNA-H firmware), because the app reads
+  Multi, Cable, TDR and the app-side calibration with it; `shots.mjs` follows the guided calibration.

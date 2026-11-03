@@ -160,6 +160,18 @@ class Vna:
             mask = int(args[3])  # bit 0: frequency, bit 1: channel 0, bit 2: channel 1
             cols = ([[str(f) for f in self.freqs()]] if mask & 1 else []) + [self.data(c) for c in (0, 1) if mask & (2 << c)]
             return ("\r\n".join(" ".join(row) for row in zip(*cols)) + "\r\n").encode()
+        if cmd == "scan_bin" and len(args) >= 3:
+            # binary answer like the NanoVNA-H firmware: flags (0x80 marks binary), points, then one record per point
+            self.start, self.stop, self.points = int(args[0]), int(args[1]), max(2, int(args[2]))
+            mask = int(args[3]) if len(args) > 3 else 7
+            freqs = self.freqs()
+            data = [[tuple(map(float, row.split())) for row in self.data(c)] for c in (0, 1)]
+            out = struct.pack("<HH", mask | 0x80, self.points)
+            for i in range(self.points):
+                if mask & 1: out += struct.pack("<I", freqs[i])
+                for c in (0, 1):
+                    if mask & (2 << c): out += struct.pack("<ff", *data[c][i])
+            return out
         if cmd == "save" and args: self.slots[args[0]] = (self.start, self.stop, self.points); return b""
         if cmd == "recall" and args:
             self.start, self.stop, self.points = self.slots.get(args[0], (50000, 900000000, 101))

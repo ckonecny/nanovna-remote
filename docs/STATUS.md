@@ -1,12 +1,12 @@
 # Status
 
-Repo: github.com/ckonecny/nanovna-remote (public), latest release v1.1.2. Open features and bugs: GitHub issues
+Repo: github.com/ckonecny/nanovna-remote (public), latest release v1.2.0. Open features and bugs: GitHub issues
 (CLAUDE.md rule 9). Finished work: `docs/STATUS-ARCHIVE.md`. Decisions and hardware findings: `docs/DECISIONS.md`.
 This file holds only the current state and hints for the next session.
 
 ## Current state (2026-11-03)
-- Solid state, everything committed and pushed; v1.1.2 is flashed on the user's Feather and tested there (installer,
-  QR codes, orientation, About, return to the status screen, OTA over `/update`).
+- Solid state, everything committed and pushed; v1.2.0 released (full-screen charts, marker labels and Min/Max, guided
+  calibration, scan_bin, status screen button order); the feature page and all screenshots are current.
 - Firmware: bridge, web app, OTA (`/update` page and `/api/ota`), calibration storage, multi-network WiFi, display UI,
   QR codes. Flash 86.8 % of the app slot (over 85 %, 207 KB free; the user decided to leave it until it gets tight).
 - Web app: Single, HAM, Multi, Cable, TDR, Smith, Freq views, app-side OSL calibration, export. Live demo with a simulated
@@ -32,6 +32,8 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
+- Chrome on the user's Android 17 phone: `ERR_TOO_MANY_RETRIES` for the whole local network until Chrome gets "Nearby devices"
+  (DECISIONS); the user still has to allow it and confirm. The Feather photo on the feature page shows the old button order.
 - Status screen: the button hints follow the physical button order (D1 above D2, reversed when the display is turned), USB line above them; flashed, checked by the user.
 - Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
   "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first
