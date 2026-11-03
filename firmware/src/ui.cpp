@@ -304,9 +304,18 @@ struct StatusScreen : Screen {
                 out[1] = {"Searching WiFi ...", ORANGE};
         }
         bool usb = vna_usb_attached();
-        if (st.state == WIFI_STA || st.state == WIFI_AP) out[5] = {"D2: show QR code", GREY};
-        out[6] = {usb ? "USB: device found" : "USB: no device", usb ? GREEN : GREY};
-        out[7] = hint_row("D1:WiFi long:Menu");
+        out[5] = {usb ? "USB: device found" : "USB: no device", usb ? GREEN : GREY};
+        // the hints follow the physical order of the buttons: D1 above D2, or D2 above D1 when the display is turned
+        Row d1 = hint_row("D1:WiFi long:Menu");
+        Row d2 = {"D2: show QR code", GREY};
+        bool qr = st.state == WIFI_STA || st.state == WIFI_AP;
+        if (ui_flipped_get()) {
+            out[6] = qr ? d2 : Row{"", GREY};
+            out[7] = d1;
+        } else {
+            out[6] = d1;
+            out[7] = qr ? d2 : Row{"", GREY};
+        }
     }
 
     void key(const ButtonMessage &m) override {
