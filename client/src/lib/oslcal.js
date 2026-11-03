@@ -26,6 +26,37 @@ export function solveOSL(open, short, load) {
     return { ed, es, er };
 }
 
+// ---- plausibility of a measured standard (raw readings: open and short reflect about as much as each other, a load hardly at all) ----
+
+const absOf = (p) => Math.hypot(p[0], p[1]);
+// mean over every point of every band; a and b are { band: [[re, im], ...] }
+const meanOf = (a, f) => {
+    let sum = 0, n = 0;
+    for (const band of Object.keys(a)) a[band].forEach((p, i) => { sum += f(p, i, band); n++; });
+    return n ? sum / n : 0;
+};
+const meanAbs = (a) => meanOf(a, absOf);
+const meanDist = (a, b) => meanOf(a, (p, i, band) => absOf(csub(p, b[band][i])));
+
+// null when the measurement of `step` ('open' | 'short' | 'load') looks like that standard, else what looks wrong.
+// others: { open, short } of the standards measured before, in the same shape as `measured`.
+export function checkStandard(step, measured, others = {}) {
+    const level = meanAbs(measured);
+    const known = (m) => m && Object.keys(m).length > 0; // nothing measured yet comes as an empty object
+    if (step === 'load') {
+        const reflecting = [others.open, others.short].filter(known).map(meanAbs);
+        if (reflecting.length && level > 0.5 * Math.min(...reflecting)) return 'This reflects strongly, a load should absorb. Is the load attached?';
+        if (!reflecting.length && level > 0.5) return 'This reflects strongly, a load should absorb. Is the load attached?';
+        return null;
+    }
+    if (level < 0.3) return `This reflects hardly at all, which looks like a load instead of the ${step} standard.`;
+    const other = step === 'open' ? others.short : others.open;
+    if (known(other) && meanDist(measured, other) < 0.5 * (level + meanAbs(other)) / 2) { // open and short lie about 2 x |gm| apart
+        return `This is almost the same as the ${step === 'open' ? 'short' : 'open'} standard measured before. Is the right standard attached?`;
+    }
+    return null;
+}
+
 export function correctPoint(g, ed, es, er) {
     const v = csub(g, ed);
     return cdiv(v, cadd(er, cmul(es, v)));

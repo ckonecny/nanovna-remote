@@ -118,6 +118,18 @@ describe('App Store', () => {
         store.autoUpdate = false;
     });
 
+    it('lets go of a calibration step that was waiting when the connection dropped', async () => {
+        const mod = await import('../store');
+        mod.calRun.running = true;
+        store.calibrationRunning = true;
+        store.updating = true;
+        await disconnect();
+        expect(mod.calRun.running).toBe(false);
+        expect(mod.calRun.error).toMatch(/lost/);
+        expect(store.calibrationRunning).toBe(false);
+        expect(store.updating).toBe(false);
+    });
+
     it('should match Reference scan logic (Single: resume, Multi: scan loop)', async () => {
         store.status = 'connected';
         store.autoUpdate = true;

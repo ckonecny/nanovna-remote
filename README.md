@@ -78,8 +78,8 @@ calibration, runs in the browser.
 3. **Connect the NanoVNA** to the Feather's USB-C port. The display says "USB: device found".
 4. **Measure.** Open the address shown on the display (`http://<feather-ip>/`, also `http://nanovna.local/` where that
    works) on a phone or computer and tap **connect**.
-5. **Calibrate once.** On the HAM tab press **Measure Open**, **Measure Short**, **Measure Load**, each after attaching the
-   standard at the end of your cable. Done for all bands.
+5. **Calibrate once.** On the HAM tab press **Calibrate...** and follow the steps: attach the open, short and load standard
+   in turn at the end of your cable and press **Measure** for each. Done for all bands.
 
 Later updates go over WiFi: open `http://<feather-ip>/update` and pick the `-update.bin` of a release (or `curl --data-binary @nanovna-remote-<version>-update.bin http://<feather-ip>/api/ota`) or, when building yourself, `firmware/tools/ota.sh <feather-ip>`. Problems? See the troubleshooting chapter in the manual.
 

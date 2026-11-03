@@ -5,7 +5,7 @@ import { HAM_BANDS, bandSweep } from './lib/bands';
 import { CABLE_RANGES, portExtend, C } from './lib/cable';
 import { TDR_RANGES } from './lib/tdr';
 import { newerFirmware } from './lib/fwcheck';
-import { appCal, applyCal, solveOSL, pullFromDevice, pushToDevice } from './lib/oslcal';
+import { appCal, applyCal, solveOSL, checkStandard, pullFromDevice, pushToDevice } from './lib/oslcal';
 
 // The bridge address: ?host=<name or ip> in the URL, or the host the page itself was served from (when it is the ESP32)
 function defaultWsHost() {
@@ -331,6 +331,16 @@ export async function connect() {
 }
 
 export async function disconnect() {
+    // whatever the update loop or a calibration was waiting for will never arrive: let go of it so that a new connection starts clean
+    loopGeneration++;
+    loopRunning = false;
+    store.updating = false;
+    if (calRun.running) {
+        calRun.running = false;
+        calRun.error = 'Connection to the NanoVNA lost during the measurement. Connect again and repeat this step.';
+    }
+    calRun.suspect = null;
+    store.calibrationRunning = false;
     if (workerProxy) {
         try {
             await workerProxy.close();
@@ -346,6 +356,7 @@ export async function disconnect() {
 }
 
 let loopRunning = false;
+let loopGeneration = 0; // a loop that was waiting on a lost connection must not carry on beside the one of the next connection
 const SWEEP_MS = 900; // a 101 point sweep of the NanoVNA-H takes about 0.6 s at the usual IF bandwidth of 1000 Hz
 // measured on the NanoVNA-H: about 0.15 s + 101 / bandwidth (0.23 s at 1000 Hz, 1.15 s at 100 Hz, 10.2 s at 10 Hz); the wait grows with the narrower bandwidth
 const sweepMs = () => SWEEP_MS + Math.max(0, Math.round(101000 * (1 / store.bandwidthHz - 1 / 1000)));
@@ -357,6 +368,7 @@ let appCalDeviceOff = false; // the device's own calibration has been switched o
 export async function startUpdateLoop() {
     if (store.status !== 'connected' || loopRunning) return;
     loopRunning = true;
+    const generation = ++loopGeneration;
 
     try {
         const worker = await getWorker();
@@ -562,7 +574,7 @@ export async function startUpdateLoop() {
         };
 
         let wasMulti = false;
-        while (store.status === 'connected') {
+        while (store.status === 'connected' && generation === loopGeneration) {
             if (wasMulti && !store.multiActive && !store.cableActive && !store.tdrActive && !store.calibrationRunning) {
                 // the other views expect the device on the range of the store
                 wasMulti = false;
@@ -596,8 +608,10 @@ export async function startUpdateLoop() {
             await new Promise(r => setTimeout(r, 100));
         }
     } finally {
-        loopRunning = false;
-        store.updating = false;
+        if (generation === loopGeneration) {
+            loopRunning = false;
+            store.updating = false;
+        }
     }
 }
 
@@ -643,7 +657,10 @@ export async function calibration(step, slot = 0) {
 
 // ---- app-side open/short/load calibration over all ham bands ----
 
-export const calRun = reactive({ running: false, step: '', band: '', done: 0, total: HAM_BANDS.length, error: '' });
+export const CAL_STEPS = ['open', 'short', 'load'];
+// guided: the step-by-step calibration is open, next: index in CAL_STEPS of the standard to measure now (3 = all done),
+// suspect: a measurement that does not look like the standard asked for, held back until the user decides
+export const calRun = reactive({ running: false, step: '', band: '', done: 0, total: HAM_BANDS.length, error: '', guided: false, next: 0, suspect: null });
 
 // One whole sweep of 101 points from start to stop: { freqs, ch0, ch1 } (ch1 only with withCh1). `scan_bin` answers once the
 // sweep is done, so there is no waiting and no half old, half new reading; a firmware without it gets the plain sequence.
@@ -677,12 +694,32 @@ async function measureRaw(worker, start, stop) {
     return { freqs: a.freqs, data: a.ch0.map((d, i) => [(d[0] + b.ch0[i][0]) / 2, (d[1] + b.ch0[i][1]) / 2]) };
 }
 
-// measures one standard ('open' | 'short' | 'load') on every band; once a band has all three its correction is computed
+const dataOf = (measured) => Object.fromEntries(Object.entries(measured).map(([name, m]) => [name, m.data]));
+
+// stores a measured standard ({ band: { freqs, data } }); once a band has all three its correction is computed
+async function commitStandard(step, measured) {
+    for (const [name, m] of Object.entries(measured)) {
+        const raw = appCal.raw[name] || (appCal.raw[name] = {});
+        raw.freqs = m.freqs;
+        raw[step] = m.data;
+        if (raw.open && raw.short && raw.load) {
+            appCal.bands[name] = { freqs: raw.freqs, ...solveOSL(raw.open, raw.short, raw.load) };
+            delete appCal.raw[name];
+        }
+    }
+    appCal.enabled = Object.keys(appCal.bands).length > 0;
+    if (calRun.guided) calRun.next = CAL_STEPS.indexOf(step) + 1;
+    await pushToDevice(store.wsHost);
+}
+
+// measures one standard ('open' | 'short' | 'load') on every band; a result that does not look like the standard is held in
+// calRun.suspect until appCalAccept() or appCalDiscard()
 export async function appCalMeasure(step) {
     if (store.status !== 'connected' || calRun.running) return;
     calRun.running = true;
     calRun.step = step;
     calRun.error = '';
+    calRun.suspect = null;
     calRun.done = 0;
     store.calibrationRunning = true;
     const restore = { start: +store.frequencies.start, stop: +store.frequencies.stop };
@@ -691,21 +728,17 @@ export async function appCalMeasure(step) {
         const worker = await getWorker();
         await worker.doCal('off');
         appCalDeviceOff = true;
+        const measured = {};
         for (const band of HAM_BANDS) {
             calRun.band = band.name;
             const { start, stop } = bandSweep(band);
-            const m = await measureRaw(worker, start, stop);
-            const raw = appCal.raw[band.name] || (appCal.raw[band.name] = {});
-            raw.freqs = m.freqs;
-            raw[step] = m.data;
-            if (raw.open && raw.short && raw.load) {
-                appCal.bands[band.name] = { freqs: raw.freqs, ...solveOSL(raw.open, raw.short, raw.load) };
-                delete appCal.raw[band.name];
-            }
+            measured[band.name] = await measureRaw(worker, start, stop);
             calRun.done++;
         }
-        appCal.enabled = Object.keys(appCal.bands).length > 0;
-        await pushToDevice(store.wsHost);
+        const before = (what) => Object.fromEntries(HAM_BANDS.filter(b => appCal.raw[b.name]?.[what]).map(b => [b.name, appCal.raw[b.name][what]]));
+        const problem = checkStandard(step, dataOf(measured), { open: before('open'), short: before('short') });
+        if (problem) calRun.suspect = { step, problem, measured };
+        else await commitStandard(step, measured);
     } catch (e) {
         calRun.error = String(e);
         log('App calibration failed: ' + e);
@@ -719,6 +752,42 @@ export async function appCalMeasure(step) {
         store.calibrationRunning = false;
         calRun.running = false;
     }
+}
+
+// keeps the held-back measurement anyway
+export async function appCalAccept() {
+    const s = calRun.suspect;
+    if (!s) return;
+    calRun.suspect = null;
+    try {
+        await commitStandard(s.step, s.measured);
+    } catch (e) {
+        calRun.error = String(e);
+    }
+}
+
+export function appCalDiscard() {
+    calRun.suspect = null;
+}
+
+// guided calibration: starts over with the standards (a finished calibration stays until a new one is complete)
+export function appCalStart() {
+    appCal.raw = {};
+    calRun.guided = true;
+    calRun.next = 0;
+    calRun.suspect = null;
+    calRun.error = '';
+}
+
+export function appCalBack() {
+    calRun.next = Math.max(0, calRun.next - 1);
+    calRun.suspect = null;
+}
+
+export function appCalClose() {
+    if (calRun.next < CAL_STEPS.length) appCal.raw = {}; // standards measured so far must not mix with a later run
+    calRun.guided = false;
+    calRun.suspect = null;
 }
 
 export function appCalReset() {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { solveOSL, correctPoint, applyCal } from '../lib/oslcal';
+import { solveOSL, correctPoint, applyCal, checkStandard } from '../lib/oslcal';
 
 // simulate a one-port with known error terms and check that the calibration undoes them
 const cmul = (a, b) => [a[0] * b[0] - a[1] * b[1], a[0] * b[1] + a[1] * b[0]];
@@ -28,5 +28,33 @@ describe('oslcal', () => {
         const { points, covered } = applyCal([{ freq: 5e6, real: 0.5, imag: 0 }], { a: cal });
         expect(covered).toBe(0);
         expect(points[0].real).toBe(0.5);
+    });
+});
+
+describe('checkStandard', () => {
+    const ed = [0.05, -0.02], es = [0.1, 0.03], er = [0.9, 0.2];
+    const std = (g) => ({ b: [0, 1, 2].map((i) => measure([g[0], g[1] + i * 0.01], ed, es, er)) });
+    const open = std([1, 0]), short = std([-1, 0]), load = std([0, 0]);
+
+    it('accepts the right standards in the right order', () => {
+        expect(checkStandard('open', open)).toBeNull();
+        expect(checkStandard('open', open, { open: {}, short: {} })).toBeNull(); // as the app passes "nothing measured yet"
+        expect(checkStandard('short', short, { open })).toBeNull();
+        expect(checkStandard('load', load, { open, short })).toBeNull();
+    });
+
+    it('notices a load where an open or short is asked for', () => {
+        expect(checkStandard('open', load)).toMatch(/load/);
+        expect(checkStandard('short', load, { open })).toMatch(/load/);
+    });
+
+    it('notices the same standard measured twice', () => {
+        expect(checkStandard('short', open, { open })).toMatch(/same as the open/);
+        expect(checkStandard('open', short, { short })).toMatch(/same as the short/);
+    });
+
+    it('notices an open or short where the load is asked for', () => {
+        expect(checkStandard('load', open, { open, short })).toMatch(/absorb/);
+        expect(checkStandard('load', short, { open, short })).toMatch(/absorb/);
     });
 });

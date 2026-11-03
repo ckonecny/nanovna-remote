@@ -284,3 +284,22 @@ installer page on https cannot call a http device (mixed content); the installer
   other views still sets the range and resumes (`wasMulti`). Received text is now decoded one character per byte (`bytesToString`);
   the old `TextDecoder('ascii')` is windows-1252 and turned bytes 0x80-0x9f into other characters, which also affected `capture`.
 - Left on `scan`/`data`: the Single/Freq live loop (gradual refresh looks smoother) and the segment scan (existing tests pin its sequence).
+
+## Guided calibration (#19, 2026-11)
+- `CalPanel.vue` leads through Open, Short, Load (state in `calRun`: `guided`, `next`, `suspect`); only the current standard can be
+  measured, the panel advances after each, **Back** repeats the previous one (not after the last: the solved bands have dropped their
+  raw data), **Cancel** drops the standards measured so far. A finished calibration stays until a new set is complete.
+- Plausibility check on the raw readings of all bands (`checkStandard` in `lib/oslcal.js`): open or short with a mean |reading|
+  below 0.3 looks like a load; open and short closer to each other than half their mean level are the same standard; a load above
+  half the level of the open/short reflects too much. A suspect result is held back (`calRun.suspect`) until **Measure again** or
+  **Use anyway**. The thresholds are rules of thumb from the simulator and the NanoVNA-H's raw readings; **Use anyway** is there for
+  setups that fall outside them (very lossy cable between the NanoVNA and the standards).
+
+## Layout of the views and lost connections (2026-11)
+- Single, HAM, Multi, Cable and TDR are plain HTML/SVG and now take their content height (`flex: 1 0 auto`, only without `.has-inputs`);
+  the page scrolls. Before, the box was clipped to the screen (`overflow: hidden`, shrinkable), so the calibration panel under
+  HAM with Return loss and R/X on could not be reached. Smith and Freq stay in a fixed box because their canvas fills its parent.
+- A closed connection leaves the update loop or a calibration step waiting forever (the reply never comes). `disconnect()` now ends the
+  calibration state (message "Connection to the NanoVNA lost ...") and bumps `loopGeneration`, so the loop of an earlier connection
+  cannot carry on beside the new one and the buttons are not stuck disabled.
+- Seen on the device: `bridge: NanoVNA gone` in `/log` while a calibration step ran (the NanoVNA left the USB bus).

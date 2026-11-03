@@ -271,10 +271,20 @@ Die App korrigiert die Messwerte selbst mit einer Open/Short/Load-Kalibrierung f
 NanoVNA ist dabei abgeschaltet.
 
 Kalibriere einmal im Reiter **HAM** oder **Multi** mit Open, Short und Load am Anschluss (oder am Ende des Kabels, durch das du
-misst). **Measure Open**, **Measure Short**, **Measure Load** jeweils nach dem Anstecken des Normals drücken. Die Korrektur eines
-Bandes wird erst berechnet, wenn alle drei Normale gemessen sind; drücke also keinen Knopf, bevor das passende Normal
-angesteckt ist. Die Kalibrierung wird im Feather gespeichert, jeder Browser nutzt sie. **Reset** löscht sie. Ohne Kalibrierung zeigt
-die Seite eine Warnung; HAM und Multi zeigen für jedes Band, ob es kalibriert ist.
+misst). Drücke **Calibrate...**; das Feld führt dich dann der Reihe nach durch die drei Normale. Eine Zeile **Open, Short, Load**
+zeigt den Fortschritt (ein Haken für jedes gemessene Normal). Im aktuellen Schritt nennt das Feld das Normal, das du anstecken
+sollst; stecke es an und drücke **Measure Open** (danach **Measure Short**, **Measure Load**). Alle Bänder werden in einem Zug gemessen, und das Feld geht von selbst
+zum nächsten Schritt. **Back** wiederholt das vorige Normal, **Cancel** bricht ab und verwirft das bisher Gemessene (eine frühere
+Kalibrierung bleibt, bis eine neue vollständig ist).
+
+Die App prüft auch, was sie gemessen hat: ein Normal, das kaum reflektiert, obwohl Open oder Short verlangt war, ein Open und ein
+Short, die gleich aussehen, oder ein Load, das stark reflektiert, werden gemeldet („Is the right standard attached?“, auf
+Englisch). Dann drückst du **Measure again**, nachdem du das richtige Normal angesteckt hast, oder **Use anyway**, um die Messung
+zu behalten. Die Korrektur eines Bandes wird erst berechnet, wenn alle drei Normale gemessen sind. Ist das letzte gemessen, zeigt
+das Feld, wie viele Bänder kalibriert sind; **Done** schließt es.
+
+Die Kalibrierung wird im Feather gespeichert, jeder Browser nutzt sie. **Reset** löscht sie. Ohne Kalibrierung zeigt die Seite eine
+Warnung; HAM und Multi zeigen für jedes Band, ob es kalibriert ist.
 
 ## 7. Firmware aktualisieren
 

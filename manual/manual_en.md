@@ -260,11 +260,19 @@ The app corrects the readings itself with an open/short/load calibration of **al
 switched off while it is in use.
 
 Calibrate once, on the **HAM** or **Multi** tab, with the open, short and load standards at the connector (or at the
-end of the cable you measure through). Press **Measure Open**, **Measure Short**, **Measure Load**, each
-after attaching the standard. A band's correction is only computed once all three standards have been measured, so do not press
-a button before the right standard is attached. The calibration is stored in the Feather, so every
-browser uses it. **Reset** deletes it. Without a calibration the page shows a warning; HAM and Multi show for each band whether
-it is calibrated.
+end of the cable you measure through). Press **Calibrate...**; the panel then guides you through the three standards in
+order. A row **Open, Short, Load** shows the progress (a tick for each standard measured). For the current step the panel names
+the standard to attach; attach it and press **Measure Open** (then **Measure Short**, **Measure Load**). All bands are measured in one go and the
+panel moves on by itself. **Back** repeats the previous standard, **Cancel** stops and throws away what was measured so far (an
+earlier calibration stays until a new one is complete).
+
+The app also checks what it measured: a standard that hardly reflects when an open or short was asked for, an open and short that
+look the same, or a load that reflects strongly are reported ("Is the right standard attached?"). Then press **Measure again**
+after attaching the right one, or **Use anyway** to keep the measurement. A band's correction is only computed once all three
+standards have been measured. When the last one is in, the panel shows how many bands are calibrated; **Done** closes it.
+
+The calibration is stored in the Feather, so every browser uses it. **Reset** deletes it. Without a calibration the page shows
+a warning; HAM and Multi show for each band whether it is calibrated.
 
 ## 7. Updating the firmware
 

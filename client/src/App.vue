@@ -741,6 +741,13 @@ const quit = () => {
   min-height: 400px;
 }
 
+/* Single, HAM, Multi, Cable and TDR are plain HTML and SVG: they are as tall as their content and the page scrolls (a box
+   without room for it clipped the calibration panel). Smith and Freq draw into a canvas that needs a box to fill. */
+.graph-area:not(.has-inputs),
+.graph-area:not(.has-inputs) > .graph-wrapper {
+  flex: 1 0 auto;
+}
+
 .graph-wrapper {
   flex: 1;
   min-height: 320px;
