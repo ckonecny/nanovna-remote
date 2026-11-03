@@ -530,12 +530,8 @@ export async function startUpdateLoop() {
                     const band = HAM_BANDS.find(b => b.name === name);
                     if (!band) continue;
                     const { start, stop } = bandSweep(band);
-                    await setRange(worker, start, stop);
-                    await worker.resume();
-                    await new Promise(r => setTimeout(r, sweepMs())); // `data` does not wait for the sweep to finish
+                    const { freqs, ch0: data0 } = await readSweep(worker, start, stop);
                     if (!store.multiActive || store.calibrationRunning) break;
-                    const freqs = await worker.getFrequencies();
-                    const data0 = await worker.getData(0);
                     let points = data0.map((d, i) => ({ freq: freqs[i], real: d[0], imag: d[1] }));
                     const cal = appCal.enabled ? appCal.bands[name] : null;
                     if (cal) points = applyCal(points, { [name]: cal }).points;
@@ -550,24 +546,13 @@ export async function startUpdateLoop() {
         };
 
         // Cable and TDR views: the raw reflection of a cable over one wide sweep (the view's own preset)
-        let cableRange = null;
         const updateCable = async () => {
             store.updating = true;
             try {
                 const worker = workerProxy || await getWorker();
                 const r = store.tdrActive ? TDR_RANGES[store.tdrPreset] : CABLE_RANGES[store.cablePreset];
-                const key = r.start + '-' + r.stop;
-                if (cableRange !== key) {
-                    await setRange(worker, r.start, r.stop);
-                    await worker.resume();
-                    await new Promise(res => setTimeout(res, sweepMs() * 2));
-                    cableRange = key;
-                } else {
-                    await new Promise(res => setTimeout(res, sweepMs()));
-                }
+                const { freqs, ch0: data0 } = await readSweep(worker, r.start, r.stop);
                 if (!(store.cableActive || store.tdrActive) || store.calibrationRunning) return;
-                const freqs = await worker.getFrequencies();
-                const data0 = await worker.getData(0);
                 store.cable = { points: data0.map((d, i) => ({ freq: freqs[i], real: d[0], imag: d[1] })), at: Date.now() };
                 store.lastDataAt = Date.now();
                 store.dataVersion++;
@@ -581,7 +566,6 @@ export async function startUpdateLoop() {
             if (wasMulti && !store.multiActive && !store.cableActive && !store.tdrActive && !store.calibrationRunning) {
                 // the other views expect the device on the range of the store
                 wasMulti = false;
-                cableRange = null;
                 try {
                     await setRange(worker, +store.frequencies.start, +store.frequencies.stop);
                 } catch (e) { /* the range is re-applied on the next change anyway */ }
@@ -590,7 +574,6 @@ export async function startUpdateLoop() {
             }
             if (store.multiActive && store.autoUpdate && !store.updating && !store.calibrationRunning) {
                 wasMulti = true;
-                cableRange = null; // the Multi view moves the sweep
                 await updateMultiBands();
             } else if ((store.cableActive || store.tdrActive) && store.autoUpdate && !store.updating && !store.calibrationRunning) {
                 wasMulti = true;
@@ -662,6 +645,25 @@ export async function calibration(step, slot = 0) {
 
 export const calRun = reactive({ running: false, step: '', band: '', done: 0, total: HAM_BANDS.length, error: '' });
 
+// One whole sweep of 101 points from start to stop: { freqs, ch0, ch1 } (ch1 only with withCh1). `scan_bin` answers once the
+// sweep is done, so there is no waiting and no half old, half new reading; a firmware without it gets the plain sequence.
+let scanBinOk = true;
+async function readSweep(worker, start, stop, withCh1 = false) {
+    if (scanBinOk) {
+        try {
+            return await worker.scanBin(Math.round(start), Math.round(stop), 101, withCh1 ? 7 : 3);
+        } catch (e) {
+            if (!e || !e.unsupported) throw e;
+            scanBinOk = false;
+        }
+    }
+    await setRange(worker, start, stop);
+    await worker.resume();
+    await new Promise(r => setTimeout(r, sweepMs())); // `data` does not wait for the sweep to finish
+    const freqs = await worker.getFrequencies();
+    return { freqs, ch0: await worker.getData(0), ch1: withCh1 ? await worker.getData(1) : [] };
+}
+
 // sets the device sweep without ever passing through start > stop (the device drags the other end along)
 async function setRange(worker, start, stop) {
     await worker.setSweep('start', 50000);
@@ -670,14 +672,9 @@ async function setRange(worker, start, stop) {
 }
 
 async function measureRaw(worker, start, stop) {
-    await setRange(worker, start, stop);
-    await worker.resume();
-    await new Promise(r => setTimeout(r, sweepMs())); // `data` does not wait for the sweep to finish
-    const freqs = await worker.getFrequencies();
-    const a = await worker.getData(0);
-    await new Promise(r => setTimeout(r, sweepMs()));
-    const b = await worker.getData(0);
-    return { freqs, data: a.map((d, i) => [(d[0] + b[i][0]) / 2, (d[1] + b[i][1]) / 2]) };
+    const a = await readSweep(worker, start, stop);
+    const b = await readSweep(worker, start, stop);
+    return { freqs: a.freqs, data: a.ch0.map((d, i) => [(d[0] + b.ch0[i][0]) / 2, (d[1] + b.ch0[i][1]) / 2]) };
 }
 
 // measures one standard ('open' | 'short' | 'load') on every band; once a band has all three its correction is computed

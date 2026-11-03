@@ -93,6 +93,10 @@ class NanoVNAWorker {
         return await this.nanovna.scan(start, stop, length);
     }
 
+    async scanBin(start, stop, length, mask) {
+        return await this.nanovna.scanBin(start, stop, length, mask);
+    }
+
     async getCapture() {
         return await this.nanovna.getCapture();
     }

@@ -185,6 +185,30 @@ class Vna {
             for (const c of [0, 1]) if (mask & (2 << c)) cols.push(this.data(c));
             return enc(cols[0].map((_, i) => cols.map((col) => col[i]).join(' ')).join('\r\n') + '\r\n');
         }
+        if (cmd === 'scan_bin' && args.length >= 4) {
+            this.start = parseInt(args[0], 10);
+            this.stop = parseInt(args[1], 10);
+            this.points = Math.max(2, parseInt(args[2], 10));
+            const mask = parseInt(args[3], 10);
+            const freqs = this.freqs();
+            const cols = [0, 1].filter((c) => mask & (2 << c)).map((c) => this.data(c));
+            const size = (mask & 1 ? 4 : 0) + 8 * cols.length;
+            const out = new Uint8Array(4 + size * freqs.length);
+            const view = new DataView(out.buffer);
+            view.setUint16(0, 0x80 | mask, true);
+            view.setUint16(2, freqs.length, true);
+            freqs.forEach((f, i) => {
+                let o = 4 + i * size;
+                if (mask & 1) { view.setUint32(o, f, true); o += 4; }
+                for (const col of cols) {
+                    const [re, im] = col[i].split(' ').map(Number);
+                    view.setFloat32(o, re, true);
+                    view.setFloat32(o + 4, im, true);
+                    o += 8;
+                }
+            });
+            return out;
+        }
         if (cmd === 'save' && args.length) { this.slots[args[0]] = [this.start, this.stop, this.points]; return enc(''); }
         if (cmd === 'recall' && args.length) {
             [this.start, this.stop, this.points] = this.slots[args[0]] || [50000, 900000000, 101];

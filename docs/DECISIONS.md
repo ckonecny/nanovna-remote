@@ -264,3 +264,23 @@ installer page on https cannot call a http device (mixed content); the installer
   `#151b27` surface, `#7aa2ff` primary). Text contrast stays high for sunlight.
 - Shapes: larger radii (8/12/16 px), hairline borders instead of heavy shadows, sentence-case buttons, tabs and labels (no upper case).
 - Trace colours: no yellow or lime (white chip text is unreadable on them); the default trace 4 and the choices use dark orange `#f57c00`.
+
+## scan_bin proof of concept (#49, 2026-11)
+- NanoVNA-H 1.2.50 has `scan_bin <start> <stop> <points> <mask>` (listed by `help`). It blocks until the sweep is done and answers
+  with `uint16 mask` (`0x80 | requested mask`), `uint16 points`, then per point `uint32 freq` (mask bit 0) and `float32 re, im` of
+  channel 0 (bit 1) and channel 1 (bit 2), little endian. 101 points, mask 7 = 2061 bytes. It matches the text `scan ... 7` to the
+  digit. `dev-tools/scan_bin_poc.py` reads and compares it.
+- Measured (101 points, 1000 Hz bandwidth, over the WiFi bridge): today's `scan` + wait + `frequencies` + `data 0` + `data 1`
+  0.89 s per full sweep (with a 0.4 s wait; the app waits `SWEEP_MS` = 0.9 s), `scan ... 7` as text 0.39 s, `scan_bin` 0.35 s.
+  Five HAM bands in the Multi view: 7.1 s today, 1.0 s with `scan_bin` (mask 3).
+- Most of the gain is not the binary format (text with a mask is only 0.04 s slower) but that one blocking command replaces the
+  fixed `sweepMs()` wait and three round trips, and returns one consistent sweep.
+- The steady Single/Freq loop (device sweeps by itself, the app reads `frequencies`/`data`) is not faster with it: reads take 0.10 s
+  but show points refreshed gradually (half old, half new sweep); with `scan_bin` one read is one whole sweep, 0.35 s. Use it for
+  range changes, Multi, TDR and calibration, where the waits dominate; decide for the live loop separately (smooth look vs consistent sweep).
+- Implemented for Multi, Cable, TDR and the app-side calibration (`readSweep`: one `scan_bin`, mask 3 = frequencies + channel 0; falls
+  back to resume + wait + `frequencies` + `data` when the firmware answers with text instead of binary). `scan_bin` leaves the
+  device **paused** on the scanned range and keeps the point count it was given (101 here), so the update loop's switch back to the
+  other views still sets the range and resumes (`wasMulti`). Received text is now decoded one character per byte (`bytesToString`);
+  the old `TextDecoder('ascii')` is windows-1252 and turned bytes 0x80-0x9f into other characters, which also affected `capture`.
+- Left on `scan`/`data`: the Single/Freq live loop (gradual refresh looks smoother) and the segment scan (existing tests pin its sequence).

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { NanoVNA_Base } from '../lib/nanovna';
+import { NanoVNA_Base, parseScanBin, bytesToString } from '../lib/nanovna';
 
 // 決定論的なテストのための非同期キュー
 class AsyncQueue {
@@ -624,5 +624,27 @@ describe('NanoVNA_WebUSB Static Methods', () => {
             serialNumber: 'SN1',
             type: 'usb'
         });
+    });
+});
+
+describe('scan_bin', () => {
+    const bytes = (...parts) => parts.flat();
+    const u16 = (v) => [v & 255, v >> 8];
+    const u32 = (v) => [v & 255, (v >> 8) & 255, (v >> 16) & 255, v >>> 24];
+    const f32 = (v) => [...new Uint8Array(new Float32Array([v]).buffer)];
+    const text = (a) => String.fromCharCode(...a);
+
+    it('parses frequencies and both channels', () => {
+        const raw = text(bytes(u16(0x87), u16(2), u32(1000000), f32(0.5), f32(-0.25), f32(0.125), f32(2), u32(30000000), f32(1), f32(0), f32(-1), f32(4)));
+        expect(parseScanBin(raw)).toEqual({ freqs: [1000000, 30000000], ch0: [[0.5, -0.25], [1, 0]], ch1: [[0.125, 2], [-1, 4]] });
+    });
+
+    it('leaves out the columns that were not asked for', () => {
+        const raw = text(bytes(u16(0x83), u16(1), u32(7000000), f32(0.5), f32(0.5)));
+        expect(parseScanBin(raw)).toEqual({ freqs: [7000000], ch0: [[0.5, 0.5]], ch1: [] });
+    });
+
+    it('keeps bytes above 0x7f when turning received data into text', () => {
+        expect(bytesToString(Uint8Array.from([0x87, 0x00, 0xff, 0x80]))).toBe('\x87\x00\xff\x80');
     });
 });

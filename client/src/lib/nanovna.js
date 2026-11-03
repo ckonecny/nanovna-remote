@@ -30,6 +30,40 @@ const USBD1_DATA_AVAILABLE_EP = 1;
 const AUDIO_BUFFER_LEN = 96;
 const DUMP_BUFFER_LEN = AUDIO_BUFFER_LEN / 2;
 
+// ---- scan_bin reply: uint16 flags (0x80 | mask), uint16 points, then per point uint32 frequency (mask bit 0) and
+// float32 re, im for channel 0 (bit 1) and channel 1 (bit 2), little endian ----
+const SCAN_BIN_FLAG = 0x80;
+
+// the shell text arrives as one character per byte
+export function bytesToString(bytes) {
+    if (!(bytes instanceof Uint8Array)) bytes = new Uint8Array(bytes);
+    let s = '';
+    for (let i = 0; i < bytes.length; i += 8192) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+    return s;
+}
+
+const scanBinRecordSize = (flags) => (flags & 1 ? 4 : 0) + 8 * ((flags >> 1) & 1) + 8 * ((flags >> 2) & 1);
+
+// -> { freqs: [Hz], ch0: [[re, im]], ch1: [[re, im]] } (a column that was not asked for is empty)
+export function parseScanBin(string) {
+    const bytes = Uint8Array.from(string, (c) => c.charCodeAt(0) & 0xff);
+    const view = new DataView(bytes.buffer);
+    const flags = view.getUint16(0, true);
+    const points = view.getUint16(2, true);
+    const size = scanBinRecordSize(flags);
+    const out = { freqs: [], ch0: [], ch1: [] };
+    for (let i = 0, o = 4; i < points; i++, o += size) {
+        let at = o;
+        if (flags & 1) { out.freqs.push(view.getUint32(at, true)); at += 4; }
+        for (const [bit, ch] of [[2, out.ch0], [4, out.ch1]]) {
+            if (!(flags & bit)) continue;
+            ch.push([view.getFloat32(at, true), view.getFloat32(at + 4, true)]);
+            at += 8;
+        }
+    }
+    return out;
+}
+
 export class NanoVNA_Base {
     static get AUDIO_BUFFER_LEN() {
         return AUDIO_BUFFER_LEN;
@@ -62,9 +96,8 @@ export class NanoVNA_Base {
         const callbacks = this.callbacks;
 
         this.buffer = '';
-        const decoder = new TextDecoder('ascii');
         this.startReaderThread((data) => {
-            this.buffer += decoder.decode(data);
+            this.buffer += bytesToString(data);
             // console.log(this.buffer);
             for (let i = 0, it; (it = callbacks[i]); i++) {
                 it();
@@ -250,6 +283,23 @@ export class NanoVNA_Base {
 
     async scan(start, stop, length) {
         await this.sendCommand(`scan ${start} ${stop} ${length}\r`);
+    }
+
+    // One sweep in a single command: `scan_bin` returns when the sweep is done, so no waiting and no separate reads.
+    // mask: bit 0 frequencies, bit 1 channel 0, bit 2 channel 1. The device stays paused on the scanned range afterwards.
+    async scanBin(start, stop, length, mask = 7) {
+        return await this.sendCommand(`scan_bin ${start} ${stop} ${length} ${mask}\r`, async () => {
+            const head = await this.read(4);
+            const flags = head.charCodeAt(0) | (head.charCodeAt(1) << 8);
+            if (!(flags & SCAN_BIN_FLAG)) {
+                await this.readline('ch> ', false); // not binary: the device does not know the command, leave its answer unread
+                const error = new Error('scan_bin is not supported by this firmware');
+                error.unsupported = true;
+                throw error;
+            }
+            const points = head.charCodeAt(2) | (head.charCodeAt(3) << 8);
+            return parseScanBin(head + (await this.read(points * scanBinRecordSize(flags))));
+        });
     }
 
     async getFrequencies() {
