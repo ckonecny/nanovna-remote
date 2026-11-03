@@ -32,7 +32,6 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
-- The Feather photo on the feature page shows the old button order (new photo needed).
 - Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
   "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first
   trace and its title names it ("Max CH0 swr · 250.2 MHz"). Not looked at on the iPhone.
