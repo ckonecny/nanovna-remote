@@ -40,10 +40,11 @@ each screen shows the hint. Holding D0 while resetting opens the setup WiFi inst
 joining a stored network. Full description: `manual/manual_en.md`.
 
 ## Versioning
-Not versioned yet. When releases start: tag `vX.Y.Z`, GitHub release with the
-firmware `.bin` and the manual PDFs, patch for fixes, minor for features.
+Released since v1.0.0: tag `vX.Y.Z` (patch for fixes, minor for features); `release.yml` builds the GitHub release
+(`-first-flash.bin`, `-update.bin`, `SHA256SUMS`) and `pages.yml` republishes the installer. The version comes from
+`git describe` (`firmware/tools/version.py`). Tagging needs the user's explicit OK.
 
-## Release consistency check (when releases start)
+## Release consistency check (before every tag)
 - `docs/STATUS.md` matches reality; finished items are in `STATUS-ARCHIVE.md`.
 - `docs/DECISIONS.md` has every architecture change since the last tag.
 - Both manual files describe the same, current behaviour.
