@@ -96,7 +96,8 @@ const setRange = (what) => {
 .mr-sep { flex: 1; }
 .mr-cap { color: var(--text-dim); }
 .mr-btn { padding: 2px 8px; min-height: 0; font-size: 12px; }
-table { border-collapse: collapse; width: 100%; font-family: monospace; }
+table { border-collapse: collapse; font-family: monospace; }
+td:first-child, th:first-child { padding-right: 16px; }
 th, td { text-align: right; padding: 1px 6px; white-space: nowrap; }
 td:first-child, th:first-child { text-align: left; color: var(--text-dim); }
 th { cursor: pointer; }

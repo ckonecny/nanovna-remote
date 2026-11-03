@@ -203,7 +203,9 @@ Ein Trace ist eine Kurve in der Ansicht **Freq** oder **Smith**. In den Einstell
 
 **Add Trace** im Seitenmenü legt einen neuen an.
 
-**Freq-Diagramm zoomen.** Zwei Finger auf das Diagramm legen: horizontal auseinanderziehen zoomt den Frequenzbereich hinein (zusammenziehen heraus), beide Finger seitlich bewegen verschiebt ihn. Der neue Bereich wird beim Loslassen übernommen und startet einen neuen Sweep. Vertikal auseinanderziehen zoomt die Werteskala (LogMag, SWR oder Phase, je nach erster Kurve), beide Finger auf/ab verschiebt sie; das folgt live. Ein Finger scrollt weiterhin die Seite.
+**Freq-Diagramm zoomen.** Zwei Finger auf das Diagramm legen: horizontal auseinanderziehen zoomt den Frequenzbereich hinein (zusammenziehen heraus), beide Finger seitlich bewegen verschiebt ihn. Der neue Bereich wird beim Loslassen übernommen und startet einen neuen Sweep. Vertikal auseinanderziehen zoomt die Werteskala (LogMag, SWR oder Phase, je nach erster Kurve), beide Finger auf/ab verschiebt sie; das folgt live. Ein Finger scrollt weiterhin die Seite. Ein schnelles doppeltes Tippen setzt den Zoom zurück (voller Bereich, Standardskala).
+
+Am Computer: das **Mausrad** zoomt den Frequenzbereich um den Mauszeiger (ein Trackpad-Pinch ebenso), **Shift + Mausrad** zoomt die Werteskala, **Ziehen** mit gedrückter Maustaste verschiebt Bereich und Skala, ein **Doppelklick** setzt den Zoom zurück. Die Radschritte werden kurz gesammelt, bevor ein neuer Sweep startet.
 
 **Firmware-Hinweis.** Gibt es für das verbundene NanoVNA (NanoVNA-H oder -H4 des Projekts von hugen79) eine neuere Firmware,
 erscheint unter der Kopfzeile ein Hinweis mit Link auf die Release-Seite; **Dismiss** blendet ihn für dieses Release aus. Dafür

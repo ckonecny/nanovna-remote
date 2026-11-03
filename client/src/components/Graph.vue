@@ -212,7 +212,8 @@ const updateChart = async () => {
       format: t.format,
       data: dsp.traceValues(channelData(t), t.format),
       borderColor: t.color,
-      backgroundColor: 'transparent',
+      backgroundColor: t.color, // fills the colour boxes of legend and tooltip
+      fill: false,
       borderWidth: 2,
       pointRadius: 2,
       yAxisID: AXES[t.format] || 'y-axis-auto'
@@ -229,7 +230,7 @@ const updateChart = async () => {
       label: `CH${t.channel} Polar`,
       data: channelData(t).map(d => ({ x: d.real, y: d.imag, freq: d.freq })),
       borderColor: t.color,
-      backgroundColor: 'transparent',
+      backgroundColor: t.color,
       showLine: true,
       borderWidth: 2,
       pointRadius: 2,
@@ -287,6 +288,42 @@ const F_MIN = 50e3;
 const F_MAX = 900e6;
 let gesture = null;
 
+// scale (and its key) the vertical zoom acts on: the first visible trace with a fixed axis
+const yKey = () => {
+  const trace = store.traces.find(t => t.show && SCALE_OF[t.format]);
+  return trace ? SCALE_OF[trace.format] : null;
+};
+const DEFAULT_SCALES = { logmag: [-80, 0], swr: [1, 10], phase: [-180, 180] };
+const setScale = (key, min, max) => {
+  const round = (v) => +v.toPrecision(4);
+  store.scales[key].min = round(min);
+  store.scales[key].max = round(max);
+};
+const areaOf = () => chart && chartKind === 'frequency' && chart.chartArea ? chart.chartArea : null;
+
+// apply a new frequency range; while paused one sweep of it is taken, started once the range switch is under way
+const commitRange = (r) => {
+  if (!r || (Math.abs(r[0] - +store.frequencies.start) <= 1 && Math.abs(r[1] - +store.frequencies.stop) <= 1)) return;
+  const fr = store.frequencies;
+  fr.start = Math.round(r[0]);
+  fr.stop = Math.round(r[1]);
+  fr.center = (fr.start + fr.stop) / 2;
+  fr.span = fr.stop - fr.start;
+  if (!store.autoUpdate) {
+    nextTick(() => { store.sweepOnce = true; store.autoUpdate = true; });
+  }
+};
+const limitRange = (lo, hi, from) => clampRange(lo, hi, F_MIN, Math.max(F_MAX, from));
+const showRange = (r) => { hint.value = r ? dsp.formatFrequency(r[0], 3) + ' – ' + dsp.formatFrequency(r[1], 3) : ''; };
+
+// back to the full range and the default scale
+const resetZoom = () => {
+  if (!areaOf()) return;
+  commitRange([F_MIN, F_MAX]);
+  const key = yKey();
+  if (key && DEFAULT_SCALES[key]) setScale(key, ...DEFAULT_SCALES[key]);
+};
+
 const touchGeometry = (e) => {
   const [a, b] = [e.touches[0], e.touches[1]];
   const r = canvasRef.value.getBoundingClientRect();
@@ -303,8 +340,7 @@ const touchGeometry = (e) => {
 const zoomStart = (e) => {
   if (!chart || chartKind !== 'frequency' || e.touches.length !== 2 || !chart.chartArea) return;
   const g = touchGeometry(e);
-  const trace = store.traces.find(t => t.show && SCALE_OF[t.format]);
-  const key = trace ? SCALE_OF[trace.format] : null;
+  const key = yKey();
   gesture = {
     ...g,
     key,
@@ -325,34 +361,99 @@ const zoomMove = (e) => {
   const h = s.area.bottom - s.area.top;
   const ax = Math.min(1, Math.max(0, (s.mx - s.area.left) / w));
   const fx = pinchFactor(s.dx, g.dx);
-  const [lo, hi] = clampRange(...transformRange(s.lo, s.hi, ax, fx, (g.mx - s.mx) / w), F_MIN, Math.max(F_MAX, s.hi));
-  s.range = [lo, hi];
-  hint.value = dsp.formatFrequency(lo, 3) + ' – ' + dsp.formatFrequency(hi, 3);
+  s.range = limitRange(...transformRange(s.lo, s.hi, ax, fx, (g.mx - s.mx) / w), s.hi);
+  showRange(s.range);
   if (s.key) {
     const ay = Math.min(1, Math.max(0, (s.area.bottom - s.my) / h));
     const fy = pinchFactor(s.dy, g.dy);
     const [min, max] = transformRange(s.y.min, s.y.max, ay, fy, (s.my - g.my) / h);
-    const round = (v) => +v.toPrecision(4);
-    store.scales[s.key].min = round(min);
-    store.scales[s.key].max = round(max);
+    setScale(s.key, min, max);
   }
 };
 
+let lastTap = 0;
 const zoomEnd = (e) => {
-  if (!gesture || e.touches.length >= 2) return;
+  if (!gesture) {
+    // a second quick tap resets the zoom
+    if (e.type === 'touchend' && e.touches.length === 0 && e.changedTouches.length === 1) {
+      const now = Date.now();
+      if (now - lastTap < 300) { resetZoom(); lastTap = 0; } else lastTap = now;
+    }
+    return;
+  }
+  if (e.touches.length >= 2) return;
   const r = gesture.range;
   gesture = null;
   hint.value = '';
-  if (r && (Math.abs(r[0] - +store.frequencies.start) > 1 || Math.abs(r[1] - +store.frequencies.stop) > 1)) {
-    const fr = store.frequencies;
-    fr.start = Math.round(r[0]);
-    fr.stop = Math.round(r[1]);
-    fr.center = (fr.start + fr.stop) / 2;
-    fr.span = fr.stop - fr.start;
-    if (!store.autoUpdate) { // paused: one sweep of the new range, started once the range switch is under way
-      nextTick(() => { store.sweepOnce = true; store.autoUpdate = true; });
-    }
+  commitRange(r);
+};
+
+// Mouse wheel (and trackpad pinch, which arrives as ctrl + wheel) zooms around the pointer: the frequency range, or
+// the value scale with shift. Wheel steps are collected for a moment before a new sweep is started.
+let wheelRange = null;
+let wheelTimer = null;
+const onWheel = (e) => {
+  const area = areaOf();
+  if (!area) return;
+  e.preventDefault();
+  const r = canvasRef.value.getBoundingClientRect();
+  const delta = e.deltaY || e.deltaX;
+  const factor = Math.exp(-delta * (e.ctrlKey ? 0.01 : 0.002) * (e.deltaMode === 1 ? 16 : 1));
+  if (e.shiftKey) {
+    const key = yKey();
+    if (!key) return;
+    const ay = Math.min(1, Math.max(0, (area.bottom - (e.clientY - r.top)) / (area.bottom - area.top)));
+    const [min, max] = transformRange(store.scales[key].min, store.scales[key].max, ay, factor);
+    setScale(key, min, max);
+    return;
   }
+  const lo = wheelRange ? wheelRange[0] : +store.frequencies.start;
+  const hi = wheelRange ? wheelRange[1] : +store.frequencies.stop;
+  const ax = Math.min(1, Math.max(0, (e.clientX - r.left - area.left) / (area.right - area.left)));
+  wheelRange = limitRange(...transformRange(lo, hi, ax, factor), hi);
+  showRange(wheelRange);
+  clearTimeout(wheelTimer);
+  wheelTimer = setTimeout(() => { const range = wheelRange; wheelRange = null; hint.value = ''; commitRange(range); }, 300);
+};
+
+// dragging with the mouse shifts the range and the scale; a click without movement stays a click
+let drag = null;
+let dragged = false;
+const onMouseDown = (e) => {
+  const area = areaOf();
+  if (!area || e.button !== 0) return;
+  const key = yKey();
+  drag = { x: e.clientX, y: e.clientY, area, key, lo: +store.frequencies.start, hi: +store.frequencies.stop, y0: key ? { ...store.scales[key] } : null, range: null, moved: false };
+  window.addEventListener('mousemove', onMouseMove);
+  window.addEventListener('mouseup', onMouseUp);
+};
+const onMouseMove = (e) => {
+  const d = drag;
+  if (!d) return;
+  if (!d.moved && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 5) return;
+  d.moved = true;
+  const w = d.area.right - d.area.left;
+  const h = d.area.bottom - d.area.top;
+  d.range = limitRange(...transformRange(d.lo, d.hi, 0.5, 1, (e.clientX - d.x) / w), d.hi);
+  showRange(d.range);
+  if (d.key) {
+    const [min, max] = transformRange(d.y0.min, d.y0.max, 0.5, 1, (d.y - e.clientY) / h);
+    setScale(d.key, min, max);
+  }
+};
+const onMouseUp = () => {
+  window.removeEventListener('mousemove', onMouseMove);
+  window.removeEventListener('mouseup', onMouseUp);
+  const d = drag;
+  drag = null;
+  if (!d || !d.moved) return;
+  dragged = true;
+  hint.value = '';
+  commitRange(d.range);
+};
+// the click that ends a drag must not set a marker or toggle a trace
+const onClickCapture = (e) => {
+  if (dragged) { dragged = false; e.stopPropagation(); }
 };
 
 // chart.js only follows window resizes; a turned phone changes the box without the canvas noticing
@@ -365,6 +466,10 @@ onMounted(() => {
     el.addEventListener('touchmove', zoomMove, { passive: false });
     el.addEventListener('touchend', zoomEnd);
     el.addEventListener('touchcancel', zoomEnd);
+    el.addEventListener('wheel', onWheel, { passive: false });
+    el.addEventListener('mousedown', onMouseDown);
+    el.addEventListener('click', onClickCapture, true);
+    el.addEventListener('dblclick', resetZoom);
   }
   if (typeof ResizeObserver === 'function' && canvasRef.value) {
     observer = new ResizeObserver(() => { if (chart && chart.resize) chart.resize(); });
@@ -384,7 +489,14 @@ onUnmounted(() => {
     el.removeEventListener('touchmove', zoomMove);
     el.removeEventListener('touchend', zoomEnd);
     el.removeEventListener('touchcancel', zoomEnd);
+    el.removeEventListener('wheel', onWheel);
+    el.removeEventListener('mousedown', onMouseDown);
+    el.removeEventListener('click', onClickCapture, true);
+    el.removeEventListener('dblclick', resetZoom);
   }
+  clearTimeout(wheelTimer);
+  window.removeEventListener('mousemove', onMouseMove);
+  window.removeEventListener('mouseup', onMouseUp);
   if (observer) observer.disconnect();
   if (chart) chart.destroy();
 });
