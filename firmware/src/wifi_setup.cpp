@@ -120,7 +120,7 @@ void wifi_last_set(const std::string &ssid) {
 
 bool ui_flipped_get() {
     nvs_handle_t h;
-    uint8_t v = 0;
+    uint8_t v = 1;  // the picture the right way up for the button labels, until the user turns it
     if (nvs_open("ui", NVS_READONLY, &h) == ESP_OK) {
         nvs_get_u8(h, "flipped", &v);
         nvs_close(h);

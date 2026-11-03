@@ -43,8 +43,8 @@ jobs:
           cp -r client/dist-demo _site/demo
           # the browser installer flashes the first-flash image of the latest release (same origin, so no CORS trouble)
           tag=$(gh release view --json tagName --jq .tagName)
-          gh release download "$tag" --pattern '*-first-flash.bin' --output _site/install/firmware.bin
-          printf '{"name":"NanoVNA Remote","version":"%s","new_install_prompt_erase":false,"builds":[{"chipFamily":"ESP32-S3","parts":[{"path":"firmware.bin","offset":0}]}]}\n' "${tag#v}" > _site/install/manifest.json
+          gh release download "$tag" --pattern '*-first-flash.bin' --output "_site/install/firmware-${tag#v}.bin"
+          printf '{"name":"NanoVNA Remote","version":"%s","new_install_prompt_erase":false,"builds":[{"chipFamily":"ESP32-S3","parts":[{"path":"firmware-%s.bin","offset":0}]}]}\n' "${tag#v}" "${tag#v}" > _site/install/manifest.json
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

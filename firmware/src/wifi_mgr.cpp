@@ -195,6 +195,9 @@ void wifi_mgr_start(bool force_ap) {
     ESP_ERROR_CHECK(esp_netif_dhcps_stop(ap_netif));
     ESP_ERROR_CHECK(esp_netif_set_dns_info(ap_netif, ESP_NETIF_DNS_MAIN, &dns));
     ESP_ERROR_CHECK(esp_netif_dhcps_option(ap_netif, ESP_NETIF_OP_SET, ESP_NETIF_DOMAIN_NAME_SERVER, &offer_dns, sizeof offer_dns));
+    // RFC 8910 captive portal URI: phones that look for it open the setup page right after joining
+    static const char portal_uri[] = "http://192.168.4.1/wifi";
+    ESP_ERROR_CHECK(esp_netif_dhcps_option(ap_netif, ESP_NETIF_OP_SET, ESP_NETIF_CAPTIVEPORTAL_URI, (void *)portal_uri, sizeof portal_uri - 1));
     ESP_ERROR_CHECK(esp_netif_dhcps_start(ap_netif));
 
     wifi_init_config_t init = WIFI_INIT_CONFIG_DEFAULT();

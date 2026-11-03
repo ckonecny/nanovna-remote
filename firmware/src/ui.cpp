@@ -13,6 +13,7 @@
 #include "qr.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "version.h"
 #include "vna.h"
 #include "wifi_mgr.h"
 #include "wifi_setup.h"
@@ -181,9 +182,14 @@ void wifi_list() {
                    }));
 }
 
+void about() {
+    push(make_list("About", "D1: back", [] { return std::vector<std::string>{"NanoVNA Remote", std::string("Version ") + FW_VERSION, "GPL-3.0-or-later"}; },
+                   [](int) { pop(); }));
+}
+
 void main_menu() {
     push(make_list("Menu", "D1:ok long:back",
-                   [] { return std::vector<std::string>{"Choose WiFi", "Start setup WiFi", "Rotate display", "Restart", "Back"}; },
+                   [] { return std::vector<std::string>{"Choose WiFi", "Start setup WiFi", "Rotate display", "Restart", "About", "Back"}; },
                    [](int i) {
                        switch (i) {
                            case 0: wifi_list(); break;
@@ -193,6 +199,7 @@ void main_menu() {
                                break;
                            case 2: ui_flipped_set(!ui_flipped_get()); display_set_flipped(ui_flipped_get()); break;
                            case 3: esp_restart(); break;
+                           case 4: about(); break;
                            default: pop();
                        }
                    }));
@@ -201,22 +208,30 @@ void main_menu() {
 // A QR code to scan with the phone: joins the setup WiFi while that is open, otherwise opens the web app.
 struct QrScreen : Screen {
     std::string shown;  // what is on the display now
+    int page = 0;       // in the setup WiFi: 0 = the code that joins it, 1 = the code that opens its setup page
 
     // the text for the QR code, and the lines of help beside it; empty text: nothing to show yet
-    static std::string content(std::string help[4]) {
+    std::string content(std::string help[4]) const {
         auto st = wifi_mgr_status();
-        if (st.state == WIFI_AP) {
-            help[0] = "Scan to join";
+        if (st.state == WIFI_AP && page == 0) {
+            help[0] = "1/2 Scan to join";
             help[1] = "the setup WiFi:";
             help[2] = st.ssid;
-            help[3] = "Then the setup page opens";
+            help[3] = "D1: 2nd code. Long D1: back";
             return "WIFI:T:WPA;S:" + st.ssid + ";P:" AP_PASSWORD ";;";
+        }
+        if (st.state == WIFI_AP) {
+            help[0] = "2/2 Scan to open";
+            help[1] = "the setup page:";
+            help[2] = "192.168.4.1/wifi";
+            help[3] = "D1: 1st code. Long D1: back";
+            return "http://192.168.4.1/wifi";
         }
         if (st.state == WIFI_STA) {
             help[0] = "Scan to open";
             help[1] = "the web app:";
             help[2] = st.ip;
-            help[3] = "or nanovna.local";
+            help[3] = "or nanovna.local. Any key: back";
             return "http://" + st.ip + "/";
         }
         return "";
@@ -224,14 +239,16 @@ struct QrScreen : Screen {
 
     void rows(Row out[ROWS]) override {}
     void key(const ButtonMessage &m) override {
-        if (m.event == BTN_SHORT || m.event == BTN_LONG) pop();
+        bool setup = wifi_mgr_status().state == WIFI_AP;
+        if (setup && m.event == BTN_SHORT) page = 1 - page;  // the other code
+        else if (m.event == BTN_SHORT || m.event == BTN_LONG) pop();
     }
     bool stays_open() override { return true; }
 
     bool draw(bool full) override {
         std::string help[4];
         std::string text = content(help);
-        std::string state = text + "|" + help[2];
+        std::string state = text + "|" + help[2] + "|" + std::to_string(page);
         if (!full && state == shown) return true;
         shown = state;
         display_fill(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
@@ -258,7 +275,6 @@ struct QrScreen : Screen {
                 rest = rest.size() > part.size() ? rest.substr(part.size() + (rest[part.size()] == ' ' ? 1 : 0)) : "";
             }
         }
-        display_text(x ? x : 0, DISPLAY_H - 10, "any key: back", GREY, BLACK, 1);
         return true;
     }
 };

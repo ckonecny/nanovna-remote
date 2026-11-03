@@ -31,8 +31,9 @@ returns to the status screen.
 
 **Status screen:** D1 short opens the WiFi list; D1 long opens the menu; D2 shows a **QR code** (see below).
 
-**QR code:** while the setup WiFi is open the code joins that WiFi (point the phone's camera at it and confirm), and the setup
-page then opens by itself on most phones. While the Feather is on your network the code opens the web app. The code
+**QR code:** while the setup WiFi is open there are two codes (D1 switches between them): the first joins that WiFi (point the
+phone's camera at it and confirm), the second opens the setup page `http://192.168.4.1/wifi`. Some phones open the setup page by
+themselves after joining (the Feather offers it), an iPhone may not, then scan the second code. While the Feather is on your network the code opens the web app. The code
 appears by itself when the setup WiFi opens; any key closes it. It is small, hold the phone 10 to 15 cm from the display.
 
 **WiFi list:** your saved networks, `*` marks the connected one and `-` a disabled one; the last entry
@@ -40,14 +41,14 @@ appears by itself when the setup WiFi opens; any key closes it. It is small, hol
 selected network: Connect, Enable/Disable, Delete (with a question), Back.
 
 **Menu:** Choose WiFi, Start setup WiFi, Rotate display (turns the picture by 180 degrees, remembered),
-Restart, Back.
+Restart, About (the firmware version, for example `v1.1.0`), Back.
 
 ## 4. First start and WiFi setup
 
 1. On first start (no saved network) the Feather opens its own WiFi **NanoVNA-Remote**,
    password **nanovna-remote**. The display shows a **QR code** for it.
-2. Scan the QR code with the phone's camera and join the WiFi; the setup page opens by itself. If it does not, or on a
-   computer, join the WiFi by hand (name and password are on the status screen, D2 shows the code again) and open
+2. Scan the QR code with the phone's camera and join the WiFi. If the setup page does not open by itself, press D1 for the
+   second code and scan it. On a computer join the WiFi by hand (name and password are on the status screen) and open
    **http://192.168.4.1/wifi**.
 3. Press **Scan for networks**, tap your network, enter its password and press **Save**. Press
    **Connect**. The Feather joins that network and the display shows the new address; the phone returns to

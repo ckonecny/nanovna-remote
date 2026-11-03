@@ -31,8 +31,10 @@ zurück auf den Status-Bildschirm.
 
 **Status-Bildschirm:** D1 kurz öffnet die WLAN-Liste, D1 lang das Menü, D2 zeigt einen **QR-Code** (siehe unten).
 
-**QR-Code:** Solange das Einrichtungs-WLAN offen ist, verbindet der Code mit diesem WLAN (Handy-Kamera draufhalten und
-bestätigen); die Einrichtungsseite öffnet sich danach auf den meisten Handys von selbst. Ist der Feather in deinem Netz,
+**QR-Code:** Solange das Einrichtungs-WLAN offen ist, gibt es zwei Codes (D1 wechselt): der erste verbindet mit diesem WLAN
+(Handy-Kamera draufhalten und bestätigen), der zweite öffnet die Einrichtungsseite `http://192.168.4.1/wifi`. Manche Handys
+öffnen die Einrichtungsseite nach dem Verbinden von selbst (der Feather bietet sie an), ein iPhone eventuell nicht, dann den
+zweiten Code scannen. Ist der Feather in deinem Netz,
 öffnet der Code die Web-App. Der Code erscheint von selbst, wenn das Einrichtungs-WLAN aufgeht; jede Taste schließt ihn.
 Er ist klein, halte das Handy 10 bis 15 cm vor das Display.
 
@@ -41,7 +43,7 @@ Er ist klein, halte das Handy 10 bis 15 cm vor das Display.
 Netzes: Connect (verbinden), Enable/Disable (aktivieren/deaktivieren), Delete (löschen, mit Rückfrage), Back (zurück).
 
 **Menü:** Choose WiFi (WLAN wählen), Start setup WiFi (Setup-WLAN starten), Rotate display (Bild um 180 Grad drehen,
-wird gemerkt), Restart (Neustart), Back (zurück).
+wird gemerkt), Restart (Neustart), About (die Firmware-Version, zum Beispiel `v1.1.0`), Back (zurück).
 
 Die Anzeige am Gerät und die Webseiten sind englisch.
 
@@ -49,9 +51,9 @@ Die Anzeige am Gerät und die Webseiten sind englisch.
 
 1. Beim ersten Start (kein Netz gespeichert) öffnet der Feather ein eigenes WLAN **NanoVNA-Remote**,
    Passwort **nanovna-remote**. Das Display zeigt einen **QR-Code** dafür.
-2. Scanne den QR-Code mit der Handy-Kamera und verbinde dich mit dem WLAN; die Einrichtungsseite öffnet sich von
-   selbst. Wenn nicht, oder am Computer: verbinde dich von Hand (Name und Passwort stehen auf dem Status-Bildschirm,
-   D2 zeigt den Code wieder) und öffne **http://192.168.4.1/wifi**.
+2. Scanne den QR-Code mit der Handy-Kamera und verbinde dich mit dem WLAN. Öffnet sich die Einrichtungsseite nicht von
+   selbst, drücke D1 für den zweiten Code und scanne ihn. Am Computer verbindest du dich von Hand (Name und Passwort stehen
+   auf dem Status-Bildschirm) und öffnest **http://192.168.4.1/wifi**.
 3. **Scan for networks** drücken, dein Netz antippen, Passwort eingeben und **Save** drücken. Dann **Connect**.
    Der Feather verbindet sich mit dem Netz, das Display zeigt die neue Adresse, das Handy kehrt in dein normales
    WLAN zurück. Öffne die Adresse vom Display.

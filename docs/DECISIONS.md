@@ -137,6 +137,12 @@ Newest first within each section. Record new decisions here as they are made.
 - `pages.yml` builds the demo and publishes it next to the feature page under `/demo/` (`site/` + `client/dist-demo`).
   It also runs on changes in `client/`.
 
+## Firmware version and display orientation (2026-11)
+- `tools/version.py` (PlatformIO pre-script) writes `src/version.h` (`FW_VERSION`, ignored by git) from `git describe --tags --always --dirty`:
+  `v1.1.0` on a tag build, `v1.1.0-3-gabc123` between tags, `-dirty` with local changes. Shown in the menu under About (the status screen is too full) and logged at boot (`/log`).
+- The display is rotated by default now (`ui_flipped_get` defaults to 1): with a fresh flash the image was upside down relative to the
+  button labels, D0/D2 were reversed. A saved choice from the menu still wins.
+
 ## QR code on the device display (2026-11)
 - `firmware/src/qr.cpp` draws a QR code with Nayuki's C generator (v1.8.0, MIT, vendored unmodified in `src/third_party/qrcodegen/`).
   Error correction L, version 1 to 4, black on white with a 2-module quiet zone, as large as the 135 px height allows
@@ -144,7 +150,9 @@ Newest first within each section. Record new decisions here as they are made.
 - `ui.cpp`: `QrScreen` (D2 on the status screen; opens by itself when the setup WiFi starts and no other screen is open). It paints
   itself instead of rows of text (`Screen::draw`) and is exempt from the 30 s return to the status screen. Content: the join code
   while in setup mode, `http://<ip>/` while on a network, otherwise a note. The existing captive portal (dns.cpp) then opens the setup page.
-- Not verified yet: scan reliability of the 4 px modules on the real panel, and which phones open the portal after joining.
+- Verified on the device (v1.1.0): the code shows, the iPhone camera joins the setup WiFi from it. The iPhone did not open the setup page by itself,
+  so in setup mode a second page of the QR screen (D1) holds `http://192.168.4.1/wifi`, and the DHCP server now also offers it as RFC 8910
+  captive portal URI (option 114). Whether option 114 makes the iPhone open the page is not verified.
 
 ## Release binaries (2026-11)
 - A tag `v*` runs `release.yml`: client tests and `build:esp`, firmware build, then `esptool merge_bin` (the esptool that
@@ -154,7 +162,7 @@ Newest first within each section. Record new decisions here as they are made.
   (stored WiFi networks), so the notes say it is for the first installation.
 - Browser installer: `site/install/` uses ESP Web Tools 10.4.0 (Apache-2.0), vendored unmodified in
   `site/install/vendor/esp-web-tools/` (pinned, no CDN at runtime). `pages.yml` downloads the first-flash image of the latest
-  release into `_site/install/firmware.bin` and writes `manifest.json` (same origin: GitHub release assets send no CORS
+  release into `_site/install/firmware-<version>.bin` (the version in the name, and a time stamp on the manifest URL, because Pages caches for 10 minutes and an old cached image would otherwise be flashed) and writes `manifest.json` (same origin: GitHub release assets send no CORS
   headers); `release.yml` starts `pages.yml` after publishing (a release made with the workflow token does not trigger
   `on: release`). The Feather's USB port is not a serial port while the firmware runs, so the page tells the user to enter
   the ROM bootloader first (D0 + RESET). Web Serial: Chrome/Edge only, not Firefox/Safari/iOS. The image overwrites NVS

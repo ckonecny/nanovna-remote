@@ -9,6 +9,7 @@
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include "ui.h"
+#include "version.h"
 #include "vna.h"
 #include "web.h"
 #include "wifi_mgr.h"
@@ -37,6 +38,7 @@ extern "C" void app_main() {
     fs.format_if_mount_failed = true;
     ESP_ERROR_CHECK(esp_vfs_spiffs_register(&fs));
 
+    ESP_LOGI(TAG, "NanoVNA Remote %s", FW_VERSION);
     buttons_start();
     display_init(ui_flipped_get());
     ui_start();

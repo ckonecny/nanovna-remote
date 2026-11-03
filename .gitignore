@@ -10,6 +10,7 @@ firmware/.pio/
 firmware/managed_components/
 firmware/sdkconfig.feather
 firmware/src/client_assets.cpp
+firmware/src/version.h
 
 # dev tools
 dev-tools/venv/

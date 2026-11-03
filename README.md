@@ -73,7 +73,7 @@ calibration, runs in the browser.
    Prefer to build it yourself? `cd client && npm install && npm run build:esp`, then
    `cd ../firmware && python3 -m platformio run -e feather -t upload` (needs Node.js and PlatformIO).
 2. **Set up the WiFi.** On first start the Feather opens its own WiFi `NanoVNA-Remote` (password `nanovna-remote`) and
-   shows a QR code for it. Scan it with the phone's camera, join, and the setup page opens (or open <http://192.168.4.1/wifi>).
+   shows a QR code for it. Scan it with the phone's camera and join; press D1 for a second code that opens the setup page (or open <http://192.168.4.1/wifi>).
    Scan for networks, pick yours, enter its password, save, press Connect.
 3. **Connect the NanoVNA** to the Feather's USB-C port. The display says "USB: device found".
 4. **Measure.** Open the address shown on the display (`http://<feather-ip>/`, also `http://nanovna.local/` where that

@@ -120,7 +120,9 @@ footer { color: var(--dim); font-size: 14px; padding: 24px 0 48px; }
   try { saved = localStorage.getItem('lang'); } catch (e) {}
   set(saved || ((navigator.language || '').toLowerCase().indexOf('de') === 0 ? 'de' : 'en'));
   document.querySelectorAll('.lang button').forEach(function (b) { b.addEventListener('click', function () { set(b.dataset.set); }); });
-  fetch('manifest.json').then(function (r) { return r.json(); }).then(function (m) {
+  // the host caches files for 10 minutes: a fresh address for the manifest, and the firmware file carries its version in the name
+  document.querySelector('esp-web-install-button').setAttribute('manifest', 'manifest.json?t=' + Date.now());
+  fetch('manifest.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (m) {
     document.getElementById('version').textContent = 'NanoVNA Remote ' + m.version;
   }).catch(function () {});
 })();
