@@ -1,41 +1,41 @@
 # Status
 
-Repo: ckonecny/nanovna-remote (private). Not versioned yet.
-Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
-`docs/STATUS-ARCHIVE.md`. This file holds only the current state and hints for the next session.
+Repo: github.com/ckonecny/nanovna-remote (public), latest release v1.1.2. Open features and bugs: GitHub issues
+(CLAUDE.md rule 9). Finished work: `docs/STATUS-ARCHIVE.md`. Decisions and hardware findings: `docs/DECISIONS.md`.
+This file holds only the current state and hints for the next session.
 
-## Current state (2026-11-02)
-- Firmware on the Feather: bridge, web app, OTA, calibration storage, multi-network WiFi,
-  display status screen and menus (English), buttons. Flash 85 % of the app slot.
-- Web app: Single frequency, HAM and Multi views with app-side OSL calibration over all bands,
-  dark mode, no-data notice. 107 client tests pass.
-- Tested on the new Feather (display, buttons, WiFi list, `/wifi` page).
+## Current state (2026-11-03)
+- Solid state, everything committed and pushed; v1.1.2 is flashed on the user's Feather and tested there (installer,
+  QR codes, orientation, About, return to the status screen, OTA over `/update`).
+- Firmware: bridge, web app, OTA (`/update` page and `/api/ota`), calibration storage, multi-network WiFi, display UI,
+  QR codes. Flash 86.8 % of the app slot (over 85 %, 207 KB free; the user decided to leave it until it gets tight).
+- Web app: Single, HAM, Multi, Cable, TDR, Smith, Freq views, app-side OSL calibration, export. Live demo with a simulated
+  NanoVNA: https://ckonecny.github.io/nanovna-remote/demo/ . Installer: .../install/ . Feature page: .../ .
+- Release: push a tag `v*`; `release.yml` builds `-first-flash.bin`, `-update.bin`, `SHA256SUMS`, then `pages.yml` republishes
+  the site with the installer manifest (about 10 min, Pages caches 10 min). Tagging needs the user's explicit OK.
 
-- Display returns to the status screen by itself once a network is joined (after v1.1.1): built, not yet seen on the device.
-- Browser installer (`site/install/`, ESP Web Tools): written, not yet flashed from the browser on a real Feather.
-- Release workflow (`release.yml`, tag `v*`) written; first release (tag) and a flash test of the first-flash image are open.
-- Live demo: `npm run build:demo`, published to `/demo/` of the Pages site by `pages.yml` (see DECISIONS).
-- Simulator and screenshots: `dev-tools/simulator.py` + `dev-tools/screenshots/shots.mjs` (see DECISIONS); the manual has
-  screenshots and `site/` holds the feature page (not published yet: GitHub Pages must be enabled, repo must be public).
-
-## Phone/device checks still open
-- TDR view (#2): confirmed working on a real cable by the user (no numbers recorded). Not yet checked: all three sweeps, a cable with a break, accuracy at 0 m.
-- Export in HAM and Multi (#7, side menu Save section): .s1p (band-date file names, one per band in Multi) and PNG of the SVG charts; checked in the browser against the device (files created, PNG rendered correctly). Not checked: iPhone/Safari download behaviour, many downloads in a row.
-- Cable view (#1): length/velocity factor/loss confirmed working on a real cable by the user (no numbers recorded). Characteristic impedance (open + short) and cut/stub lengths added; impedance confirmed on a real 50 ohm cable (52.3 ohm). Not checked on hardware: 75 ohm cable, stub lengths (maths covered by tests).
-- Multi view: checked uncalibrated against the NanoVNA; still to check with the calibration of all bands.
-- Second network (hotspot): join, switch with the buttons, fall back to the setup WiFi when
-  a network is out of range; the 60 s retry of stored networks in the setup WiFi.
-- Switching networks from the `/wifi` page while connected over the same WiFi.
-- No-data banner against a real NanoVNA freeze.
-- Client on an iPhone.
-- The old Feather (still on the pre-display firmware): update over WiFi.
+## Open checks
+- iPhone: does it open the setup page by itself after joining the setup WiFi (DHCP option 114)? The second QR code is the fallback.
+- Android phone: flashing via the installer (Chrome) and the captive portal.
+- Browser upload through `/update` works (user tested); `/update` on a phone not checked.
+- Phone/device checks of older features: TDR (all sweeps, cable with a break), export on iPhone/Safari, 75 ohm cable and
+  stub lengths, Multi with all-band calibration, second network/hotspot fallback, no-data banner against a real NanoVNA
+  freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
-OSV ignore list (`client/osv-scanner.toml`, 3 build-tool findings in vite-plugin-pwa/workbox-build) expires 2027-02-02: check for a workbox-build update before then and drop the entries.
-Feature backlog (Stick Pro parity) is in GitHub issues: accuracy check of the calibration against an independent mismatch (#6; kit-only check done, see DECISIONS), single-stub matching (#8).
+- Feature backlog in GitHub issues (#6, #8-#24, #26-#29). #27 (firmware update from the web app) is partly done by the
+  device's `/update` page; decide whether to close it. #29: screenshots in the manual (the user has not decided).
+- OSV ignore list (`client/osv-scanner.toml`, 3 build-tool findings in vite-plugin-pwa/workbox-build) expires 2027-02-02:
+  check for a workbox-build update before then and drop the entries.
+- Optional: `dev-tools/screenshots/shots.mjs` could use the JS simulator (`client/src/lib/demo.js`) instead of
+  `dev-tools/simulator.py`, removing the duplicate model. No flash saving (neither simulator is in the firmware).
+- Known warnings: 3 `-Wmissing-field-initializers` in `web.cpp` (route table); `dns.cpp` still logs every query.
 
 ## Hints for the next session
-- Screenshots without hardware: `dev-tools/venv/bin/python dev-tools/simulator.py`, then `node shots.mjs` in `dev-tools/screenshots` (after `npm install`).
+- Chat with the user in German; repo content English (CLAUDE.md).
+- OTA: `firmware/tools/ota.sh` (default host `nanovna.local`, works when the Mac is on the same WiFi). Over USB: hold D0,
+  tap RESET, release D0, then `-t upload --upload-port /dev/cu.usbmodem...`.
 - Logs: `http://<ip>/log`. The Feather's IP is on its display.
-- Over USB: hold D0, tap RESET, then `-t upload --upload-port /dev/cu.usbmodem...`.
-- `dns.cpp` still logs every query (diagnostic); remove when no longer needed.
+- Screenshots without hardware: `dev-tools/venv/bin/python dev-tools/simulator.py`, then `node shots.mjs` in
+  `dev-tools/screenshots` (after `npm install`).
+- The auto-mode classifier blocks `gh pr merge` and creating releases/tags without the user's explicit word: ask first.
