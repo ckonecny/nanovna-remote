@@ -1,0 +1,89 @@
+name: Release
+
+# A version tag (v1.0.0, ...) builds the web app and the firmware and publishes a release with ready-made binaries:
+#   *-first-flash.bin  bootloader + partition table + app in one file, flashed once over USB at offset 0x0
+#   *-update.bin       the app only, for updates over WiFi (POST to http://<ip>/api/ota, see firmware/tools/ota.sh)
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Web app (tests, then the build that the firmware embeds)
+        working-directory: client
+        run: |
+          npm ci
+          npx vitest run
+          npm run build:esp
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v6
+        with:
+          path: ~/.platformio
+          key: pio-${{ hashFiles('firmware/platformio.ini', 'firmware/dependencies.lock') }}
+      - run: python -m pip install platformio
+      - name: Firmware
+        working-directory: firmware
+        run: python -m platformio run -e feather
+      - name: Assemble the files
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          B=firmware/.pio/build/feather
+          mkdir release
+          cp $B/firmware.bin "release/nanovna-remote-$TAG-update.bin"
+          python ~/.platformio/packages/tool-esptoolpy/esptool.py --chip esp32s3 merge_bin \
+            -o "release/nanovna-remote-$TAG-first-flash.bin" \
+            --flash_mode dio --flash_freq 80m --flash_size 4MB \
+            0x0 $B/bootloader.bin 0x8000 $B/partitions.bin 0xf000 $B/ota_data_initial.bin 0x20000 $B/firmware.bin
+          cd release && sha256sum *.bin > SHA256SUMS && cat SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-files
+          path: release
+          retention-days: 3
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-files
+          path: release
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          cat > notes.md <<NOTES
+          Ready-made firmware for the Adafruit ESP32-S3 Reverse TFT Feather (product 5691), with the web app embedded.
+
+          **First time (USB):** put the Feather in the bootloader (hold D0, tap RESET, release D0) and flash the whole image once:
+
+          \`\`\`sh
+          pip install esptool
+          esptool.py --chip esp32s3 write_flash 0x0 nanovna-remote-$TAG-first-flash.bin
+          \`\`\`
+
+          This also resets the stored WiFi networks. **Update later (WiFi):** upload \`nanovna-remote-$TAG-update.bin\` to \`http://<feather-ip>/api/ota\` (\`curl --data-binary @file http://<ip>/api/ota\`).
+
+          Checksums in \`SHA256SUMS\`. Source of exactly this build: the tag \`$TAG\` of https://github.com/$REPO. Licences: firmware GPL-3.0-or-later, embedded web app GPL-2.0.
+          NOTES
+          gh release create "$TAG" release/* --repo "$REPO" --title "$TAG" --notes-file notes.md

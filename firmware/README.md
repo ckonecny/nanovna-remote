@@ -10,6 +10,12 @@ is passed through as well). It joins your WiFi and does three things:
 - **Services:** WiFi setup (`/wifi`), over-the-air update (`/api/ota`), the calibration of the web app
   (`/api/appcal`, kept in flash so every browser sees the same one), a log of recent events (`/log`).
 
+## Ready-made binaries
+
+Releases (tag `v*`, built by `.github/workflows/release.yml`) carry `*-first-flash.bin` (bootloader, partition table, otadata
+and app in one file, written once at offset 0x0 with `esptool.py --chip esp32s3 write_flash 0x0 <file>`) and `*-update.bin`
+(the app only, `curl --data-binary @file http://<ip>/api/ota`). The first-flash image overwrites the stored WiFi networks.
+
 ## Build and flash
 
 ```sh

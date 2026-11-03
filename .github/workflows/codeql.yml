@@ -49,7 +49,6 @@ jobs:
         with:
           languages: c-cpp
           build-mode: manual
-          config-file: ./.github/codeql/codeql-config.yml
       - name: Build the firmware (without the web client; the table of embedded files is then empty)
         run: python -m platformio run -e feather
         working-directory: firmware

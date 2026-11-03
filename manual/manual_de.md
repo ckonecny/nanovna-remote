@@ -229,8 +229,16 @@ die Seite eine Warnung; HAM und Multi zeigen für jedes Band, ob es kalibriert i
 
 ## 7. Firmware aktualisieren
 
-Per WLAN: `firmware/tools/ota.sh <Adresse>` (baut und lädt hoch). Per USB: D0 halten, RESET tippen, dann mit
-PlatformIO hochladen. Siehe `firmware/README.md`.
+Jedes [Release](https://github.com/ckonecny/nanovna-remote/releases) enthält zwei fertige Dateien:
+
+- **`...-first-flash.bin`** für die erste Installation (oder zum Neustart von null) per USB: D0 halten, RESET tippen, D0
+  loslassen, dann `pip install esptool` und `esptool.py --chip esp32s3 write_flash 0x0 <Datei>`. Das löscht auch die
+  gespeicherten WLAN-Netze.
+- **`...-update.bin`** für spätere Updates per WLAN, ohne Kabel:
+  `curl --data-binary @<Datei> http://<Adresse>/api/ota`. Der Feather startet neu; WLAN-Netze und Kalibrierung bleiben.
+
+Wer die Firmware selbst baut: `firmware/tools/ota.sh <Adresse>` baut und lädt per WLAN hoch; per USB mit PlatformIO
+hochladen. Siehe `firmware/README.md`.
 
 ## 8. Fehlersuche
 

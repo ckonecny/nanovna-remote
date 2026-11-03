@@ -225,8 +225,15 @@ it is calibrated.
 
 ## 7. Updating the firmware
 
-Over WiFi: `firmware/tools/ota.sh <address>` (builds and uploads). Over USB: hold D0, tap RESET, then upload
-with PlatformIO. See `firmware/README.md`.
+Every [release](https://github.com/ckonecny/nanovna-remote/releases) has two ready-made files:
+
+- **`...-first-flash.bin`** for the first installation (or to start over) over USB: hold D0, tap RESET, release D0, then
+  `pip install esptool` and `esptool.py --chip esp32s3 write_flash 0x0 <file>`. This also clears the stored WiFi networks.
+- **`...-update.bin`** for later updates over WiFi, no cable needed:
+  `curl --data-binary @<file> http://<address>/api/ota`. The Feather restarts; the WiFi networks and the calibration stay.
+
+If you build the firmware yourself: `firmware/tools/ota.sh <address>` builds and uploads over WiFi; over USB upload with
+PlatformIO. See `firmware/README.md`.
 
 ## 8. Troubleshooting
 

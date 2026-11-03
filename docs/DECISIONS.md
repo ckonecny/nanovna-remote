@@ -137,6 +137,14 @@ Newest first within each section. Record new decisions here as they are made.
 - `pages.yml` builds the demo and publishes it next to the feature page under `/demo/` (`site/` + `client/dist-demo`).
   It also runs on changes in `client/`.
 
+## Release binaries (2026-11)
+- A tag `v*` runs `release.yml`: client tests and `build:esp`, firmware build, then `esptool merge_bin` (the esptool that
+  PlatformIO installs) joins bootloader 0x0, partition table 0x8000, otadata 0xf000 and app 0x20000 into one
+  `*-first-flash.bin` (checked byte for byte against the single files; 4 MB, dio, 80 MHz). `*-update.bin` is the plain app
+  for `/api/ota`. `SHA256SUMS` is attached; the release notes carry the flash commands. The merged image also erases NVS
+  (stored WiFi networks), so the notes say it is for the first installation.
+- Not tested yet: flashing the merged image on the device and a real tag run of the workflow.
+
 ## Build reproducibility (2026-11)
 - `client/dsp-wasm/web/` (the wasm DSP package of cho45's client, built by wasm-pack from `client/dsp-wasm/`) is tracked in
   git although wasm-pack writes a `.gitignore` for it: without it a fresh clone cannot build or test the client (CI found

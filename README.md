@@ -57,16 +57,19 @@ calibration, runs in the browser.
 - An **Adafruit ESP32-S3 Reverse TFT Feather**, [product 5691](https://www.adafruit.com/product/5691)
 - A **USB-C cable** between the two (the Feather is the host)
 - Power for the Feather (USB-C power or a LiPo battery) and the **calibration kit** (open, short, load) that came with the NanoVNA
-- To build it: [Node.js](https://nodejs.org/) and [PlatformIO](https://platformio.org/)
+- To flash the ready-made release: Python with `pip install esptool`. To build it yourself: [Node.js](https://nodejs.org/) and [PlatformIO](https://platformio.org/)
 
 ## Quick start
 
-1. **Build the web app and flash the firmware** (the firmware embeds the app). Connect the Feather over USB-C to the computer:
+1. **Flash the firmware** (it has the web app inside). Download `nanovna-remote-<version>-first-flash.bin` from the
+   [latest release](https://github.com/ckonecny/nanovna-remote/releases/latest), connect the Feather over USB-C to the computer,
+   hold **D0**, tap **RESET**, release D0, and run (needs Python):
    ```sh
-   cd client && npm install && npm run build:esp
-   cd ../firmware && python3 -m platformio run -e feather -t upload
+   pip install esptool
+   esptool.py --chip esp32s3 write_flash 0x0 nanovna-remote-<version>-first-flash.bin
    ```
-   If the Feather is not found, hold **D0**, tap **RESET**, release D0 and run the upload again.
+   Prefer to build it yourself? `cd client && npm install && npm run build:esp`, then
+   `cd ../firmware && python3 -m platformio run -e feather -t upload` (needs Node.js and PlatformIO).
 2. **Set up the WiFi.** On first start the Feather opens its own WiFi `NanoVNA-Remote` (password `nanovna-remote`), the
    display shows it. Join it, open <http://192.168.4.1/wifi>, scan, pick your network, enter its password, save, press Connect.
 3. **Connect the NanoVNA** to the Feather's USB-C port. The display says "USB: device found".
@@ -75,7 +78,7 @@ calibration, runs in the browser.
 5. **Calibrate once.** On the HAM tab press **Measure Open**, **Measure Short**, **Measure Load**, each after attaching the
    standard at the end of your cable. Done for all bands.
 
-Later firmware updates go over WiFi: `firmware/tools/ota.sh <feather-ip>`. Problems? See the troubleshooting chapter in the manual.
+Later updates go over WiFi: upload the `-update.bin` of a release (`curl --data-binary @nanovna-remote-<version>-update.bin http://<feather-ip>/api/ota`) or, when building yourself, `firmware/tools/ota.sh <feather-ip>`. Problems? See the troubleshooting chapter in the manual.
 
 ## Try it without hardware
 

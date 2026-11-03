@@ -1,3 +1,0 @@
-# Third-party components the firmware build downloads (Espressif's mdns and usb_host_cdc_acm): findings there are not ours to fix.
-paths-ignore:
-  - firmware/managed_components
