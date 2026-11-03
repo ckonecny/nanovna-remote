@@ -11,7 +11,7 @@ Open features and bugs: GitHub issues (CLAUDE.md rule 9). Finished work:
   dark mode, no-data notice. 107 client tests pass.
 - Tested on the new Feather (display, buttons, WiFi list, `/wifi` page).
 
-- QR code on the display (D2, and automatic in setup mode): built (86.5 % flash), not yet seen on the device or scanned. Closes #25 once checked.
+- Display returns to the status screen by itself once a network is joined (after v1.1.1): built, not yet seen on the device.
 - Browser installer (`site/install/`, ESP Web Tools): written, not yet flashed from the browser on a real Feather.
 - Release workflow (`release.yml`, tag `v*`) written; first release (tag) and a flash test of the first-flash image are open.
 - Live demo: `npm run build:demo`, published to `/demo/` of the Pages site by `pages.yml` (see DECISIONS).

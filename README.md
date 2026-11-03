@@ -81,7 +81,7 @@ calibration, runs in the browser.
 5. **Calibrate once.** On the HAM tab press **Measure Open**, **Measure Short**, **Measure Load**, each after attaching the
    standard at the end of your cable. Done for all bands.
 
-Later updates go over WiFi: upload the `-update.bin` of a release (`curl --data-binary @nanovna-remote-<version>-update.bin http://<feather-ip>/api/ota`) or, when building yourself, `firmware/tools/ota.sh <feather-ip>`. Problems? See the troubleshooting chapter in the manual.
+Later updates go over WiFi: open `http://<feather-ip>/update` and pick the `-update.bin` of a release (or `curl --data-binary @nanovna-remote-<version>-update.bin http://<feather-ip>/api/ota`) or, when building yourself, `firmware/tools/ota.sh <feather-ip>`. Problems? See the troubleshooting chapter in the manual.
 
 ## Try it without hardware
 

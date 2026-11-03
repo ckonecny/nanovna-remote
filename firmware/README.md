@@ -7,7 +7,7 @@ is passed through as well). It joins your WiFi and does three things:
   evaluation live in the web app. One session at a time; a new tab takes over.
 - **Web app:** the built client (`../client/dist`) is gzip-embedded into the firmware image (`tools/embed_client.py`) and
   served from `/`.
-- **Services:** WiFi setup (`/wifi`), over-the-air update (`/api/ota`), the calibration of the web app
+- **Services:** WiFi setup (`/wifi`), over-the-air update (page `/update`, endpoint `/api/ota`), the calibration of the web app
   (`/api/appcal`, kept in flash so every browser sees the same one), a log of recent events (`/log`).
 
 ## Ready-made binaries

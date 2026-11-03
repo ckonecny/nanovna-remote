@@ -154,6 +154,12 @@ Newest first within each section. Record new decisions here as they are made.
   so in setup mode a second page of the QR screen (D1) holds `http://192.168.4.1/wifi`, and the DHCP server now also offers it as RFC 8910
   captive portal URI (option 114). Whether option 114 makes the iPhone open the page is not verified.
 
+## Update page on the device (2026-11)
+
+`/update` is a small page served by the firmware: file picker, upload progress, shows the installed version (`/api/info`).
+It POSTs the `-update.bin` to the existing `/api/ota`. It lives on the device (plain http, same origin) because the
+installer page on https cannot call a http device (mixed content); the installer stays USB-only (Web Serial).
+
 ## Release binaries (2026-11)
 - A tag `v*` runs `release.yml`: client tests and `build:esp`, firmware build, then `esptool merge_bin` (the esptool that
   PlatformIO installs) joins bootloader 0x0, partition table 0x8000, otadata 0xf000 and app 0x20000 into one

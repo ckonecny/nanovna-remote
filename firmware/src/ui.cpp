@@ -338,6 +338,10 @@ void ui_task(void *) {
             push(std::make_shared<QrScreen>());
             apply_navigation();
         }
+        if (state == WIFI_STA && state_seen != WIFI_STA && stack.size() > 1) {  // joined a network (e.g. just set up): back to the status screen
+            pop_to_root();
+            apply_navigation();
+        }
         state_seen = state;
         bool repaint = false;
         if (ui_flipped_get() != flipped_seen) {  // turned in the menu: repaint everything

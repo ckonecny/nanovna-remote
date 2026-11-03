@@ -35,7 +35,7 @@ zurück auf den Status-Bildschirm.
 (Handy-Kamera draufhalten und bestätigen), der zweite öffnet die Einrichtungsseite `http://192.168.4.1/wifi`. Manche Handys
 öffnen die Einrichtungsseite nach dem Verbinden von selbst (der Feather bietet sie an), ein iPhone eventuell nicht, dann den
 zweiten Code scannen. Ist der Feather in deinem Netz,
-öffnet der Code die Web-App. Der Code erscheint von selbst, wenn das Einrichtungs-WLAN aufgeht; jede Taste schließt ihn.
+öffnet der Code die Web-App. Der Code erscheint von selbst, wenn das Einrichtungs-WLAN aufgeht; jede Taste schließt ihn, und er schließt sich von selbst, sobald der Feather ein Netz verbunden hat.
 Er ist klein, halte das Handy 10 bis 15 cm vor das Display.
 
 **WLAN-Liste:** deine gespeicherten Netze, `*` markiert das verbundene, `-` ein deaktiviertes; der letzte Eintrag
@@ -249,7 +249,8 @@ Jedes [Release](https://github.com/ckonecny/nanovna-remote/releases) enthält zw
   loslassen, dann `pip install esptool` und `esptool.py --chip esp32s3 write_flash 0x0 <Datei>`. Das löscht auch die
   gespeicherten WLAN-Netze.
 - **`...-update.bin`** für spätere Updates per WLAN, ohne Kabel:
-  `curl --data-binary @<Datei> http://<Adresse>/api/ota`. Der Feather startet neu; WLAN-Netze und Kalibrierung bleiben.
+  öffne `http://<Adresse>/update` (auch unten auf der Seite `/wifi` verlinkt), wähle die Datei und drücke **Upload and restart**; die Seite zeigt die installierte Version. Der Feather startet neu; WLAN-Netze und Kalibrierung bleiben.
+  Mit einem Terminal geht es auch als `curl --data-binary @<Datei> http://<Adresse>/api/ota`.
 
 Wer die Firmware selbst baut: `firmware/tools/ota.sh <Adresse>` baut und lädt per WLAN hoch; per USB mit PlatformIO
 hochladen. Siehe `firmware/README.md`.

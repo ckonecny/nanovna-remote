@@ -34,7 +34,7 @@ returns to the status screen.
 **QR code:** while the setup WiFi is open there are two codes (D1 switches between them): the first joins that WiFi (point the
 phone's camera at it and confirm), the second opens the setup page `http://192.168.4.1/wifi`. Some phones open the setup page by
 themselves after joining (the Feather offers it), an iPhone may not, then scan the second code. While the Feather is on your network the code opens the web app. The code
-appears by itself when the setup WiFi opens; any key closes it. It is small, hold the phone 10 to 15 cm from the display.
+appears by itself when the setup WiFi opens; any key closes it, and it closes by itself once the Feather has joined a network. It is small, hold the phone 10 to 15 cm from the display.
 
 **WiFi list:** your saved networks, `*` marks the connected one and `-` a disabled one; the last entry
 `[Setup WiFi]` opens the setup WiFi. D0/D2 select, D1 short connects. D1 long opens the options of the
@@ -241,7 +241,8 @@ Every [release](https://github.com/ckonecny/nanovna-remote/releases) has two rea
 - **`...-first-flash.bin`** for the first installation (or to start over) over USB: hold D0, tap RESET, release D0, then
   `pip install esptool` and `esptool.py --chip esp32s3 write_flash 0x0 <file>`. This also clears the stored WiFi networks.
 - **`...-update.bin`** for later updates over WiFi, no cable needed:
-  `curl --data-binary @<file> http://<address>/api/ota`. The Feather restarts; the WiFi networks and the calibration stay.
+  open `http://<address>/update` (also linked at the bottom of the `/wifi` page), pick the file and press **Upload and restart**; the page shows the installed version. The Feather restarts; the WiFi networks and the calibration stay.
+  With a terminal it also works as `curl --data-binary @<file> http://<address>/api/ota`.
 
 If you build the firmware yourself: `firmware/tools/ota.sh <address>` builds and uploads over WiFi; over USB upload with
 PlatformIO. See `firmware/README.md`.

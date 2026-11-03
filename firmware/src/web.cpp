@@ -22,6 +22,7 @@
 #include "client_assets.h"
 #include "wifi_mgr.h"
 #include "wifi_setup.h"
+#include "version.h"
 
 static const char *TAG = "web";
 
@@ -74,7 +75,9 @@ bool read_body(httpd_req_t *req, char *buf, size_t size) {
     return true;
 }
 
-esp_err_t info_handler(httpd_req_t *req) { return send_json(req, "200 OK", "{\"name\":\"NanoVNA Remote\"}"); }
+esp_err_t info_handler(httpd_req_t *req) {
+    return send_json(req, "200 OK", "{\"name\":\"NanoVNA Remote\",\"version\":\"" FW_VERSION "\"}");
+}
 
 esp_err_t send_detail(httpd_req_t *req, const char *status, const std::string &detail) {
     return send_json(req, status, "{\"detail\":\"" + detail + "\"}");
@@ -133,7 +136,7 @@ input{width:100%} button{cursor:pointer}
 <input id=ssid placeholder='Network name' maxlength=32>
 <input id=pass type=password placeholder='Password (empty for open networks)' maxlength=64>
 <button id=save>Save</button>
-<p><a href=/>Open the app</a></p>
+<p><a href=/>Open the app</a> &middot; <a href=/update>Update the firmware</a></p>
 <script>
 const $=s=>document.getElementById(s);
 const post=(p,o)=>fetch(p,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(o).toString()});
@@ -175,6 +178,49 @@ load();setInterval(load,5000);
 esp_err_t wifi_page_handler(httpd_req_t *req) {
     httpd_resp_set_type(req, "text/html");
     return httpd_resp_send(req, WIFI_PAGE, HTTPD_RESP_USE_STRLEN);
+}
+
+const char UPDATE_PAGE[] = R"HTML(<!doctype html><html lang=en><head><meta charset=utf-8>
+<meta name=viewport content='width=device-width,initial-scale=1'><title>NanoVNA Remote update</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:30em;margin:1em auto;padding:0 1em;color:#222}
+h2{margin:.8em 0 .3em} button,input{font-size:1.05em;box-sizing:border-box;padding:.45em .6em;margin:.2em 0}
+input{width:100%} button{cursor:pointer} progress{width:100%}
+#msg{background:#fff4d6;padding:.5em;border-radius:4px;display:none}
+</style></head><body>
+<h2>Update the firmware</h2>
+<p>Installed: <b id=ver>...</b></p>
+<p>Pick the <code>nanovna-remote-&lt;version&gt;-update.bin</code> file of a
+<a href=https://github.com/ckonecny/nanovna-remote/releases/latest>release</a> (download it first, on a computer or phone).
+The WiFi networks and the calibration stay.</p>
+<input id=file type=file accept=.bin>
+<button id=go>Upload and restart</button>
+<progress id=bar max=100 value=0 hidden></progress>
+<div id=msg></div>
+<p><a href=/>Open the app</a></p>
+<script>
+const $=s=>document.getElementById(s);
+const say=t=>{$('msg').textContent=t;$('msg').style.display=t?'block':'none'};
+fetch('/api/info').then(r=>r.json()).then(d=>{$('ver').textContent=d.version||'unknown'}).catch(()=>{});
+$('go').onclick=()=>{
+  const f=$('file').files[0];
+  if(!f){say('Pick the update file first.');return}
+  if(!/update\.bin$/.test(f.name)&&!confirm(f.name+' does not look like an update file (...-update.bin). Upload it anyway?'))return;
+  $('go').disabled=true;$('bar').hidden=false;say('Uploading ... do not unplug the device.');
+  const x=new XMLHttpRequest();x.open('POST','/api/ota');
+  x.upload.onprogress=e=>{if(e.lengthComputable)$('bar').value=100*e.loaded/e.total};
+  x.onload=()=>{
+    if(x.status==200){say('Done. The device restarts; this takes a few seconds. Then reload the page to see the new version.');}
+    else{say('The device rejected the file ('+x.status+'). Is it the right file?');$('go').disabled=false}
+  };
+  x.onerror=()=>{say('The upload failed. Try again, close other pages that use the device.');$('go').disabled=false};
+  x.send(f);
+};
+</script></body></html>)HTML";
+
+esp_err_t update_page_handler(httpd_req_t *req) {
+    httpd_resp_set_type(req, "text/html");
+    return httpd_resp_send(req, UPDATE_PAGE, HTTPD_RESP_USE_STRLEN);
 }
 
 std::string json_string(const std::string &s) {
@@ -475,6 +521,7 @@ void web_start() {
         {.uri = "/ws", .method = HTTP_GET, .handler = ws_handler, .user_ctx = nullptr, .is_websocket = true},
         {.uri = "/log", .method = HTTP_GET, .handler = log_handler, .user_ctx = nullptr},
         {.uri = "/wifi", .method = HTTP_GET, .handler = wifi_page_handler, .user_ctx = nullptr},
+        {.uri = "/update", .method = HTTP_GET, .handler = update_page_handler, .user_ctx = nullptr},
         {.uri = "/api/wifi", .method = HTTP_POST, .handler = wifi_save_handler, .user_ctx = nullptr},
         {.uri = "/api/wifi/nets", .method = HTTP_GET, .handler = wifi_nets_handler, .user_ctx = nullptr},
         {.uri = "/api/wifi/scan", .method = HTTP_GET, .handler = wifi_scan_handler, .user_ctx = nullptr},
