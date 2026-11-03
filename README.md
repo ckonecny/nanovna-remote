@@ -72,8 +72,9 @@ calibration, runs in the browser.
    ```
    Prefer to build it yourself? `cd client && npm install && npm run build:esp`, then
    `cd ../firmware && python3 -m platformio run -e feather -t upload` (needs Node.js and PlatformIO).
-2. **Set up the WiFi.** On first start the Feather opens its own WiFi `NanoVNA-Remote` (password `nanovna-remote`), the
-   display shows it. Join it, open <http://192.168.4.1/wifi>, scan, pick your network, enter its password, save, press Connect.
+2. **Set up the WiFi.** On first start the Feather opens its own WiFi `NanoVNA-Remote` (password `nanovna-remote`) and
+   shows a QR code for it. Scan it with the phone's camera, join, and the setup page opens (or open <http://192.168.4.1/wifi>).
+   Scan for networks, pick yours, enter its password, save, press Connect.
 3. **Connect the NanoVNA** to the Feather's USB-C port. The display says "USB: device found".
 4. **Measure.** Open the address shown on the display (`http://<feather-ip>/`, also `http://nanovna.local/` where that
    works) on a phone or computer and tap **connect**.
@@ -113,6 +114,7 @@ Ideas, bug reports and feature requests are welcome as [GitHub issues](https://g
 - `client/` is GPL-2.0 (see `client/COPYING`, upstream cho45/NanoVNA-WebClient). It is built separately and only
   embedded into the firmware image as data, so both licenses stay apart.
 
+- The QR code on the Feather's display is drawn with Nayuki's [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT, `firmware/src/third_party/qrcodegen/`).
 - The browser installer vendors [ESP Web Tools](https://github.com/esphome/esp-web-tools) (Apache-2.0, `site/install/vendor/`).
 
 ## Acknowledgements

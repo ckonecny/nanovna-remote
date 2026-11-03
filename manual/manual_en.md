@@ -29,7 +29,11 @@ The display shows the status: WiFi network and IP address, whether a USB device 
 The bottom line of every screen shows what D1 does. After 30 seconds without a key the display
 returns to the status screen.
 
-**Status screen:** D1 short opens the WiFi list; D1 long opens the menu.
+**Status screen:** D1 short opens the WiFi list; D1 long opens the menu; D2 shows a **QR code** (see below).
+
+**QR code:** while the setup WiFi is open the code joins that WiFi (point the phone's camera at it and confirm), and the setup
+page then opens by itself on most phones. While the Feather is on your network the code opens the web app. The code
+appears by itself when the setup WiFi opens; any key closes it. It is small, hold the phone 10 to 15 cm from the display.
 
 **WiFi list:** your saved networks, `*` marks the connected one and `-` a disabled one; the last entry
 `[Setup WiFi]` opens the setup WiFi. D0/D2 select, D1 short connects. D1 long opens the options of the
@@ -41,8 +45,10 @@ Restart, Back.
 ## 4. First start and WiFi setup
 
 1. On first start (no saved network) the Feather opens its own WiFi **NanoVNA-Remote**,
-   password **nanovna-remote**. The display shows the name, password and address.
-2. Join that WiFi with your phone or computer and open **http://192.168.4.1/wifi**.
+   password **nanovna-remote**. The display shows a **QR code** for it.
+2. Scan the QR code with the phone's camera and join the WiFi; the setup page opens by itself. If it does not, or on a
+   computer, join the WiFi by hand (name and password are on the status screen, D2 shows the code again) and open
+   **http://192.168.4.1/wifi**.
 3. Press **Scan for networks**, tap your network, enter its password and press **Save**. Press
    **Connect**. The Feather joins that network and the display shows the new address; the phone returns to
    your normal WiFi. Open the address shown on the display.

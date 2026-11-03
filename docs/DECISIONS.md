@@ -137,6 +137,15 @@ Newest first within each section. Record new decisions here as they are made.
 - `pages.yml` builds the demo and publishes it next to the feature page under `/demo/` (`site/` + `client/dist-demo`).
   It also runs on changes in `client/`.
 
+## QR code on the device display (2026-11)
+- `firmware/src/qr.cpp` draws a QR code with Nayuki's C generator (v1.8.0, MIT, vendored unmodified in `src/third_party/qrcodegen/`).
+  Error correction L, version 1 to 4, black on white with a 2-module quiet zone, as large as the 135 px height allows
+  (WiFi payload `WIFI:T:WPA;S:<ssid>;P:<password>;;` is version 3, 29 modules, 4 px each, 132 px). Flash +0.8 percentage points.
+- `ui.cpp`: `QrScreen` (D2 on the status screen; opens by itself when the setup WiFi starts and no other screen is open). It paints
+  itself instead of rows of text (`Screen::draw`) and is exempt from the 30 s return to the status screen. Content: the join code
+  while in setup mode, `http://<ip>/` while on a network, otherwise a note. The existing captive portal (dns.cpp) then opens the setup page.
+- Not verified yet: scan reliability of the 4 px modules on the real panel, and which phones open the portal after joining.
+
 ## Release binaries (2026-11)
 - A tag `v*` runs `release.yml`: client tests and `build:esp`, firmware build, then `esptool merge_bin` (the esptool that
   PlatformIO installs) joins bootloader 0x0, partition table 0x8000, otadata 0xf000 and app 0x20000 into one

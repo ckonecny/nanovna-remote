@@ -10,6 +10,7 @@
 #include "display.h"
 #include "esp_log.h"
 #include "esp_system.h"
+#include "qr.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "vna.h"
@@ -40,6 +41,9 @@ struct Screen {
     virtual ~Screen() = default;
     virtual void rows(Row out[ROWS]) = 0;
     virtual void key(const ButtonMessage &m) = 0;
+    // a screen that draws itself instead of rows of text: paints everything when full is set, returns true if it does
+    virtual bool draw(bool full) { return false; }
+    virtual bool stays_open() { return false; }  // true: no return to the status screen after IDLE_MS
 };
 
 std::vector<std::shared_ptr<Screen>> stack;
@@ -194,6 +198,71 @@ void main_menu() {
                    }));
 }
 
+// A QR code to scan with the phone: joins the setup WiFi while that is open, otherwise opens the web app.
+struct QrScreen : Screen {
+    std::string shown;  // what is on the display now
+
+    // the text for the QR code, and the lines of help beside it; empty text: nothing to show yet
+    static std::string content(std::string help[4]) {
+        auto st = wifi_mgr_status();
+        if (st.state == WIFI_AP) {
+            help[0] = "Scan to join";
+            help[1] = "the setup WiFi:";
+            help[2] = st.ssid;
+            help[3] = "Then the setup page opens";
+            return "WIFI:T:WPA;S:" + st.ssid + ";P:" AP_PASSWORD ";;";
+        }
+        if (st.state == WIFI_STA) {
+            help[0] = "Scan to open";
+            help[1] = "the web app:";
+            help[2] = st.ip;
+            help[3] = "or nanovna.local";
+            return "http://" + st.ip + "/";
+        }
+        return "";
+    }
+
+    void rows(Row out[ROWS]) override {}
+    void key(const ButtonMessage &m) override {
+        if (m.event == BTN_SHORT || m.event == BTN_LONG) pop();
+    }
+    bool stays_open() override { return true; }
+
+    bool draw(bool full) override {
+        std::string help[4];
+        std::string text = content(help);
+        std::string state = text + "|" + help[2];
+        if (!full && state == shown) return true;
+        shown = state;
+        display_fill(0, 0, DISPLAY_W, DISPLAY_H, BLACK);
+        int side = text.empty() ? 0 : qr_draw(text.c_str());
+        int x = side ? side + 8 : 0;
+        int cols = (DISPLAY_W - x) / GLYPH_W;
+        if (!side) {
+            display_text(x, 40, "No QR code yet:", WHITE, BLACK, 1);
+            display_text(x, 56, "no WiFi connection", GREY, BLACK, 1);
+        } else {
+            int y = 14;
+            display_text(x, y, help[0].substr(0, cols).c_str(), WHITE, BLACK, 1);
+            display_text(x, y + 12, help[1].substr(0, cols).c_str(), GREY, BLACK, 1);
+            display_text(x, y + 30, help[2].substr(0, cols).c_str(), CYAN, BLACK, 1);
+            // the last help line may be longer than the space: split at the last space that fits
+            std::string rest = help[3];
+            for (int line = 0; !rest.empty() && line < 3; line++) {
+                std::string part = rest.substr(0, cols);
+                if ((int)rest.size() > cols) {
+                    size_t cut = part.rfind(' ');
+                    if (cut != std::string::npos && cut > 0) part = rest.substr(0, cut);
+                }
+                display_text(x, y + 48 + line * 12, part.c_str(), GREY, BLACK, 1);
+                rest = rest.size() > part.size() ? rest.substr(part.size() + (rest[part.size()] == ' ' ? 1 : 0)) : "";
+            }
+        }
+        display_text(x ? x : 0, DISPLAY_H - 10, "any key: back", GREY, BLACK, 1);
+        return true;
+    }
+};
+
 struct StatusScreen : Screen {
     void rows(Row out[ROWS]) override {
         auto st = wifi_mgr_status();
@@ -219,12 +288,14 @@ struct StatusScreen : Screen {
                 out[1] = {"Searching WiFi ...", ORANGE};
         }
         bool usb = vna_usb_attached();
+        if (st.state == WIFI_STA || st.state == WIFI_AP) out[5] = {"D2: show QR code", GREY};
         out[6] = {usb ? "USB: device found" : "USB: no device", usb ? GREEN : GREY};
         out[7] = hint_row("D1:WiFi long:Menu");
     }
 
     void key(const ButtonMessage &m) override {
-        if (m.event == BTN_SHORT && m.button == BTN_D1) wifi_list();
+        if (m.event == BTN_SHORT && m.button == BTN_D2) push(std::make_shared<QrScreen>());
+        else if (m.event == BTN_SHORT && m.button == BTN_D1) wifi_list();
         else if (m.event == BTN_LONG && m.button == BTN_D1) main_menu();
     }
 };
@@ -234,20 +305,36 @@ void ui_task(void *) {
     bool drawn = false;
     uint32_t last_key = 0;
     bool flipped_seen = ui_flipped_get();
+    bool custom_drawn = false;  // the top screen paints itself (QR code) and has covered the rows
+    WifiState state_seen = WIFI_STARTING;
     while (true) {
         ButtonMessage m;
         if (buttons_wait(m, 250)) {
             last_key = xTaskGetTickCount() * portTICK_PERIOD_MS;
             stack.back()->key(m);
             apply_navigation();
-        } else if (stack.size() > 1 && xTaskGetTickCount() * portTICK_PERIOD_MS - last_key > IDLE_MS) {
+        } else if (stack.size() > 1 && xTaskGetTickCount() * portTICK_PERIOD_MS - last_key > IDLE_MS && !stack.back()->stays_open()) {
             pop_to_root();
             apply_navigation();
         }
+        WifiState state = wifi_mgr_status().state;
+        if (state == WIFI_AP && state_seen != WIFI_AP && stack.size() == 1) {  // the setup WiFi just opened: show the code to join it
+            push(std::make_shared<QrScreen>());
+            apply_navigation();
+        }
+        state_seen = state;
+        bool repaint = false;
         if (ui_flipped_get() != flipped_seen) {  // turned in the menu: repaint everything
             flipped_seen = ui_flipped_get();
             drawn = false;
+            repaint = true;
         }
+        if (stack.back()->draw(!custom_drawn || repaint)) {
+            custom_drawn = true;
+            drawn = false;
+            continue;
+        }
+        custom_drawn = false;
         Row now[ROWS];
         stack.back()->rows(now);
         for (int i = 0; i < ROWS; i++) {

@@ -1,0 +1,2 @@
+Nayuki QR Code generator (C), version 1.8.0, MIT License: https://github.com/nayuki/QR-Code-generator (the licence text is in the header of qrcodegen.c).
+Unmodified copies of c/qrcodegen.c and c/qrcodegen.h; README.md is the upstream readme.

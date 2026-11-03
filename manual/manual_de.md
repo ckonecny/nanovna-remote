@@ -29,7 +29,12 @@ Das Display zeigt den Status: WLAN-Netz und IP-Adresse, ob ein USB-Gerät angesc
 Die unterste Zeile jedes Bildschirms zeigt, was D1 tut. Nach 30 Sekunden ohne Tastendruck springt das Display
 zurück auf den Status-Bildschirm.
 
-**Status-Bildschirm:** D1 kurz öffnet die WLAN-Liste, D1 lang das Menü.
+**Status-Bildschirm:** D1 kurz öffnet die WLAN-Liste, D1 lang das Menü, D2 zeigt einen **QR-Code** (siehe unten).
+
+**QR-Code:** Solange das Einrichtungs-WLAN offen ist, verbindet der Code mit diesem WLAN (Handy-Kamera draufhalten und
+bestätigen); die Einrichtungsseite öffnet sich danach auf den meisten Handys von selbst. Ist der Feather in deinem Netz,
+öffnet der Code die Web-App. Der Code erscheint von selbst, wenn das Einrichtungs-WLAN aufgeht; jede Taste schließt ihn.
+Er ist klein, halte das Handy 10 bis 15 cm vor das Display.
 
 **WLAN-Liste:** deine gespeicherten Netze, `*` markiert das verbundene, `-` ein deaktiviertes; der letzte Eintrag
 `[Setup WiFi]` öffnet das Setup-WLAN. D0/D2 wählen, D1 kurz verbindet. D1 lang öffnet die Optionen des gewählten
@@ -43,8 +48,10 @@ Die Anzeige am Gerät und die Webseiten sind englisch.
 ## 4. Erster Start und WLAN-Einrichtung
 
 1. Beim ersten Start (kein Netz gespeichert) öffnet der Feather ein eigenes WLAN **NanoVNA-Remote**,
-   Passwort **nanovna-remote**. Das Display zeigt Name, Passwort und Adresse.
-2. Verbinde dich mit diesem WLAN und öffne **http://192.168.4.1/wifi**.
+   Passwort **nanovna-remote**. Das Display zeigt einen **QR-Code** dafür.
+2. Scanne den QR-Code mit der Handy-Kamera und verbinde dich mit dem WLAN; die Einrichtungsseite öffnet sich von
+   selbst. Wenn nicht, oder am Computer: verbinde dich von Hand (Name und Passwort stehen auf dem Status-Bildschirm,
+   D2 zeigt den Code wieder) und öffne **http://192.168.4.1/wifi**.
 3. **Scan for networks** drücken, dein Netz antippen, Passwort eingeben und **Save** drücken. Dann **Connect**.
    Der Feather verbindet sich mit dem Netz, das Display zeigt die neue Adresse, das Handy kehrt in dein normales
    WLAN zurück. Öffne die Adresse vom Display.
