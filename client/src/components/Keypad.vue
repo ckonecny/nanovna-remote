@@ -118,14 +118,14 @@ const submitWithUnit = (factor) => {
 .key-btn {
   width: 100%;
   height: 80px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   background: var(--surface-2);
   font-size: 24px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #333;
+  color: var(--text-main);
 }
 
 .key-btn:hover {

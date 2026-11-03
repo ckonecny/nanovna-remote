@@ -81,6 +81,8 @@ const scaleTypes = [
 .input {
   border: none;
   border-bottom: 1px solid var(--divider);
+  min-height: var(--tap);
+  color: var(--text-main);
   padding: 4px 0;
   font-size: 16px;
   background: transparent;

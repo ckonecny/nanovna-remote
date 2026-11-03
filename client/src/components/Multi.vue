@@ -55,7 +55,7 @@ const grid = [1, 2, 3, 5];
     <CalStatus :bands="store.multiBands" />
 
     <div class="bands">
-      <button v-for="b in HAM_BANDS" :key="b.name" class="band" :class="{ active: store.multiBands.includes(b.name) }" @click="toggle(b.name)">{{ b.name }}</button>
+      <button v-for="b in HAM_BANDS" :key="b.name" class="band pill" :class="{ active: store.multiBands.includes(b.name) }" @click="toggle(b.name)">{{ b.name }}</button>
     </div>
     <div class="sub">Select the bands to watch. Each band is swept in turn, so the more bands, the slower the refresh.</div>
 
@@ -93,7 +93,6 @@ const grid = [1, 2, 3, 5];
 <style scoped>
 .multi { flex: 1; min-width: 0; padding: 8px 12px; display: flex; flex-direction: column; gap: 10px; }
 .bands { display: flex; flex-wrap: wrap; gap: 6px; }
-.band { padding: 6px 12px; border-radius: 16px; border: 1px solid var(--border-color); background: transparent; color: var(--text-main); font-size: 14px; cursor: pointer; }
 .band.active { background: #3f51b5; color: #fff; border-color: #3f51b5; }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 8px; }
 .card { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 8px; background: var(--tile-bg); border-left: 4px solid var(--border-color); }

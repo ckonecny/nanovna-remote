@@ -66,6 +66,8 @@ const defaultState = {
     cableLength: 10, // known length in m for the velocity factor measurement
     cable: { points: [], at: 0 }, // latest raw sweep of the cable view
     multi: {}, // band name -> { points, calibrated, at } from the latest sweep of that band
+    hamCursorMode: 'manual', // 'manual', or 'min' / 'max': the cursor follows the lowest / highest SWR of the band, not saved
+    hamCursor: null, // frequency (Hz) of the cursor in the HAM view, not saved
     theme: 'auto', // 'auto' follows the system, 'light' / 'dark' are the user's choice
     themeEffective: 'light',
     lastDataAt: 0, // when the last measurement arrived
@@ -157,12 +159,17 @@ const darkQuery = typeof matchMedia === 'function' ? matchMedia('(prefers-color-
 function applyTheme() {
     store.themeEffective = store.theme === 'auto' ? (darkQuery && darkQuery.matches ? 'dark' : 'light') : store.theme;
     document.documentElement.dataset.theme = store.themeEffective;
+    // the browser bar of a phone takes the colour of the page
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', store.themeEffective === 'dark' ? '#1e1e1e' : '#ffffff');
 }
 watch(() => store.theme, applyTheme, { immediate: true });
 if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener('change', applyTheme);
 
-export function toggleTheme() {
-    store.theme = store.themeEffective === 'dark' ? 'light' : 'dark';
+export const THEME_LABELS = { auto: 'follows the system', light: 'light', dark: 'dark' };
+
+// system -> light -> dark -> system
+export function cycleTheme() {
+    store.theme = { auto: 'light', light: 'dark', dark: 'auto' }[store.theme] || 'auto';
 }
 
 // seconds without a measurement, for the "no data" notice

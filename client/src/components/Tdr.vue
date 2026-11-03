@@ -60,15 +60,15 @@ const pickType = (e) => {
 
     <div class="row">
       <label>Sweep
-        <select v-model="store.tdrPreset" class="input">
+        <select v-model="store.tdrPreset" class="input field-input">
           <option v-for="(r, k) in TDR_RANGES" :key="k" :value="k">{{ names[k] }}: up to {{ fmtM(info(r).range) }}, resolution about {{ fmtM(info(r).resolution) }}</option>
         </select>
       </label>
       <label>Velocity factor
-        <input type="number" v-model.number="store.velocityFactor" class="input" step="0.01" min="0.1" max="1">
+        <input type="number" v-model.number="store.velocityFactor" class="input field-input" step="0.01" min="0.1" max="1">
       </label>
       <label>Cable type
-        <select class="input" @change="pickType" :value="''">
+        <select class="input field-input" @change="pickType" :value="''">
           <option value="">typical values…</option>
           <option v-for="t in CABLE_TYPES" :key="t.name" :value="t.name">{{ t.name }} ({{ t.vf }})</option>
         </select>
@@ -105,7 +105,6 @@ const pickType = (e) => {
 .how { font-size: 14px; }
 .row { display: flex; flex-wrap: wrap; gap: 12px; }
 .row label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--text-dim); flex: 1; min-width: 180px; }
-.input { padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: transparent; color: var(--text-main); font-size: 14px; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
 .tile { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 8px; background: var(--tile-bg); }
 .label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; }

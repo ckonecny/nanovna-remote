@@ -7,6 +7,7 @@ vi.mock('../store', async () => {
     return {
         store: {
             status: 'disconnected',
+            theme: 'auto',
             frequencies: {
                 start: 1e6,
                 stop: 900e6,
@@ -26,7 +27,9 @@ vi.mock('../store', async () => {
         connect: vi.fn(),
         disconnect: vi.fn(),
         getWorker: vi.fn(),
-        startUpdateLoop: vi.fn()
+        startUpdateLoop: vi.fn(),
+        cycleTheme: vi.fn(),
+        THEME_LABELS: { auto: 'follows the system', light: 'light', dark: 'dark' }
     };
 });
 

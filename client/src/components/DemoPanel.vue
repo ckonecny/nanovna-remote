@@ -23,5 +23,5 @@ onUnmounted(() => channel.close());
 <style scoped>
 .demo { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 6px 16px; font-size: 13px; background: var(--tile-bg); border-bottom: 1px solid var(--border-color); color: var(--text-main); }
 .note { flex: 1 1 280px; }
-select { flex: 0 1 auto; max-width: 100%; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--surface-color); color: var(--text-main); font-size: 13px; }
+select { flex: 0 1 auto; max-width: 100%; min-height: var(--tap); padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--surface-color); color: var(--text-main); font-size: 16px; }
 </style>

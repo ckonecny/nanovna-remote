@@ -101,12 +101,12 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
 
     <div class="row">
       <label>Sweep
-        <select v-model="store.cablePreset" class="input">
+        <select v-model="store.cablePreset" class="input field-input">
           <option v-for="(r, k) in CABLE_RANGES" :key="k" :value="k">{{ r.label }}</option>
         </select>
       </label>
       <label>Measure
-        <select v-model="mode" class="input">
+        <select v-model="mode" class="input field-input">
           <option value="length">Length (velocity factor known)</option>
           <option value="vf">Velocity factor (length known)</option>
         </select>
@@ -114,22 +114,22 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
     </div>
     <div class="row">
       <label v-if="mode === 'length'">Velocity factor
-        <input type="number" v-model.number="store.velocityFactor" class="input" step="0.01" min="0.1" max="1">
+        <input type="number" v-model.number="store.velocityFactor" class="input field-input" step="0.01" min="0.1" max="1">
       </label>
       <label v-if="mode === 'length'">Cable type
-        <select class="input" @change="pickType" :value="''">
+        <select class="input field-input" @change="pickType" :value="''">
           <option value="">typical values…</option>
           <option v-for="t in CABLE_TYPES" :key="t.name" :value="t.name">{{ t.name }} ({{ t.vf }})</option>
         </select>
       </label>
       <label v-else>Known length (m)
-        <input type="number" v-model.number="store.cableLength" class="input" step="0.1" min="0.1">
+        <input type="number" v-model.number="store.cableLength" class="input field-input" step="0.1" min="0.1">
       </label>
     </div>
 
     <div class="zero">
-      <button class="btn-small" :disabled="rawDelay === null" @click="setZero">Zero: nothing attached</button>
-      <button class="btn-small" :disabled="!zero" @click="clearZero">Clear zero</button>
+      <button class="btn-small pill" :disabled="rawDelay === null" @click="setZero">Zero: nothing attached</button>
+      <button class="btn-small pill" :disabled="!zero" @click="clearZero">Clear zero</button>
       <span class="sub">{{ zero ? 'Zero set: ' + fmt(zero * 1e9, 2) + ' ns subtracted' : 'No zero set: the NanoVNA\'s own delay (about 2 ns) is included. Remove the cable and press Zero.' }}</span>
     </div>
 
@@ -166,9 +166,9 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
       <span class="label">Characteristic impedance</span>
       <div class="sub">Measure the same cable twice with the same sweep: once with the far end open, once shorted. Both sweeps are kept until cleared.</div>
       <div class="zero">
-        <button class="btn-small" :disabled="!result" @click="keep('open')">Measure open</button>
-        <button class="btn-small" :disabled="!result" @click="keep('short')">Measure short</button>
-        <button class="btn-small" :disabled="!openSweep && !shortSweep" @click="clearImpedance">Clear</button>
+        <button class="btn-small pill" :disabled="!result" @click="keep('open')">Measure open</button>
+        <button class="btn-small pill" :disabled="!result" @click="keep('short')">Measure short</button>
+        <button class="btn-small pill" :disabled="!openSweep && !shortSweep" @click="clearImpedance">Clear</button>
         <span class="sub">Open: {{ openSweep ? 'measured' : '–' }} · Short: {{ shortSweep ? 'measured' : '–' }}</span>
       </div>
       <div v-if="impedance" class="tiles">
@@ -181,11 +181,11 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
     <div class="section">
       <span class="label">Cut and stub lengths</span>
       <div class="row">
-        <label>Frequency (MHz)<input type="number" v-model.number="stub.freqMHz" class="input" step="0.1" min="0.1"></label>
-        <label>Reactance to produce (Ω, negative: capacitive)<input type="number" v-model.number="stub.x" class="input" step="1"></label>
-        <label>Cable impedance (Ω)<input type="number" v-model.number="stub.z0" class="input" step="1" min="1"></label>
+        <label>Frequency (MHz)<input type="number" v-model.number="stub.freqMHz" class="input field-input" step="0.1" min="0.1"></label>
+        <label>Reactance to produce (Ω, negative: capacitive)<input type="number" v-model.number="stub.x" class="input field-input" step="1"></label>
+        <label>Cable impedance (Ω)<input type="number" v-model.number="stub.z0" class="input field-input" step="1" min="1"></label>
       </div>
-      <div class="zero"><button class="btn-small" :disabled="!impedance" @click="useMeasuredZ0">Use measured impedance</button><span class="sub">Uses the velocity factor above ({{ fmt(store.velocityFactor) }}).</span></div>
+      <div class="zero"><button class="btn-small pill" :disabled="!impedance" @click="useMeasuredZ0">Use measured impedance</button><span class="sub">Uses the velocity factor above ({{ fmt(store.velocityFactor) }}).</span></div>
       <div v-if="stubs" class="tiles">
         <div class="tile"><span class="label">λ/4</span><span class="value">{{ fmt(stubs.quarter) }} m</span></div>
         <div class="tile"><span class="label">λ/2</span><span class="value">{{ fmt(stubs.half) }} m</span></div>
@@ -204,7 +204,6 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
 .how { font-size: 14px; }
 .row { display: flex; flex-wrap: wrap; gap: 12px; }
 .row label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--text-dim); flex: 1; min-width: 180px; }
-.input { padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: transparent; color: var(--text-main); font-size: 14px; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
 .tile { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 8px; background: var(--tile-bg); }
 .tile.bad { border-left: 4px solid #f44336; }
@@ -213,8 +212,6 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
 .value.small { font-size: 16px; }
 .sub { font-size: 12px; color: var(--text-dim); }
 .zero { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-.btn-small { padding: 6px 12px; border-radius: 16px; border: 1px solid var(--border-color); background: transparent; color: var(--text-main); font-size: 14px; cursor: pointer; }
-.btn-small:disabled { opacity: 0.5; cursor: default; }
 .warn { padding: 8px 12px; border-radius: 8px; background: var(--notice-bg); font-size: 14px; }
 .chart { display: block; max-width: 100%; }
 .grid { stroke: var(--swr-grid); stroke-width: 1; }

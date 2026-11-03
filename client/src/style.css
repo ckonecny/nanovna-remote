@@ -2,34 +2,49 @@
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 :root {
-  /* Colors - Vue Material Default Light Theme */
-  --primary: #448aff;
-  --accent: #ff5252;
-  --bg-color: #fafafa;
+  /* Light theme, tuned for contrast so it stays readable in sunlight */
+  color-scheme: light;
+  --primary: #0b3fb8;
+  --accent: #c62828;
+  --bg-color: #ffffff;
   --surface-color: #ffffff;
-  --text-main: rgba(0, 0, 0, 0.87);
-  --text-dim: rgba(0, 0, 0, 0.54);
+  --text-main: #000000;
+  --text-dim: rgba(0, 0, 0, 0.72);
   --text-inverse: #ffffff;
-  --border-color: rgba(0, 0, 0, 0.12);
-  --divider: rgba(0, 0, 0, 0.12);
+  --border-color: rgba(0, 0, 0, 0.35);
+  --divider: rgba(0, 0, 0, 0.3);
+
+  /* minimum size of a tappable control; larger on touch screens */
+  --tap: 36px;
 
   --header-height: 64px;
   --drawer-width: 280px;
   --transition: .4s cubic-bezier(.4, 0, .2, 1);
   --shadow-1: 0 3px 1px -2px rgba(0, 0, 0, .2), 0 2px 2px 0 rgba(0, 0, 0, .14), 0 1px 5px 0 rgba(0, 0, 0, .12);
 
-  --tile-bg: rgba(0, 0, 0, 0.04);
-  --hover-bg: rgba(0, 0, 0, 0.08);
-  --surface-2: #f5f5f5;
-  --surface-3: #e0e0e0;
-  --chart-grid: rgba(0, 0, 0, 0.08);
-  --swr-grid: rgba(0, 0, 0, 0.12);
-  --band-area: rgba(76, 175, 80, 0.12);
-  --notice-bg: rgba(255, 152, 0, 0.15);
-  --curve: #3f51b5;
-  --good-bg: #c8e6c9;
-  --warn-bg: #ffe0b2;
-  --bad-bg: #ffcdd2;
+  --tile-bg: rgba(0, 0, 0, 0.07);
+  --hover-bg: rgba(0, 0, 0, 0.1);
+  --surface-2: #f0f0f0;
+  --surface-3: #d6d6d6;
+  --chart-grid: rgba(0, 0, 0, 0.2);
+  --swr-grid: rgba(0, 0, 0, 0.28);
+  --band-area: rgba(46, 125, 50, 0.2);
+  --notice-bg: rgba(255, 152, 0, 0.3);
+  --curve: #1a237e;
+  --good-bg: #a5d6a7;
+  --warn-bg: #ffcc80;
+  --bad-bg: #ef9a9a;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --tap: 48px;
+  }
+
+  input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 :root[data-theme="dark"] {
@@ -91,6 +106,7 @@ h6 {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh; /* the visible height on phones, where the browser bars come and go */
   overflow: hidden;
 }
 
@@ -104,6 +120,7 @@ h6 {
   box-shadow: var(--shadow-1);
   z-index: 10;
   flex-shrink: 0;
+  gap: 4px;
 }
 
 .drawer-overlay {
@@ -151,7 +168,7 @@ h6 {
   border: none;
   background: transparent;
   padding: 0 16px;
-  height: 36px;
+  height: var(--tap);
   border-radius: 2px;
   font-family: inherit;
   font-size: 14px;
@@ -189,8 +206,8 @@ h6 {
 }
 
 .btn-icon {
-  width: 40px;
-  height: 40px;
+  width: max(40px, var(--tap));
+  height: max(40px, var(--tap));
   padding: 0;
   border-radius: 50%;
   color: inherit;
@@ -233,10 +250,18 @@ h6 {
   height: 48px;
   border-bottom: 1px solid var(--divider);
   background: var(--surface-color);
+  flex-shrink: 0; /* with overflow set, a flex item would otherwise shrink to nothing in a short column */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs-navigation::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
-  flex: 1;
+  flex: 1 0 auto;
+  padding: 0 14px;
   height: 100%;
   border: none;
   background: transparent;
@@ -269,7 +294,7 @@ h6 {
 .chip {
   display: inline-flex;
   align-items: center;
-  height: 32px;
+  height: max(32px, calc(var(--tap) - 4px));
   padding: 0 12px;
   border-radius: 16px;
   background: var(--surface-3);
@@ -299,7 +324,7 @@ h6 {
   box-shadow: 0 11px 15px -7px rgba(0, 0, 0, .2), 0 24px 38px 3px rgba(0, 0, 0, .14), 0 9px 46px 8px rgba(0, 0, 0, .12);
   border-radius: 2px;
   min-width: 280px;
-  max-width: 80%;
+  max-width: calc(100% - 32px);
 }
 
 .dialog-title {
@@ -312,10 +337,81 @@ h6 {
   padding: 0 24px 24px;
   overflow-y: auto;
   max-height: 70vh;
+  max-height: 70dvh;
 }
 
 .dialog-actions {
   padding: 8px;
   display: flex;
   justify-content: flex-end;
+}
+/* A pill-shaped button, shared by the views (band choice, calibration steps, small actions) */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  min-height: var(--tap);
+  border-radius: calc(var(--tap) / 2);
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pill:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Text fields and selects of the views */
+.field-input {
+  min-height: var(--tap);
+  padding: 6px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 16px; /* below 16px iOS zooms the page when a field gets the focus */
+}
+
+/* Narrow screens: phones in portrait */
+@media (max-width: 480px) {
+  .header {
+    padding: 0 8px;
+  }
+
+  .header .version {
+    display: none;
+  }
+
+  .main-content {
+    padding: 8px;
+  }
+
+  .dialog {
+    min-width: 0;
+  }
+
+  .dialog-content {
+    padding: 0 16px 16px;
+  }
+}
+
+/* A phone held sideways: little height, so the controls move next to the chart */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --header-height: 48px;
+  }
+
+  .main-content {
+    padding: 4px 8px;
+  }
+
+  .dialog-content {
+    max-height: 60vh;
+    max-height: 60dvh;
+  }
 }

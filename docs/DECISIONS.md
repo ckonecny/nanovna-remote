@@ -175,6 +175,25 @@ installer page on https cannot call a http device (mixed content); the installer
   (WiFi networks) but not the `storage` partition (calibration, 0x320000).
 - Not tested yet: flashing the merged image on the device and a real tag run of the workflow.
 
+## Touch operation and colour scheme (2026-11)
+- Colour scheme: `store.theme` is `auto` (system) / `light` / `dark`; the header button cycles through all three (it used to
+  toggle only light/dark). The light scheme is tuned for contrast (black text, darker primary and curve, stronger grid lines)
+  because it is meant for use in sunlight; no separate "high contrast" scheme. `<meta name="theme-color">` follows the scheme.
+  The manifest's static `theme_color` stays `#ffffff` (PWA work is issue #17).
+- Touch size: `--tap` (36 px, 48 px with `(pointer: coarse)`) is the minimum height of tappable controls; shared `.pill` and
+  `.field-input` classes in `style.css` replace the per-view copies. Inputs use 16 px text, because iOS zooms the page into
+  smaller fields. The tab bar scrolls sideways (`flex-shrink: 0`, else it collapses to 1 px in a short column).
+- Swipe between views (`App.vue`): only quick (<600 ms), clearly horizontal (>=90 px and twice the vertical move) one-finger
+  moves that start outside charts, fields, buttons, sideways-scrolling areas and the 24 px screen edges (browser back gesture).
+  Switching a view can start another kind of sweep (Multi, Cable, TDR), so accidental switches must stay rare.
+- Landscape on a phone (`orientation: landscape` and height <= 500 px): in Smith and Freq the inputs sit left of the chart.
+- HAM cursor: `store.hamCursor` (Hz, not saved) so that the tap in the chart and the keypad ("Frequency…", via App.vue) set the
+  same cursor; it snaps to the nearest measured point and is hidden when outside the sweep. The values sit in a bar above the
+  chart (below the fold on a phone otherwise). `store.hamCursorMode` (`manual` / `min` / `max`, not saved): min and max follow the
+  lowest / highest SWR inside the band on every sweep, like the NanoVNA's marker search; a tap or the keypad switches to manual.
+  The return loss and R/X charts show the cursor's values as dots plus an exact readout in the chart title. The markers of the side menu stay limited to Smith and Freq.
+- Tested only in the browser (demo mode, emulated viewport, synthetic touch events); not yet on a real phone.
+
 ## Build reproducibility (2026-11)
 - `client/dsp-wasm/web/` (the wasm DSP package of cho45's client, built by wasm-pack from `client/dsp-wasm/`) is tracked in
   git although wasm-pack writes a `.gitignore` for it: without it a fresh clone cannot build or test the client (CI found

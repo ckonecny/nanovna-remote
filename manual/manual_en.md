@@ -78,12 +78,14 @@ calibration stays in your browser only.
 
 ### 5.1 Overview
 
-**Header.** Left: the menu button (opens the side menu, 5.9). Then the light/dark switch and, depending on the state,
-**connect** / **connecting...**. When connected, the button next to it controls the measurement: **Pause** / **Resume** for
+**Header.** Left: the menu button (opens the side menu, 5.9). Then the colour scheme button (tap it to cycle through
+*follows the system* (A), *light* (sun) and *dark* (moon); the light scheme has a high contrast for use in sunlight; the choice
+is remembered in the browser) and, depending on the state, **connect** / **connecting...**. When connected, the button next to it controls the measurement: **Pause** / **Resume** for
 sweeps of up to 101 points (the app measures continuously), **Update** / **Stop** for longer sweeps (see *Resolution* in 5.9;
 the button shows the progress in segments).
 
-**Tabs.** Seven views: **Single**, **HAM**, **Multi**, **Cable**, **Smith**, **Freq**, **TDR**.
+**Tabs.** Seven views: **Single**, **HAM**, **Multi**, **Cable**, **Smith**, **Freq**, **TDR**. On a narrow screen the tab bar
+scrolls sideways; the selected tab stays in sight.
 
 | Tab | Use it to |
 |---|---|
@@ -94,6 +96,11 @@ the button shows the progress in segments).
 | Smith | see a sweep of your own range in a Smith chart |
 | Freq | see a sweep of your own range as curves over frequency |
 | TDR | find where along a cable the signal is reflected |
+
+**On a phone.** On a touch screen the buttons, chips and fields are larger so that neighbours are not hit by mistake. Swipe
+sideways on a free area of the page (not on a chart, a field or a button) to go to the next or previous view; the swipe must be
+quick, clearly horizontal and not start at the screen edge. Held sideways, the frequency inputs of **Smith** and **Freq** move
+next to the chart so that it gets the full height.
 
 If no data arrives for a while the page shows a notice (check the cable, restart the NanoVNA).
 
@@ -109,8 +116,12 @@ inductance or capacitance (series), |Γ| and the phase. A chart around the frequ
 <img src="../site/img/phone-ham-extras.png" width="280" alt="HAM view">
 
 Sweep over an amateur band: pick the band with the band buttons. The SWR curve shows the minimum, and the tiles name the minimum
-SWR with its frequency, the range where SWR ≤ 2 and the SWR at both band edges. Tap or click into the chart to place a cursor;
-the tile **Cursor** then shows SWR, R and X at that frequency. Under the chart, **Also show** adds a return loss chart (dB) and an
+SWR with its frequency, the range where SWR ≤ 2 and the SWR at both band edges. Tap or click into the chart to place a cursor, or press
+**Frequency…** and type an exact frequency (for example 435 M); the cursor sits on the nearest measured point. The bar above the
+chart shows frequency, SWR, return loss, R and X there. **Min** and **Max** make the cursor follow the lowest or highest SWR in the
+band with every sweep (like the NanoVNA's marker search); **Manual** keeps it where it is, and tapping a chart or entering a
+frequency also switches to Manual. **Clear** removes a manual cursor. In the additional charts the cursor shows its value as a dot,
+and the title of each chart repeats the exact value. The markers of the side menu (5.9) do not apply to this view. Under the chart, **Also show** adds a return loss chart (dB) and an
 R / X chart (resistance and reactance in Ω); both share the frequency axis and the cursor of the SWR chart. The choice is
 remembered. The calibration panel at the bottom is described in chapter 6.
 

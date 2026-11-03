@@ -546,3 +546,30 @@ describe('App Store', () => {
     });
 });
 
+
+describe('colour scheme', () => {
+    it('cycles system -> light -> dark -> system and sets the page theme', async () => {
+        vi.resetModules();
+        const { store, cycleTheme } = await import('../store');
+        const metaColor = document.createElement('meta');
+        metaColor.name = 'theme-color';
+        document.head.appendChild(metaColor);
+
+        store.theme = 'auto';
+        cycleTheme();
+        expect(store.theme).toBe('light');
+        await Promise.resolve();
+        expect(document.documentElement.dataset.theme).toBe('light');
+        expect(metaColor.content).toBe('#ffffff');
+
+        cycleTheme();
+        expect(store.theme).toBe('dark');
+        await Promise.resolve();
+        expect(document.documentElement.dataset.theme).toBe('dark');
+        expect(metaColor.content).toBe('#1e1e1e');
+
+        cycleTheme();
+        expect(store.theme).toBe('auto');
+        metaColor.remove();
+    });
+});

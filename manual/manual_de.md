@@ -81,12 +81,15 @@ modelliert, nicht gemessen, und die Kalibrierung bleibt nur in deinem Browser.
 
 ### 5.1 Überblick
 
-**Kopfzeile.** Links der Menüknopf (öffnet das Seitenmenü, 5.9). Dann der Hell/Dunkel-Schalter und je nach Zustand **connect** /
+**Kopfzeile.** Links der Menüknopf (öffnet das Seitenmenü, 5.9). Dann der Farbschema-Knopf (Antippen schaltet der Reihe nach
+*folgt dem System* (A), *hell* (Sonne) und *dunkel* (Mond) durch; das helle Schema hat einen hohen Kontrast für den Einsatz im
+Sonnenlicht; die Wahl merkt sich der Browser) und je nach Zustand **connect** /
 **connecting...**. Bei bestehender Verbindung steuert der Knopf daneben die Messung: **Pause** / **Resume** bei Sweeps bis 101
 Punkten (die App misst laufend), **Update** / **Stop** bei längeren Sweeps (siehe *Resolution* in 5.9; der Knopf zeigt den
 Fortschritt in Segmenten).
 
-**Reiter.** Sieben Ansichten: **Single**, **HAM**, **Multi**, **Cable**, **Smith**, **Freq**, **TDR**.
+**Reiter.** Sieben Ansichten: **Single**, **HAM**, **Multi**, **Cable**, **Smith**, **Freq**, **TDR**. Auf einem schmalen Bildschirm
+lässt sich die Reiterleiste seitlich verschieben; der gewählte Reiter bleibt im Blick.
 
 | Reiter | Wofür |
 |---|---|
@@ -97,6 +100,11 @@ Fortschritt in Segmenten).
 | Smith | einen Sweep über einen eigenen Bereich im Smith-Diagramm sehen |
 | Freq | einen Sweep über einen eigenen Bereich als Kurven über der Frequenz sehen |
 | TDR | herausfinden, wo entlang eines Kabels das Signal reflektiert wird |
+
+**Am Handy.** Auf einem Touchscreen sind Knöpfe, Chips und Felder größer, damit man keinen Nachbarn aus Versehen trifft. Wische
+seitlich auf einer freien Fläche der Seite (nicht auf einem Diagramm, Feld oder Knopf), um zur nächsten oder vorigen Ansicht zu
+gehen; die Wischbewegung muss schnell und deutlich waagerecht sein und darf nicht am Bildschirmrand beginnen. Im Querformat
+rücken die Frequenzeingaben von **Smith** und **Freq** neben das Diagramm, das so die volle Höhe bekommt.
 
 Kommen längere Zeit keine Daten, zeigt die Seite einen Hinweis (Kabel prüfen, NanoVNA neu starten).
 
@@ -113,7 +121,12 @@ X, die Reaktanz als Induktivität oder Kapazität (in Reihe), |Γ| und die Phase
 
 Sweep über ein Amateurfunkband: Das Band wählst du mit den Bandtasten. Die SWR-Kurve zeigt das Minimum, und die Kacheln nennen das
 minimale SWR mit seiner Frequenz, den Bereich mit SWR ≤ 2 und das SWR an beiden Bandgrenzen. Tippe oder klicke ins Diagramm, um
-einen Cursor zu setzen; die Kachel **Cursor** zeigt dann SWR, R und X bei dieser Frequenz. Unter dem Diagramm ergänzt **Also show**
+einen Cursor zu setzen, oder drücke **Frequency…** und gib eine genaue Frequenz ein (zum Beispiel 435 M); der Cursor sitzt dann auf
+dem nächsten Messpunkt. Die Leiste über dem Diagramm zeigt dort Frequenz, SWR, Rückflussdämpfung, R und X. **Min** und **Max** lassen den Cursor bei
+jedem Sweep dem niedrigsten oder höchsten SWR im Band folgen (wie die Marker-Suche des NanoVNA); **Manual** lässt ihn, wo er ist, und
+auch ein Tipp ins Diagramm oder eine Frequenzeingabe schaltet auf Manual. **Clear** entfernt einen manuellen Cursor. In den
+zusätzlichen Diagrammen zeigt ein Punkt den Wert des Cursors, und der Titel jedes Diagramms nennt den genauen Wert. Die Marker
+des Seitenmenüs (5.9) gelten in dieser Ansicht nicht. Unter dem Diagramm ergänzt **Also show**
 ein Diagramm der Rückflussdämpfung (dB) und eines für R / X (Wirk- und Blindwiderstand in Ω); beide teilen sich Frequenzachse und
 Cursor mit dem SWR-Diagramm. Die Auswahl wird gemerkt. Das Kalibrierfeld unten ist in Kapitel 6 beschrieben.
 

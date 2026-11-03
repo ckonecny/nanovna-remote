@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { store, connect, disconnect, getWorker, startUpdateLoop, toggleTheme } from './store';
+import { ref, onMounted, watch, nextTick } from 'vue';
+import { store, connect, disconnect, getWorker, startUpdateLoop, cycleTheme, THEME_LABELS } from './store';
 import Graph from './components/Graph.vue';
 import Keypad from './components/Keypad.vue';
 import TraceDialog from './components/TraceDialog.vue';
@@ -69,6 +69,8 @@ const handleKeypadSubmit = (value) => {
     if (key === 'center' || key === 'span') updateCenterSpan();
   } else if (keypadTarget.value === 'single.freq') {
     applySingleFreq(value);
+  } else if (keypadTarget.value === 'ham.cursor') {
+    store.hamCursor = value;
   } else if (keypadTarget.value === 'marker.add') {
     store.markers.push({ id: Date.now(), show: true, freq: value, data: [] });
     store.markers.sort((a, b) => a.freq - b.freq);
@@ -94,6 +96,51 @@ const selectBand = (band) => {
   store.frequencies.start = start;
   store.frequencies.stop = stop;
   updateStartStop();
+};
+
+// the views in tab order; the tabs and the swipe gesture both go through selectView
+const VIEWS = [
+  ['single', 'Single'], ['ham', 'HAM'], ['multi', 'Multi'], ['cable', 'Cable'],
+  ['smith', 'Smith'], ['frequency', 'Freq'], ['tdr', 'TDR'],
+];
+const selectView = (id) => {
+  if (id === 'single') selectSingle();
+  else if (id === 'ham') selectBand(HAM_BANDS.find(b => b.name === store.hamBand) || HAM_BANDS[0]);
+  else graphSelected.value = id;
+};
+// keep the active tab in sight; the tab bar scrolls sideways on a narrow screen
+const revealActiveTab = () => document.querySelector('.view-tabs .tab-btn.active')?.scrollIntoView({ inline: 'center', block: 'nearest' });
+watch(graphSelected, () => nextTick(revealActiveTab));
+onMounted(revealActiveTab);
+
+// Swipe sideways to the next or previous view. A view only changes on a clear, fast, mostly
+// horizontal move that starts outside charts, fields and sideways-scrolling areas, so that
+// scrolling, dragging in a chart or picking a value never switches the view by accident.
+const SWIPE_MIN_X = 90, SWIPE_MAX_MS = 600, SWIPE_EDGE = 24;
+let swipe = null;
+const scrollsSideways = (el) => {
+  for (; el && el !== document.body; el = el.parentElement) {
+    if (el.scrollWidth > el.clientWidth + 1 && ['auto', 'scroll'].includes(getComputedStyle(el).overflowX)) return true;
+  }
+  return false;
+};
+const onTouchStart = (e) => {
+  swipe = null;
+  if (e.touches.length !== 1) return;
+  const t = e.touches[0];
+  if (t.clientX < SWIPE_EDGE || t.clientX > innerWidth - SWIPE_EDGE) return; // the browser's own back gesture
+  if (e.target.closest('canvas, svg, input, select, textarea, button, .tabs-navigation') || scrollsSideways(e.target)) return;
+  swipe = { x: t.clientX, y: t.clientY, at: Date.now() };
+};
+const onTouchEnd = (e) => {
+  if (!swipe) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - swipe.x, dy = t.clientY - swipe.y;
+  const quick = Date.now() - swipe.at <= SWIPE_MAX_MS;
+  swipe = null;
+  if (!quick || Math.abs(dx) < SWIPE_MIN_X || Math.abs(dx) < 2 * Math.abs(dy)) return;
+  const i = VIEWS.findIndex(([id]) => id === graphSelected.value) + (dx < 0 ? 1 : -1);
+  if (i >= 0 && i < VIEWS.length) selectView(VIEWS[i][0]);
 };
 
 const applySingleFreq = (freq) => {
@@ -332,15 +379,15 @@ const quit = () => {
       <button class="btn btn-icon" @click="menuVisible = !menuVisible">
         <span class="icon">menu</span>
       </button>
-      <h3 class="md-title" style="flex: 1; margin-left: 16px;">
+      <h3 class="md-title" style="flex: 1; margin-left: 12px;">
         NanoVNA
-        <span v-if="store.version" style="font-size: 0.8em; opacity: 0.7; margin-left: 8px;">
+        <span v-if="store.version" class="version" style="font-size: 0.8em; opacity: 0.7; margin-left: 8px;">
           ({{ store.version.trim() }})
         </span>
       </h3>
       
-      <button class="btn btn-icon" @click="toggleTheme" :title="store.themeEffective === 'dark' ? 'Light mode' : 'Dark mode'">
-        <span class="icon">{{ store.themeEffective === 'dark' ? 'light_mode' : 'dark_mode' }}</span>
+      <button class="btn btn-icon" @click="cycleTheme" :title="'Colour scheme: ' + THEME_LABELS[store.theme] + ' (tap to change)'" :aria-label="'Colour scheme: ' + THEME_LABELS[store.theme]">
+        <span class="icon">{{ { auto: 'brightness_auto', light: 'light_mode', dark: 'dark_mode' }[store.theme] }}</span>
       </button>
 
       <button class="btn btn-primary" v-if="store.status === 'disconnected'" @click="handleConnect">
@@ -413,13 +460,13 @@ const quit = () => {
 
         <div style="padding: 0 16px; margin: 8px 0;">
           <label style="font-size: 11px; color: var(--text-dim); display: block; margin-bottom: 4px; text-transform: uppercase;">Connection Type</label>
-          <select v-model="store.connectionType" style="width: 100%; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: transparent; color: var(--text-main); font-size: 13px;">
+          <select v-model="store.connectionType" class="field-input" style="width: 100%;">
             <option value="auto">Auto (Default)</option>
             <option value="serial">WebSerial</option>
             <option value="usb">WebUSB</option>
             <option value="ws">WiFi bridge (ESP32)</option>
           </select>
-          <input v-if="store.connectionType === 'ws'" v-model="store.wsHost" placeholder="nanovna.local or IP" style="width: 100%; box-sizing: border-box; margin-top: 4px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 4px; background: transparent; color: var(--text-main); font-size: 13px;">
+          <input v-if="store.connectionType === 'ws'" v-model="store.wsHost" placeholder="nanovna.local or IP" class="field-input" style="width: 100%; margin-top: 4px;">
         </div>
         
         <div class="nav-subheader">Save</div>
@@ -473,16 +520,10 @@ const quit = () => {
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content">
-      <div class="graph-area">
-        <div class="tabs-navigation">
-          <button class="tab-btn" :class="{ active: graphSelected === 'single' }" @click="selectSingle">Single</button>
-          <button class="tab-btn" :class="{ active: graphSelected === 'ham' }" @click="selectBand(HAM_BANDS.find(b => b.name === store.hamBand) || HAM_BANDS[0])">HAM</button>
-          <button class="tab-btn" :class="{ active: graphSelected === 'multi' }" @click="graphSelected = 'multi'">Multi</button>
-          <button class="tab-btn" :class="{ active: graphSelected === 'cable' }" @click="graphSelected = 'cable'">Cable</button>
-          <button class="tab-btn" :class="{ active: graphSelected === 'smith' }" @click="graphSelected = 'smith'">Smith</button>
-          <button class="tab-btn" :class="{ active: graphSelected === 'frequency' }" @click="graphSelected = 'frequency'">Freq</button>
-          <button class="tab-btn" :class="{ active: graphSelected === 'tdr' }" @click="graphSelected = 'tdr'">TDR</button>
+    <main class="main-content" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
+      <div class="graph-area" :class="{ 'has-inputs': !['single', 'ham', 'multi', 'cable', 'tdr'].includes(graphSelected) }">
+        <div class="tabs-navigation view-tabs">
+          <button v-for="[id, name] in VIEWS" :key="id" class="tab-btn" :class="{ active: graphSelected === id }" @click="selectView(id)">{{ name }}</button>
         </div>
         <div class="input-panel" v-show="!['single', 'ham', 'multi', 'cable', 'tdr'].includes(graphSelected)">
           <div class="tabs-navigation">
@@ -531,7 +572,7 @@ const quit = () => {
         </div>
         <div class="graph-wrapper">
           <Single v-if="graphSelected === 'single'" @edit-frequency="openKeypad('Frequency', 'single.freq', store.singleFreq)" />
-          <Ham v-else-if="graphSelected === 'ham'" @select-band="selectBand" />
+          <Ham v-else-if="graphSelected === 'ham'" @select-band="selectBand" @edit-cursor="(f) => openKeypad('Cursor frequency', 'ham.cursor', f)" />
           <Multi v-else-if="graphSelected === 'multi'" />
           <Cable v-else-if="graphSelected === 'cable'" />
           <Tdr v-else-if="graphSelected === 'tdr'" />
@@ -596,9 +637,9 @@ const quit = () => {
 .btn-nav {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 24px;
   padding: 0 16px;
-  height: 48px;
+  min-height: max(48px, var(--tap));
   border: none;
   background: transparent;
   width: 100%;
@@ -639,7 +680,7 @@ const quit = () => {
 }
 
 .field {
-  height: 32px;
+  min-height: max(32px, var(--tap));
   border-bottom: 1px solid var(--divider);
   display: flex;
   align-items: center;
@@ -721,5 +762,45 @@ const quit = () => {
 .slot-actions {
   display: flex;
   gap: 8px;
+}
+
+/* Phone in portrait: tighter spacing so that the chart starts higher up */
+@media (max-width: 480px) {
+  .input-panel {
+    margin: 8px 0 12px;
+  }
+
+  .freq-inputs,
+  .traces-chips {
+    margin-top: 8px;
+  }
+}
+
+/* A phone held sideways: the frequency inputs go next to the chart instead of above it */
+@media (orientation: landscape) and (max-height: 500px) {
+  .graph-area {
+    min-height: 0;
+  }
+
+  .graph-area.has-inputs {
+    display: grid;
+    grid-template-columns: minmax(240px, 36%) 1fr;
+    grid-template-rows: auto 1fr;
+    column-gap: 8px;
+    flex: 1;
+  }
+
+  .graph-area.has-inputs > .view-tabs {
+    grid-column: 1 / -1;
+  }
+
+  .graph-area.has-inputs > .input-panel {
+    margin: 4px 0;
+    overflow-y: auto;
+  }
+
+  .graph-area.has-inputs > .graph-wrapper {
+    min-height: 0;
+  }
 }
 </style>
