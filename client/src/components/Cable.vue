@@ -1,16 +1,21 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { store } from '../store';
+import ChartFrame from './ChartFrame.vue';
+import { useFullChart } from '../lib/fullchart';
 import { CABLE_RANGES, CABLE_TYPES, analyseCable, analyseImpedance, stubLength, wavelength } from '../lib/cable';
 import { formatFrequency } from '../lib/dsp';
 
 const mode = ref('length'); // 'length': velocity factor known, 'vf': length known
 
 const L = 52, R = 12, T = 12, B = 28;
-const W = ref(600), H = 220;
+const fc = useFullChart();
+const boxW = ref(600);
+const W = computed(() => (fc.current.value ? fc.current.value.w : boxW.value));
+const H = computed(() => fc.sizeOf('chart', 0, 220)[1]);
 const wrap = ref(null);
 let observer = null;
-const resize = () => { if (wrap.value) W.value = Math.max(280, Math.round(wrap.value.clientWidth) - 24); };
+const resize = () => { if (wrap.value) boxW.value = Math.max(280, Math.round(wrap.value.clientWidth) - 24); };
 onMounted(() => { resize(); observer = new ResizeObserver(resize); observer.observe(wrap.value); });
 onUnmounted(() => { if (observer) observer.disconnect(); });
 
@@ -37,7 +42,7 @@ const chart = computed(() => {
     let lo = Math.min(...vals), hi = Math.max(...vals);
     if (hi - lo < 1e-6) { lo -= 1; hi += 1; }
     const x = (f) => L + (f - f0) / (f1 - f0 || 1) * (W.value - L - R);
-    const y = (v) => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+    const y = (v) => T + (1 - (v - lo) / (hi - lo)) * (H.value - T - B);
     const line = (get) => used.map((p, i) => (i ? 'L' : 'M') + x(p.f).toFixed(1) + ' ' + y(get(p)).toFixed(1)).join(' ');
     return {
         data: line(p => turns(p.ph)),
@@ -143,7 +148,8 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
         <div class="tile" :class="{ bad: !result.good }"><span class="label">Fit</span><span class="value small">{{ result.good ? 'phase is a straight line' : 'not a straight line' }}</span><span class="sub">{{ result.good ? 'result is plausible' : 'cable not open/short, or not connected' }}</span></div>
       </div>
 
-      <svg v-if="chart" :viewBox="`0 0 ${W} ${H}`" :width="W" :height="H" class="chart">
+      <ChartFrame v-if="chart" title="Cable phase" @change="(s) => fc.onFrame('chart', s)">
+      <svg :viewBox="`0 0 ${W} ${H}`" :width="W" :height="H" class="chart">
         <g v-for="t in chart.yticks" :key="t.label">
           <line :x1="L" :x2="W - R" :y1="t.y" :y2="t.y" class="grid" />
           <text :x="L - 6" :y="t.y + 4" class="axis" text-anchor="end">{{ t.label }}</text>
@@ -152,6 +158,7 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
         <path :d="chart.fit" class="fit" />
         <path :d="chart.data" class="curve" />
       </svg>
+      </ChartFrame>
       <div class="sub">Unwrapped reflection phase in turns over frequency in MHz, with the fitted line (dashed).</div>
 
       <div v-if="lossRows.length" class="loss">

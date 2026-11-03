@@ -303,3 +303,22 @@ installer page on https cannot call a http device (mixed content); the installer
   calibration state (message "Connection to the NanoVNA lost ...") and bumps `loopGeneration`, so the loop of an earlier connection
   cannot carry on beside the new one and the buttons are not stuck disabled.
 - Seen on the device: `bridge: NanoVNA gone` in `/log` while a calibration step ran (the NanoVNA left the USB bus).
+
+## Chart full screen (2026-11)
+- `ChartFrame.vue` wraps every chart: a button (inline SVG, Material "fullscreen" paths, Apache-2.0 like the Material Icons already used;
+  not the icon font, which is missing without internet) puts the box over the whole window with `position: fixed`, so the chart is not
+  re-created and keeps its handlers (HAM cursor, Smith/Freq zoom and pan). The browser's own Fullscreen API is requested as well where it
+  exists (not on an iPhone); Esc or leaving it ends the mode.
+- Charts drawn at pixel size (HAM, Cable, TDR, Multi cards) take the box size from `useFullChart` (`lib/fullchart.js`) while full; the
+  canvas of Smith/Freq follows its container. Several charts in a view are full one at a time, identified by an id.
+
+## Marker labels and Min / Max (2026-11)
+- The chart labels (pinned marker labels and hover labels) get theme tokens `--tip-bg` / `--tip-border` (border and a lighter
+  background); the default black box vanished on the dark chart. A marker point is a larger diamond with a ring in the text colour.
+- Min / Max now make the active marker **follow** the extremum with every sweep (`marker.track`), like the cursor modes in HAM; the same
+  button again stops it. The label of a following marker starts with "Min" / "Max". The extremum is searched on the first visible trace
+  that the chart of the view draws (MarkerReadout gets `view`): Polar is not drawn in Freq and used to decide the search there.
+- With several traces Chart.js puts a tooltip at the mean of all points, i.e. between the curves. Tooltips use the positioner
+  `firstPoint` (tip on the first trace's point); the marker diamond is set on every trace's element (`_model`) in `beforeRender`, because
+  the dataset arrays alone were not picked up with several traces. With several traces the title names the first trace
+  ("Max CH0 swr · 250.2 MHz"): it alone decides Min / Max.

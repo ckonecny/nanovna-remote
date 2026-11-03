@@ -4,10 +4,13 @@ import { store } from '../store';
 import { HAM_BANDS } from '../lib/bands';
 import CalStatus from './CalStatus.vue';
 import CalPanel from './CalPanel.vue';
+import ChartFrame from './ChartFrame.vue';
+import { useFullChart } from '../lib/fullchart';
 import { calcSWR, formatFrequency } from '../lib/dsp';
 
 const SWR_MAX = 5;
 const W = 300, H = 110, L = 22, R = 6, T = 6, B = 6;
+const fc = useFullChart(); // a card can fill the screen: its chart is then drawn at the size of the screen
 
 const toggle = (name) => {
     const i = store.multiBands.indexOf(name);
@@ -33,9 +36,11 @@ const cards = computed(() => {
             } else cur = null;
         }
         const f0 = points.length ? points[0].freq : band.start, f1 = points.length ? points[points.length - 1].freq : band.stop;
-        const x = (f) => L + (f - f0) / (f1 - f0 || 1) * (W - L - R);
-        const y = (swr) => T + (1 - (Math.min(swr, SWR_MAX) - 1) / (SWR_MAX - 1)) * (H - T - B);
+        const [w, h] = fc.sizeOf(name, W, H);
+        const x = (f) => L + (f - f0) / (f1 - f0 || 1) * (w - L - R);
+        const y = (swr) => T + (1 - (Math.min(swr, SWR_MAX) - 1) / (SWR_MAX - 1)) * (h - T - B);
         return {
+            W: w, H: h, full: fc.isFull(name),
             band, points, min, swr2: best, calibrated: m ? m.calibrated : false, measured: !!m,
             path: points.map((p, i) => (i ? 'L' : 'M') + x(p.freq).toFixed(1) + ' ' + y(p.swr).toFixed(1)).join(' '),
             bandX: x(band.start), bandW: Math.max(0, x(band.stop) - x(band.start)),
@@ -68,15 +73,17 @@ const grid = [1, 2, 3, 5];
           <span v-if="c.measured" class="flag" :class="c.calibrated ? 'is-cal' : ''">{{ c.calibrated ? 'calibrated' : 'not calibrated' }}</span>
           <span v-if="c.min" class="swr">{{ fmt(c.min.swr) }}</span>
         </div>
-        <svg :viewBox="`0 0 ${W} ${H}`" class="chart">
-          <rect :x="c.bandX" :y="T" :width="c.bandW" :height="H - T - B" class="band-area" />
+        <ChartFrame :title="'SWR ' + c.band.name" @change="(s) => fc.onFrame(c.band.name, s)">
+        <svg :viewBox="`0 0 ${c.W} ${c.H}`" class="chart" :class="{ full: c.full }">
+          <rect :x="c.bandX" :y="T" :width="c.bandW" :height="c.H - T - B" class="band-area" />
           <g v-for="g in grid" :key="g">
-            <line :x1="L" :x2="W - R" :y1="c.y(g)" :y2="c.y(g)" :class="['grid', g === 2 && 'grid2']" />
+            <line :x1="L" :x2="c.W - R" :y1="c.y(g)" :y2="c.y(g)" :class="['grid', g === 2 && 'grid2']" />
             <text :x="L - 3" :y="c.y(g) + 3" class="axis" text-anchor="end">{{ g }}</text>
           </g>
           <path :d="c.path" class="curve" />
           <circle v-if="c.min" :cx="c.minX" :cy="c.y(c.min.swr)" r="3.5" class="min" />
         </svg>
+        </ChartFrame>
         <div v-if="!c.measured" class="sub">Waiting for measurement…</div>
         <div v-else class="sub">
           <template v-if="c.min">min at {{ formatFrequency(c.min.freq, 4) }}</template>
@@ -105,6 +112,7 @@ const grid = [1, 2, 3, 5];
 .flag.is-cal { color: #4caf50; }
 .swr { margin-left: auto; font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .chart { display: block; width: 100%; height: auto; }
+.chart.full { height: 100%; }
 .band-area { fill: var(--band-area); }
 .grid { stroke: var(--swr-grid); stroke-width: 1; }
 .grid2 { stroke: rgba(244, 67, 54, 0.5); stroke-dasharray: 4 3; }

@@ -28,6 +28,8 @@
   --surface-2: #f1f4f9;
   --surface-3: #dfe5ee;
   --chart-grid: rgba(15, 23, 42, 0.16);
+  --tip-bg: #ffffff; /* marker and hover labels in the charts: set apart from the plot and the page */
+  --tip-border: #1d4ed8;
   --swr-grid: rgba(0, 0, 0, 0.28);
   --band-area: rgba(46, 125, 50, 0.2);
   --notice-bg: rgba(255, 152, 0, 0.3);
@@ -64,6 +66,8 @@
   --surface-2: #1b2332;
   --surface-3: #2a3547;
   --chart-grid: rgba(255, 255, 255, 0.12);
+  --tip-bg: #2c3a57;
+  --tip-border: #7aa2ff;
   --swr-grid: rgba(255, 255, 255, 0.16);
   --band-area: rgba(102, 187, 106, 0.16);
   --notice-bg: rgba(255, 152, 0, 0.25);

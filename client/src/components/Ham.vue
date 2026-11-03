@@ -3,6 +3,8 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { store } from '../store';
 import CalStatus from './CalStatus.vue';
 import CalPanel from './CalPanel.vue';
+import ChartFrame from './ChartFrame.vue';
+import { useFullChart } from '../lib/fullchart';
 import { HAM_BANDS } from '../lib/bands';
 import { calcSWR, calcZ, calcLogMag, formatFrequency } from '../lib/dsp';
 
@@ -11,13 +13,16 @@ const emit = defineEmits(['select-band', 'edit-cursor']);
 const SWR_MAX = 5;
 const L = 44, R = 12, T = 12, B = 28;
 // the chart is drawn 1:1 in pixels at whatever size the page gives it, from a phone to a full screen display
-const W = ref(600), H = ref(300);
+const fc = useFullChart();
+const boxW = ref(600), boxH = ref(300);
+const W = computed(() => (fc.current.value ? fc.current.value.w : boxW.value));
+const H = computed(() => fc.sizeOf('swr', 0, boxH.value)[1]);
 const wrap = ref(null);
 let observer = null;
 const resize = () => {
     if (!wrap.value) return;
-    W.value = Math.max(280, Math.round(wrap.value.clientWidth) - 24); // minus the padding
-    H.value = Math.round(Math.min(Math.max(W.value * 0.5, 220), Math.max(220, window.innerHeight * 0.5)));
+    boxW.value = Math.max(280, Math.round(wrap.value.clientWidth) - 24); // minus the padding
+    boxH.value = Math.round(Math.min(Math.max(boxW.value * 0.5, 220), Math.max(220, window.innerHeight * 0.5)));
 };
 onMounted(() => {
     resize();
@@ -102,13 +107,13 @@ const toggleExtra = (id) => {
     if (i >= 0) store.hamExtras.splice(i, 1);
     else store.hamExtras.push(id);
 };
-const EH = 160;
+const EH = computed(() => (fc.current.value && fc.current.value.id !== 'swr' ? fc.current.value.h : 160));
 const extraCharts = computed(() => store.hamExtras.map((id) => {
     const pts = points.value;
     const line = (key, scale) => pts.map((p, i) => (i ? 'L' : 'M') + x(p.freq).toFixed(1) + ' ' + scale(p[key]).toFixed(1)).join(' ');
     if (id === 'rl') {
         const RL_MAX = 30; // dB, 0 at the top so that a notch dips like in the SWR chart
-        const yy = (v) => T + Math.min(Math.max(v, 0), RL_MAX) / RL_MAX * (EH - T - B);
+        const yy = (v) => T + Math.min(Math.max(v, 0), RL_MAX) / RL_MAX * (EH.value - T - B);
         const p = cursor.value && cursor.value.p;
         return {
             id, title: 'Return loss (dB)', ticks: [0, 10, 20, 30].map(v => ({ y: yy(v), label: String(v) })), zero: null, curves: [{ d: line('rl', yy), cls: 'curve' }],
@@ -119,7 +124,7 @@ const extraCharts = computed(() => store.hamExtras.map((id) => {
     const cp = cursor.value && cursor.value.p;
     const reach = Math.max(0, ...pts.flatMap(p => [Math.abs(p.r), Math.abs(p.xr)]).filter(isFinite));
     const m = [50, 100, 200, 500].find(v => reach <= v) || 500; // symmetric scale, values beyond it are clipped
-    const yy = (v) => T + (1 - (Math.min(Math.max(v, -m), m) + m) / (2 * m)) * (EH - T - B);
+    const yy = (v) => T + (1 - (Math.min(Math.max(v, -m), m) + m) / (2 * m)) * (EH.value - T - B);
     return {
         id, title: 'R (blue) / X (orange) in Ω',
         ticks: [-m, -m / 2, 0, m / 2, m].map(v => ({ y: yy(v), label: String(v) })),
@@ -161,6 +166,7 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
       </div>
     </div>
 
+    <ChartFrame :title="'SWR ' + band.name" @change="(s) => fc.onFrame('swr', s)">
     <svg :viewBox="`0 0 ${W} ${H}`" :width="W" :height="H" class="chart" @click="onChartClick">
       <rect :x="x(band.start)" :y="T" :width="Math.max(0, x(band.stop) - x(band.start))" :height="H - T - B" class="band-area" />
       <g v-for="g in grid" :key="g">
@@ -174,6 +180,7 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
       <circle v-if="cursor" :cx="x(cursor.p.freq)" :cy="y(cursor.p.swr)" r="6" class="cursor-dot" />
       <text v-if="cursor" :x="x(cursor.p.freq) + (x(cursor.p.freq) > W / 2 ? -10 : 10)" :y="T + 14" class="cursor-label" :text-anchor="x(cursor.p.freq) > W / 2 ? 'end' : 'start'">SWR {{ fmt(cursor.p.swr) }}</text>
     </svg>
+    </ChartFrame>
 
     <div v-if="!points.length" class="empty">{{ store.status === 'connected' ? 'Waiting for measurement…' : 'Connect to the NanoVNA to measure' }}</div>
     <div v-else class="tiles">
@@ -189,6 +196,7 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
     </div>
     <div v-for="c in extraCharts" :key="c.id" class="extra">
       <div class="label">{{ c.title }}<span v-if="c.readout" class="readout"> · {{ c.readout }}</span></div>
+      <ChartFrame :title="c.title" @change="(s) => fc.onFrame(c.id, s)">
       <svg :viewBox="`0 0 ${W} ${EH}`" :width="W" :height="EH" class="chart" @click="onChartClick">
         <rect :x="x(band.start)" :y="T" :width="Math.max(0, x(band.stop) - x(band.start))" :height="EH - T - B" class="band-area" />
         <g v-for="t in c.ticks" :key="t.label">
@@ -203,6 +211,7 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
           <text v-for="(m, i) in c.marks" :key="'t' + m.text" :x="x(cursor.p.freq) + (x(cursor.p.freq) > W / 2 ? -10 : 10)" :y="T + 14 + i * 16" class="cursor-label" :text-anchor="x(cursor.p.freq) > W / 2 ? 'end' : 'start'">{{ m.text }}</text>
         </g>
       </svg>
+      </ChartFrame>
     </div>
 
     <CalPanel />

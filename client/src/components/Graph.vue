@@ -3,8 +3,15 @@ import { nextTick, onMounted, onUnmounted, ref, watch, watchEffect } from 'vue';
 import Chart from 'chart.js';
 import 'chartjs-chart-smith';
 import { store, getWorker } from '../store';
+import ChartFrame from './ChartFrame.vue';
 import * as dsp from '../lib/dsp';
 import { transformRange, clampRange, pinchFactor } from '../lib/zoom';
+
+// with several traces the default tooltip position is the mean of all points, which floats between the curves:
+// anchor it on the first trace's point instead
+if (Chart.Tooltip && Chart.Tooltip.positioners) {
+  Chart.Tooltip.positioners.firstPoint = (elements) => (elements.length ? { x: elements[0]._model.x, y: elements[0]._model.y } : false);
+}
 
 // Register Chart.js plugin for pinned tooltips (markers)
 Chart.pluginService.register({
@@ -17,13 +24,7 @@ Chart.pluginService.register({
         return chart.data.labels.findIndex((f) => f >= freq);
       }).filter(i => i >= 0);
 
-      const pointRadius = [];
-      const pointStyle = [];
-      
       for (let target of indexes) {
-        pointRadius[target] = 5;
-        pointStyle[target] = 'rectRot';
-
         const active = chart.config.data.datasets.map((_, i) => {
           const meta = chart.getDatasetMeta(i);
           return meta && meta.data && meta.data[target];
@@ -40,10 +41,30 @@ Chart.pluginService.register({
         }
       }
 
+      // a marker is a larger diamond with a ring in the text colour, so that it shows on the curve in every theme
+      const marked = new Set(indexes);
+      const ring = colors().main;
       for (let dataset of chart.data.datasets) {
-        dataset.pointRadius = pointRadius;
-        dataset.pointStyle = pointStyle;
+        const per = (on, off) => Array.from({ length: dataset.data.length }, (_, i) => (marked.has(i) ? on : off));
+        dataset.pointRadius = per(7, 2);
+        dataset.pointStyle = per('rectRot', 'circle');
+        dataset.pointBackgroundColor = dataset.borderColor;
+        dataset.pointBorderColor = per(ring, dataset.borderColor);
+        dataset.pointBorderWidth = per(2, 1);
       }
+      // the elements were built before this hook ran, so set the marked ones directly as well
+      chart.data.datasets.forEach((dataset, i) => {
+        const meta = chart.getDatasetMeta(i);
+        for (let target of indexes) {
+          const model = meta && meta.data && meta.data[target] && meta.data[target]._model;
+          if (!model) continue;
+          model.radius = 7;
+          model.pointStyle = 'rectRot';
+          model.borderColor = ring;
+          model.borderWidth = 2;
+          model.backgroundColor = dataset.borderColor;
+        }
+      });
     }
   },
   afterDraw: function (chart, easing) {
@@ -77,7 +98,19 @@ let chartKind = kind();
 const colors = () => {
   const cs = getComputedStyle(document.documentElement);
   const get = (n) => cs.getPropertyValue(n).trim();
-  return { dim: get('--text-dim'), main: get('--text-main'), grid: get('--chart-grid') };
+  return { dim: get('--text-dim'), main: get('--text-main'), grid: get('--chart-grid'), tipBg: get('--tip-bg'), tipBorder: get('--tip-border') };
+};
+
+// marker and hover labels: a border and a background that differ from the plot in every theme
+const tipStyle = () => ({
+  backgroundColor: colors().tipBg, borderColor: colors().tipBorder, borderWidth: 1,
+  titleFontColor: colors().main, bodyFontColor: colors().main, cornerRadius: 6,
+});
+
+// "Min" or "Max" for a marker that follows the minimum or maximum of the first trace
+const markerTag = (freq) => {
+  const m = store.markers.find(x => x.show && x.track && x.freq === freq);
+  return m ? (m.track === 'min' ? 'Min' : 'Max') : '';
 };
 
 const canvasRef = ref(null);
@@ -117,10 +150,15 @@ const getFreqConfig = () => ({
     },
     legend: { labels: { fontColor: colors().main } },
     tooltips: {
+      ...tipStyle(),
+      position: 'firstPoint',
       callbacks: {
-        title: (tooltipItems) => {
+        title: (tooltipItems, data) => {
           if (tooltipItems.length > 0) {
-            return dsp.formatFrequency(tooltipItems[0].xLabel);
+            const tag = markerTag(+tooltipItems[0].xLabel);
+            // with several traces say which one decides: the first one
+            const first = data.datasets.length > 1 && data.datasets[0].label ? ' ' + data.datasets[0].label : '';
+            return (tag ? tag + first + ' · ' : '') + dsp.formatFrequency(tooltipItems[0].xLabel);
           }
           return '';
         },
@@ -151,6 +189,7 @@ const getPolarConfig = () => ({
     },
     legend: { labels: { fontColor: colors().main } },
     tooltips: {
+      ...tipStyle(),
       callbacks: {
         label: (tooltipItem, data) => {
           const ds = data.datasets[tooltipItem.datasetIndex];
@@ -172,6 +211,7 @@ const getSmithConfig = () => ({
     scale: { gridLines: { color: colors().grid }, ticks: { fontColor: colors().dim } },
     legend: { labels: { fontColor: colors().main } },
     tooltips: {
+      ...tipStyle(),
       callbacks: {
         label: (tooltipItem, data) => {
           const datasetLabel = data.datasets[tooltipItem.datasetIndex].label || '';
@@ -503,10 +543,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="graph-container">
-    <canvas ref="canvasRef" :data-graph-type="props.type"></canvas>
-    <div v-if="hint" class="zoom-hint">{{ hint }}</div>
-  </div>
+  <ChartFrame :title="props.type === 'smith' ? 'Smith chart' : 'Frequency chart'">
+    <div class="graph-container">
+      <canvas ref="canvasRef" :data-graph-type="props.type"></canvas>
+      <div v-if="hint" class="zoom-hint">{{ hint }}</div>
+    </div>
+  </ChartFrame>
 </template>
 
 <style scoped>

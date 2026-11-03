@@ -595,7 +595,7 @@ const quit = () => {
             </button>
           </div>
         </div>
-          <MarkerReadout v-if="graphSelected === 'smith' || graphSelected === 'frequency'" />
+          <MarkerReadout v-if="graphSelected === 'smith' || graphSelected === 'frequency'" :view="graphSelected" />
         </div>
         <div class="graph-wrapper">
           <Single v-if="graphSelected === 'single'" @edit-frequency="openKeypad('Frequency', 'single.freq', store.singleFreq)" />

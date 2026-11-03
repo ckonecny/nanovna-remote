@@ -102,6 +102,11 @@ sideways on a free area of the page (not on a chart, a field or a button) to go 
 quick, clearly horizontal and not start at the screen edge. Held sideways, the frequency inputs of **Smith** and **Freq** move
 next to the chart so that it gets the full height.
 
+**Chart full screen.** Every chart (HAM, each band card in Multi, the Cable and TDR charts, Smith and Freq) has a small
+button in its top right corner. It makes the chart fill the whole screen, without the other information next to it; the same button
+(or **Esc** on a computer) takes you back. The chart keeps working: cursor, zoom and moving the range behave as before. In
+HAM the three charts (SWR, return loss, R / X) can each be enlarged. Turn the phone sideways for the widest chart.
+
 If no data arrives for a while the page shows a notice (check the cable, restart the NanoVNA).
 
 ### 5.2 Single
@@ -215,8 +220,10 @@ The menu button opens it. Entries that need a connection are greyed out until yo
 - **Marker readout**: under the **Smith** and **Freq** charts, each shown marker has a column with the impedance (R ± jX), SWR,
   return loss, phase, Q (|X| / R), the series equivalent (R with L or C) and the parallel equivalent (R in parallel with L or
   C), taken from the nearest measured point of the first visible trace. Tap a column head to make that marker the active one.
-  **Delta** shows every other marker relative to the active one (differences instead of values). **Min** and **Max** move the
-  active marker to the minimum or maximum of the first visible trace. **→ Start**, **→ Stop** and **→ Center** set the sweep
+  **Delta** shows every other marker relative to the active one (differences instead of values). **Min** and **Max** make the
+  active marker follow the minimum or maximum of the first visible trace of the chart (with every sweep; the button stays lit, and
+  pressing it again leaves the marker where it is). The label of such a marker starts with **Min** or **Max**; with several traces it also names the first trace, which decides (the other traces show their values at that frequency). The labels have a
+  border and a lighter background so that they show against the chart in the dark scheme too; the marker is a diamond with a ring. **→ Start**, **→ Stop** and **→ Center** set the sweep
   range from the active marker; **→ Span** sweeps from the lowest to the highest shown marker.
 - **Setup Scales**: minimum and maximum of the vertical axes for LogMag (dB), SWR, Phase (°) and Linear.
 - **Add Trace**: see 5.8.

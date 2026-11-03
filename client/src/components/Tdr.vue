@@ -1,14 +1,19 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { store } from '../store';
+import ChartFrame from './ChartFrame.vue';
+import { useFullChart } from '../lib/fullchart';
 import { CABLE_TYPES } from '../lib/cable';
 import { TDR_RANGES, describeRange, computeTdr, strongestReflection } from '../lib/tdr';
 
 const L = 48, R = 12, T = 12, B = 28;
-const W = ref(600), H = 260;
+const fc = useFullChart();
+const boxW = ref(600);
+const W = computed(() => (fc.current.value ? fc.current.value.w : boxW.value));
+const H = computed(() => fc.sizeOf('chart', 0, 260)[1]);
 const wrap = ref(null);
 let observer = null;
-const resize = () => { if (wrap.value) W.value = Math.max(280, Math.round(wrap.value.clientWidth) - 24); };
+const resize = () => { if (wrap.value) boxW.value = Math.max(280, Math.round(wrap.value.clientWidth) - 24); };
 onMounted(() => { resize(); observer = new ResizeObserver(resize); observer.observe(wrap.value); });
 onUnmounted(() => { if (observer) observer.disconnect(); });
 
@@ -36,7 +41,7 @@ const chart = computed(() => {
     const peak = Math.max(0.2, ...t.impulse.map(Math.abs));
     const m = Math.min(1.2, peak * 1.15);
     const x = (d) => L + (d - minD) / (maxD - minD) * (W.value - L - R);
-    const y = (v) => T + (1 - (Math.min(Math.max(v, -m), m) + m) / (2 * m)) * (H - T - B);
+    const y = (v) => T + (1 - (Math.min(Math.max(v, -m), m) + m) / (2 * m)) * (H.value - T - B);
     return {
         path: t.dist.map((d, i) => (i ? 'L' : 'M') + x(d).toFixed(1) + ' ' + y(t.impulse[i]).toFixed(1)).join(' '),
         zero: y(0),
@@ -82,6 +87,7 @@ const pickType = (e) => {
         <div class="tile" v-else><span class="label">Strongest reflection</span><span class="value small">none found</span><span class="sub">nothing above {{ MIN_REFLECTION }} beyond the connector</span></div>
         <div class="tile"><span class="label">Sweep</span><span class="value small">range {{ fmtM(current.range) }}</span><span class="sub">two reflections closer than {{ fmtM(current.resolution) }} blur into one</span></div>
       </div>
+      <ChartFrame title="TDR" @change="(s) => fc.onFrame('chart', s)">
       <svg :viewBox="`0 0 ${W} ${H}`" :width="W" :height="H" class="chart">
         <g v-for="t in chart.yticks" :key="t.label">
           <line :x1="L" :x2="W - R" :y1="t.y" :y2="t.y" class="grid" />
@@ -93,6 +99,7 @@ const pickType = (e) => {
         <path :d="chart.path" class="curve" />
         <circle v-if="chart.mark" :cx="chart.mark.x" :cy="chart.mark.y" r="5" class="min" />
       </svg>
+      </ChartFrame>
       <div class="sub">Reflections over distance. Up: open or higher impedance. Down: short or lower impedance. The marker is the strongest one beyond the first {{ fmtM(2 * tdr.resolution) }}; the peak at 0 m is the connector.</div>
     </template>
 

@@ -1,11 +1,13 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { store } from '../store';
 import * as dsp from '../lib/dsp';
 import { nearestIndex, readout, delta, search, eng } from '../lib/marker';
 
-// the channel and value of the first visible trace of the Smith / Freq views
-const trace = computed(() => store.traces.find((t) => t.show));
+const props = defineProps({ view: { type: String, default: 'frequency' } }); // 'smith' or 'frequency'
+
+// the channel and value of the first visible trace that the chart of this view draws (Polar is not drawn in Freq)
+const trace = computed(() => store.traces.find((t) => t.show && (props.view === 'smith' ? dsp.SMITH_FORMATS : dsp.FREQ_FORMATS).includes(t.format)));
 const points = computed(() => (trace.value && trace.value.channel === 1 ? store.data.ch1 : store.data.ch0));
 
 const shown = computed(() => store.markers.filter((m) => m.show));
@@ -34,11 +36,24 @@ const valueOf = (t) => {
 };
 
 const active = () => store.markers.find((m) => m.id === store.activeMarkerId) || shown.value[0];
+// Min / Max make the active marker follow the minimum or maximum of the first trace with every sweep; the same button again
+// leaves the marker where it is
 const find = (kind) => {
   const m = active();
+  if (!m) return;
+  if (m.track === kind) { m.track = null; return; }
   const fr = search(points.value, valueOf(trace.value), kind);
-  if (m && fr !== null) { m.freq = fr; store.activeMarkerId = m.id; }
+  if (fr !== null) { m.freq = fr; m.track = kind; store.activeMarkerId = m.id; }
 };
+const following = computed(() => (active() ? active().track : null));
+const retrack = () => {
+  for (const m of store.markers) {
+    if (!m.track) continue;
+    const fr = search(points.value, valueOf(trace.value), m.track);
+    if (fr !== null && fr !== m.freq) m.freq = fr;
+  }
+};
+watch(() => [store.dataVersion, trace.value && trace.value.format, trace.value && trace.value.channel], retrack);
 
 // frequency range from the markers: start/stop from the lowest and highest shown marker, centre from the active one
 const setRange = (what) => {
@@ -58,8 +73,8 @@ const setRange = (what) => {
   <div class="marker-readout" v-if="rows.length">
     <div class="mr-tools">
       <label class="mr-delta"><input type="checkbox" v-model="store.markerDelta" /> Delta</label>
-      <button class="btn mr-btn" @click="find('min')" title="Move the active marker to the minimum of the first trace">Min</button>
-      <button class="btn mr-btn" @click="find('max')" title="Move the active marker to the maximum of the first trace">Max</button>
+      <button class="btn mr-btn" :class="{ on: following === 'min' }" @click="find('min')" title="The active marker follows the minimum of the first trace (tap again to stop)">Min</button>
+      <button class="btn mr-btn" :class="{ on: following === 'max' }" @click="find('max')" title="The active marker follows the maximum of the first trace (tap again to stop)">Max</button>
       <span class="mr-sep"></span>
       <span class="mr-cap">Sweep range from marker:</span>
       <button class="btn mr-btn" @click="setRange('start')">→ Start</button>
@@ -96,6 +111,7 @@ const setRange = (what) => {
 .mr-sep { flex: 1; }
 .mr-cap { color: var(--text-dim); }
 .mr-btn { padding: 2px 8px; min-height: 0; font-size: 12px; }
+.mr-btn.on { background: var(--primary); color: #fff; border-color: var(--primary); }
 table { border-collapse: collapse; font-family: monospace; }
 td:first-child, th:first-child { padding-right: 16px; }
 th, td { text-align: right; padding: 1px 6px; white-space: nowrap; }

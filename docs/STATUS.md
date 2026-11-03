@@ -32,13 +32,18 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
+- Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
+  "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first
+  trace and its title names it ("Max CH0 swr · 250.2 MHz"). Not looked at on the iPhone.
+- Chart full screen (button top right of every chart): built, tested in the demo (desktop, 390x800), flashed. Not yet looked at on
+  the iPhone (Safari has no Fullscreen API: the fixed box covers the page but not the address bar).
 - Open: the NanoVNA dropped off USB once while the Short step of the calibration ran (`NanoVNA gone` in `/log`). Cause unknown
   (static when attaching the standard? USB power?); watch for it. The app now recovers from a lost connection (DECISIONS).
 - #19 guided calibration: built, tested in the demo (right standards and the two wrong-standard warnings) and flashed. Open check:
   the plausibility thresholds against real standards on the device (a false alarm would show as the "Use anyway" prompt).
 - #49 `scan_bin`: in the app for Multi, Cable, TDR and the app-side calibration (`readSweep` in `store.js`, `scanBin` in
   `nanovna.js`), flashed and checked on the device (Multi, TDR, back to Freq). Single/Freq live loop and the segment scan are
-  unchanged on purpose (see DECISIONS). Not committed yet; #49 stays open until then.
+  unchanged on purpose (see DECISIONS). Committed.
 - #44 port extension: done for S11 in metres only; open: input in ns, S21. Issue stays open (user to decide).
 - Feature backlog in GitHub issues (#6, #8-#15, #17, #20-#24, #26, #28, #29, #44, #45, #47-#51 (#46, #47 done); #16 and #18 are closed by the touch/theme commit). #27 is closed (device page `/update`). #29: screenshots in the manual (the user has not decided).
 - OSV ignore list (`client/osv-scanner.toml`, 3 build-tool findings in vite-plugin-pwa/workbox-build) expires 2027-02-02:

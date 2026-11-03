@@ -106,6 +106,12 @@ seitlich auf einer freien Fläche der Seite (nicht auf einem Diagramm, Feld oder
 gehen; die Wischbewegung muss schnell und deutlich waagerecht sein und darf nicht am Bildschirmrand beginnen. Im Querformat
 rücken die Frequenzeingaben von **Smith** und **Freq** neben das Diagramm, das so die volle Höhe bekommt.
 
+**Diagramm im Vollbild.** Jedes Diagramm (HAM, jede Bandkarte in Multi, die Diagramme von Cable und TDR, Smith und Freq) hat oben
+rechts einen kleinen Knopf. Er lässt das Diagramm den ganzen Bildschirm füllen, ohne die übrigen Angaben daneben; derselbe Knopf
+(am Computer auch **Esc**) bringt dich zurück. Das Diagramm funktioniert weiter: Cursor, Zoom und Verschieben des Bereichs
+verhalten sich wie vorher. In HAM lassen sich die drei Diagramme (SWR, Rückflussdämpfung, R / X) einzeln vergrößern. Drehe das
+Handy für das breiteste Diagramm ins Querformat.
+
 Kommen längere Zeit keine Daten, zeigt die Seite einen Hinweis (Kabel prüfen, NanoVNA neu starten).
 
 ### 5.2 Single
@@ -224,7 +230,10 @@ Der Menüknopf öffnet es. Einträge, die eine Verbindung brauchen, sind bis zum
   (R ± jX), SWR, Rückflussdämpfung, Phase, Q (|X| / R), Serien-Ersatzschaltung (R mit L oder C) und Parallel-Ersatzschaltung
   (R parallel zu L oder C), genommen vom nächstgelegenen Messpunkt der ersten sichtbaren Kurve. Tippe auf einen Spaltenkopf, um
   diesen Marker zum aktiven zu machen. **Delta** zeigt alle anderen Marker relativ zum aktiven (Differenzen statt Werte). **Min**
-  und **Max** setzen den aktiven Marker auf das Minimum oder Maximum der ersten sichtbaren Kurve. **→ Start**, **→ Stop** und
+  und **Max** lassen den aktiven Marker dem Minimum oder Maximum der ersten sichtbaren Kurve des Diagramms folgen (mit jedem
+  Sweep; der Knopf bleibt hell, ein erneutes Drücken lässt den Marker, wo er ist). Das Label eines solchen Markers beginnt mit
+  **Min** oder **Max**; bei mehreren Kurven steht dort auch die erste Kurve, die den Wert bestimmt (die anderen zeigen ihre Werte bei dieser Frequenz). Die Labels haben einen Rand und einen helleren Hintergrund, damit sie sich auch im dunklen Schema vom
+  Diagramm abheben; der Marker ist eine Raute mit Ring. **→ Start**, **→ Stop** und
   **→ Center** setzen den Sweep-Bereich vom aktiven Marker; **→ Span** sweept vom niedrigsten bis zum höchsten sichtbaren Marker.
 - **Setup Scales**: Minimum und Maximum der senkrechten Achsen für LogMag (dB), SWR, Phase (°) und Linear.
 - **Add Trace**: siehe 5.8.
