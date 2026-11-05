@@ -124,6 +124,27 @@ Kommen längere Zeit keine Daten, zeigt die Seite einen Hinweis (Kabel prüfen, 
 Eine Frequenz: Tippe auf die Frequenz, um sie zu ändern (Zahlenfeld, siehe 5.7). Die Kacheln zeigen SWR, Rückflussdämpfung, |Z|, R,
 X, die Reaktanz als Induktivität oder Kapazität (in Reihe), |Γ| und die Phase. Dazu gibt es ein Diagramm um die Frequenz.
 
+**Log over time (Verlauf).** Der Bereich ganz unten (zu Beginn eingeklappt) zeichnet die Messwerte der gewählten Frequenz auf und zeigt sie über der
+Zeit, um eine Drift zu beobachten (Temperatur, nasse Antenne) oder ein Anpassnetzwerk mit Live-Rückmeldung abzustimmen.
+
+- **Start** / **Stop** beginnen und beenden die Aufzeichnung; **Continue** setzt ein vorhandenes Log fort. **Every** stellt den Abstand zweier
+  Punkte ein (jede Messung des Geräts, 1 s, 5 s, 30 s oder 1 min). Aufgezeichnet wird nur, solange die Single-Ansicht offen ist, bei der
+  angezeigten Frequenz und nicht während einer Kalibrierung; eine Lücke (andere Ansicht, Pause) wird im Diagramm nicht verbunden.
+- **Show** wählt, was das Diagramm zeichnet: **SWR**, **Return loss**, **R / X**, **|Z|**, **Rp / Xp**, **Q**, **|Γ|** oder **Phase**; das Zeitfenster ist das ganze Log
+  (**All**) oder die letzte Minute, 10 Minuten oder Stunde. Das Log behält nur den Rohwert der Messung, du kannst das Format also jederzeit ändern, auch bei einem
+  schon laufenden Log. Weit außen liegende Werte (offenes Ende, Kurzschluss) werden am Rand des Diagramms gezeichnet, und ein fast gleichbleibender Wert bleibt
+  eine ruhige Linie. Tippe ins Diagramm, um die Werte zu dieser Zeit abzulesen. Die Taste oben rechts zeigt es im Vollbild.
+- **Export CSV** speichert das Log für eine Tabellenkalkulation: Zeit, Sekunden seit dem ersten Punkt, Frequenz, der rohe Reflexionsfaktor (Re, Im) und alle
+  Formate (SWR, Rückflussdämpfung, R, X, |Z|, Rp, Xp, Q, |Γ|, Phase). **Clear** löscht es.
+- Das Log hat keine Zeitgrenze. Ab 20.000 Punkten behält es jeden zweiten Punkt und zeichnet von da an halb so oft auf (der Hinweis unter den
+  Tasten sagt es), sodass der ganze Verlauf im Diagramm bleibt.
+- Das Log wird beim Laufen im Browser gespeichert (IndexedDB) und übersteht einen Reload oder einen geschlossenen Tab; es wartet dann angehalten,
+  bis du **Continue** drückst. Der Browser löscht es bei „Websitedaten löschen" oder in einem privaten Fenster, und die Adresse zählt: die Seite
+  als `nanovna.local` und als IP-Adresse geöffnet hat getrennte Logs. Exportiere ein Log, das du behalten willst.
+- Sperrt ein Handy den Bildschirm oder wechselt es in eine andere App, hält die Seite an, und das Log bekommt eine Lücke. **Keep screen on**
+  (Menü, Device) hält den Bildschirm an, wo der Browser das anbietet: es braucht eine HTTPS-Seite, auf der Seite des Geräts (reines HTTP) ist
+  es meist nicht verfügbar, und der Menüeintrag sagt das. Lass den Bildschirm dann entsperrt.
+
 ### 5.3 HAM
 
 <img src="../site/img/phone-ham-extras.png" width="280" alt="HAM-Ansicht">
@@ -272,6 +293,8 @@ Der Menüknopf öffnet es. Einträge, die eine Verbindung brauchen, sind bis zum
 - **Add Trace**: siehe 5.8.
 - **Resolution...**: die Anzahl der Segmente mit je 101 Punkten pro Sweep. 1 bedeutet 101 Punkte; mehr Segmente geben einen
   feineren Sweep, dauern aber länger, und der Knopf in der Kopfzeile wechselt zu Update/Stop.
+- **Keep screen on** (Gruppe Device): verhindert, dass sich der Bildschirm abschaltet, solange die Seite offen ist (Screen Wake Lock API). Browser
+  erlauben das nur auf HTTPS-Seiten, daher ist es auf der Seite des Geräts meist ausgegraut; zum Log siehe 5.2. Die Wahl bleibt im Browser gespeichert.
 - **Sweep quality...** (braucht eine Verbindung): die ZF-Bandbreite des NanoVNA (2000 Hz bis 10 Hz; schmaler heißt weniger Rauschen,
   aber ein langsamerer Sweep), die Glättung (aus oder Mittelung 1-8) und die Ausgangsleistung (automatisch oder vier Stufen). Der
   Dialog zeigt, was das Gerät gerade eingestellt hat. Die Einstellungen bleiben im NanoVNA, bis es ausgeschaltet wird.

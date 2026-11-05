@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { store } from '../store';
 import { calcSWR, calcLogMag, calcZ, calcLinear, calcPhase, formatFrequency } from '../lib/dsp';
 import { formatZ } from '../lib/valuefmt';
+import SingleLog from './SingleLog.vue';
 
 const emit = defineEmits(['edit-frequency']);
 
@@ -75,6 +76,8 @@ function fmtInductance(l) {
       <div class="tile"><span class="label">|Γ|</span><span class="value">{{ fmt(values.gamma, 3) }}</span></div>
       <div class="tile"><span class="label">Phase</span><span class="value">{{ fmt(values.phase, 1) }}°</span></div>
     </div>
+
+    <SingleLog />
   </div>
 </template>
 

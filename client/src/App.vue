@@ -18,6 +18,7 @@ import Tdr from './components/Tdr.vue';
 import SweepDialog from './components/SweepDialog.vue';
 import ValueDialog from './components/ValueDialog.vue';
 import DemoPanel from './components/DemoPanel.vue';
+import { awake, setKeepAwake } from './lib/wakelock';
 import { HAM_BANDS, bandSweep } from './lib/bands';
 import { bandFileName, chartsToPng, download, hamChartItems, multiChartItems, saveTouchstone } from './lib/export';
 
@@ -26,7 +27,9 @@ const menuVisible = ref(false);
 const freqInputSelect = ref('start-stop');
 const graphSelected = ref('frequency');
 // the Multi view makes the update loop sweep the selected bands one after another
+watch(() => store.keepAwake, setKeepAwake, { immediate: true });
 watch(graphSelected, (g) => {
+  store.singleActive = g === 'single';
   store.multiActive = g === 'multi';
   store.cableActive = g === 'cable';
   store.tdrActive = g === 'tdr';
@@ -474,6 +477,13 @@ const quit = () => {
         </button>
 
         <div class="nav-subheader">Device</div>
+        <button class="btn-nav" @click="store.keepAwake = !store.keepAwake" :disabled="!awake.supported" :title="awake.supported ? '' : 'The browser only offers this on secure (HTTPS) pages'">
+          <span class="icon">visibility</span>
+          <span class="nav-text">Keep screen on: {{ store.keepAwake ? (awake.active ? 'on' : 'on (waiting)') : 'off' }}
+            <small v-if="!awake.supported">Not available: the browser needs an HTTPS page for it</small>
+            <small v-else-if="awake.error">{{ awake.error }}</small>
+          </span>
+        </button>
         <button class="btn-nav" @click="showSweepDialog = true; menuVisible = false" :disabled="store.status !== 'connected'">
           <span class="icon">tune</span> Sweep quality...
         </button>
@@ -683,6 +693,10 @@ const quit = () => {
   font-weight: 500;
   cursor: pointer;
 }
+
+.btn-nav:disabled { opacity: 0.6; cursor: default; }
+.nav-text { display: flex; flex-direction: column; gap: 2px; padding: 6px 0; }
+.nav-text small { font-size: 11px; font-weight: 400; color: var(--text-dim); }
 
 .btn-nav:hover {
   background: var(--hover-bg);

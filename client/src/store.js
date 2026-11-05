@@ -71,6 +71,8 @@ const defaultState = {
     hamRef: {}, // band name -> reference sweep of the HAM view { at, calibrated, show, points: [{ freq, swr }] }
     hamExtras: [], // additional charts under the SWR chart of the HAM view: 'rl', 'rx'
     multiBands: ['40 m', '20 m', '2 m'], // bands shown in the Multi view
+    singleActive: false, // the Single view is open (the log only takes readings of its frequency then), not saved
+    keepAwake: false, // keep the screen on (Screen Wake Lock, where the browser offers it)
     multiActive: false, // the Multi view is open: the update loop sweeps the selected bands one after another
     cableActive: false, // the Cable view is open: the update loop sweeps the cable range and keeps the raw readings
     tdrActive: false, // the TDR view is open: like the Cable view it keeps the raw readings of its own sweep in `cable`
@@ -130,6 +132,7 @@ function loadState() {
             if (Z_FORMATS.includes(parsed.zFormat)) state.zFormat = parsed.zFormat;
             if (MATCH_MAINS.includes(parsed.matchMain)) state.matchMain = parsed.matchMain;
             if (SWR_LIMITS.includes(parsed.swrLimit)) state.swrLimit = parsed.swrLimit;
+            if (typeof parsed.keepAwake === 'boolean') state.keepAwake = parsed.keepAwake;
             if (parsed.hamRef && typeof parsed.hamRef === 'object') {
                 for (const [name, r] of Object.entries(parsed.hamRef)) if (validReference(r)) state.hamRef[name] = r;
             }
@@ -191,6 +194,7 @@ watch(store, (newState) => {
         zFormat: newState.zFormat,
         matchMain: newState.matchMain,
         swrLimit: newState.swrLimit,
+        keepAwake: newState.keepAwake,
         hamRef: newState.hamRef,
         hamExtras: newState.hamExtras,
         cablePreset: newState.cablePreset,

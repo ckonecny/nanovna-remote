@@ -119,6 +119,27 @@ If no data arrives for a while the page shows a notice (check the cable, restart
 One frequency: tap the frequency to change it (keypad, see 5.7). The tiles show SWR, return loss, |Z|, R, X, the reactance as
 inductance or capacitance (series), |Γ| and the phase. A chart around the frequency is shown as well.
 
+**Log over time.** The section at the bottom (folded at first) records the readings of the chosen frequency and draws them over time, to watch
+drift (temperature, a wet antenna) or to tune a matching network with live feedback.
+
+- **Start** / **Stop** begin and end the recording; **Continue** carries on with an existing log. **Every** sets the time between two points
+  (every reading of the device, 1 s, 5 s, 30 s or 1 min). It records only while the Single view is open, at the frequency shown, and not
+  during a calibration; a gap (another view, paused) is not joined up in the chart.
+- **Show** chooses what the chart draws: **SWR**, **Return loss**, **R / X**, **|Z|**, **Rp / Xp**, **Q**, **|Γ|** or **Phase**; the window is **All** of the log or the
+  last 1 min, 10 min or 1 h. The log keeps the raw reading only, so you can change the format at any time, also for a log that is already running.
+  Values far out (an open end, a short circuit) are drawn at the edge of the chart, and a nearly constant value stays a calm line. Tap the chart to
+  read the values at that time. The chart button at its top right shows it full screen.
+- **Export CSV** saves the log for a spreadsheet: time, seconds since the first point, frequency, the raw reflection (Re, Im) and all formats
+  (SWR, return loss, R, X, |Z|, Rp, Xp, Q, |Γ|, phase). **Clear** deletes it.
+- The log has no time limit. Above 20,000 points it keeps every second point and records half as often from then on (the note under the
+  buttons says so), so the whole history stays in the chart.
+- The log is stored in the browser (IndexedDB) while it runs and survives a reload or a closed tab; it then waits as stopped
+  until you press **Continue**. The browser deletes it with "clear site data" or in a private window, and the address matters: the page opened as
+  `nanovna.local` and as the IP address have separate logs. Export a log you want to keep.
+- A phone that locks its screen or switches to another app stops the page, and the log gets a gap. **Keep screen on** (menu, Device)
+  holds the screen on where the browser offers that: it needs an HTTPS page, so on the device's own page (plain HTTP) it is usually
+  not available, and the menu entry says so. Keep the screen unlocked then.
+
 ### 5.3 HAM
 
 <img src="../site/img/phone-ham-extras.png" width="280" alt="HAM view">
@@ -258,6 +279,8 @@ The menu button opens it. Entries that need a connection are greyed out until yo
 - **Add Trace**: see 5.8.
 - **Resolution...**: the number of 101-point segments per sweep. 1 means 101 points; more segments give a finer sweep but take
   longer, and the header button changes to Update/Stop.
+- **Keep screen on** (Device group): keeps the screen from turning off while the page is open (Screen Wake Lock API). Browsers allow it on
+  HTTPS pages only, so on the device's own page it is usually greyed out; see 5.2 for the log. The choice is kept in the browser.
 - **Sweep quality...** (needs a connection): the NanoVNA's IF bandwidth (2000 Hz down to 10 Hz; narrower means less noise but a
   slower sweep), smoothing (off or averaging 1-8) and output power (automatic or four levels). The dialog shows what the device
   has now. The settings stay in the NanoVNA until it is switched off. They apply to every view and to the calibration. A sweep of
