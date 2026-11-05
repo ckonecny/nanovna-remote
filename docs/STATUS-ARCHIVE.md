@@ -3,6 +3,7 @@
 Finished items, moved here from `docs/STATUS.md` (newest first).
 
 ## 2026-11
+- SWR limit (1.5 / 2 / 3), limit line, bandwidth around the resonance and R + jX at the minimum in HAM and Multi (#11, #12): `lib/resonance.js`, tests, manual EN + DE; flashed and tried on the phone, works.
 - Live demo (simulated NanoVNA in the browser, GitHub Pages `/demo/`), Dependabot/OSV/CodeQL cleanup, branch ruleset on `main`.
 - Releases with ready-made binaries (v1.0.0 ... v1.1.2), browser installer (`/install/`, ESP Web Tools), QR codes on the display (join the setup WiFi, open the setup page, open the web app; #25), display rotated by default, version under Menu > About, DHCP captive-portal URI, display returns to the status screen once a network is joined, update page `/update` on the device (#27 in part). All tested on the device with v1.1.2.
 - Return loss and R/X charts in the HAM view (#4).

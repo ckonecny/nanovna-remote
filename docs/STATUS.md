@@ -32,8 +32,6 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
-- #11 limit line and bandwidth, #12 resonance readout (HAM tiles, Multi cards; limit 1.5 / 2 / 3): built, tested (`resonance.test.js`)
-  and checked in the demo; flashed via OTA (flash 87.3 %); not yet looked at on the phone. Both issues close with the commit.
 - Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
   "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first
   trace and its title names it ("Max CH0 swr · 250.2 MHz"). Not looked at on the iPhone.
