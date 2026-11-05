@@ -6,6 +6,7 @@ import CalPanel from './CalPanel.vue';
 import ChartFrame from './ChartFrame.vue';
 import { useFullChart } from '../lib/fullchart';
 import { HAM_BANDS } from '../lib/bands';
+import { resonance, SWR_LIMITS } from '../lib/resonance';
 import { calcSWR, calcZ, calcLogMag, formatFrequency } from '../lib/dsp';
 
 const emit = defineEmits(['select-band', 'edit-cursor']);
@@ -62,16 +63,19 @@ const nearest = (f) => points.value.length ? points.value.reduce((a, p) => Math.
 const lowEdge = computed(() => nearest(band.value.start));
 const highEdge = computed(() => nearest(band.value.stop));
 
-// widest stretch of the band where SWR stays at or below 2
-const swr2 = computed(() => {
-    let best = null, cur = null;
-    for (const p of inBand.value) {
-        if (p.swr <= 2) {
-            cur = cur ? { from: cur.from, to: p.freq } : { from: p.freq, to: p.freq };
-            if (!best || cur.to - cur.from > best.to - best.from) best = { ...cur };
-        } else cur = null;
-    }
-    return best;
+// lowest SWR in the band and the stretch around it that stays at or below the chosen limit
+const res = computed(() => resonance(points.value, inBand.value, store.swrLimit));
+const bw = computed(() => (res.value ? res.value.bandwidth : null));
+const bwText = computed(() => {
+    const b = bw.value;
+    if (!b) return 'none';
+    return formatFrequency(b.from, 3) + ' – ' + formatFrequency(b.to, 3);
+});
+const bwWidth = computed(() => {
+    const b = bw.value;
+    if (!b) return '';
+    const w = b.width >= 1e6 ? (b.width / 1e6).toFixed(3) + ' MHz' : (b.width / 1e3).toFixed(1) + ' kHz';
+    return (b.lowOpen || b.highOpen ? '≥ ' : '') + w;
 });
 
 // The cursor is either set by hand (store.hamCursor: tap in a chart or the keypad; it sits on the measured point nearest to that
@@ -148,6 +152,11 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
       <button v-for="b in HAM_BANDS" :key="b.name" class="band pill" :class="{ active: b.name === store.hamBand }" @click="emit('select-band', b)">{{ b.name }}</button>
     </div>
 
+    <div class="extras">
+      <span class="label">SWR limit</span>
+      <button v-for="l in SWR_LIMITS" :key="l" class="band pill" :class="{ active: store.swrLimit === l }" @click="store.swrLimit = l">{{ l }}</button>
+    </div>
+
     <div class="cursorbar">
       <div v-if="cursor" class="cursor-values">
         <span class="cursor-freq">{{ formatFrequency(cursor.p.freq, 4) }}</span>
@@ -170,9 +179,12 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
     <svg :viewBox="`0 0 ${W} ${H}`" :width="W" :height="H" class="chart" @click="onChartClick">
       <rect :x="x(band.start)" :y="T" :width="Math.max(0, x(band.stop) - x(band.start))" :height="H - T - B" class="band-area" />
       <g v-for="g in grid" :key="g">
-        <line :x1="L" :x2="W - R" :y1="y(g)" :y2="y(g)" :class="['grid', g === 2 && 'grid2']" />
+        <line :x1="L" :x2="W - R" :y1="y(g)" :y2="y(g)" class="grid" />
         <text :x="L - 6" :y="y(g) + 4" class="axis" text-anchor="end">{{ g }}</text>
       </g>
+      <rect v-if="bw" :x="x(bw.from)" :y="T" :width="Math.max(1, x(bw.to) - x(bw.from))" :height="H - T - B" class="bw-area" />
+      <line :x1="L" :x2="W - R" :y1="y(store.swrLimit)" :y2="y(store.swrLimit)" class="grid2" />
+      <text :x="W - R - 4" :y="y(store.swrLimit) - 4" class="limit-label" text-anchor="end">SWR {{ store.swrLimit }}</text>
       <text v-for="f in xticks" :key="f" :x="x(f)" :y="H - 8" class="axis" text-anchor="middle">{{ (f / 1e6).toFixed(f < 20e6 ? 3 : 2) }}</text>
       <path :d="path" class="curve" />
       <circle v-if="minPoint" :cx="x(minPoint.freq)" :cy="y(minPoint.swr)" r="5" class="min" />
@@ -184,8 +196,8 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
 
     <div v-if="!points.length" class="empty">{{ store.status === 'connected' ? 'Waiting for measurement…' : 'Connect to the NanoVNA to measure' }}</div>
     <div v-else class="tiles">
-      <div class="tile" v-if="minPoint"><span class="label">Minimum SWR</span><span class="value">{{ fmt(minPoint.swr) }}</span><span class="sub">at {{ formatFrequency(minPoint.freq, 4) }}</span></div>
-      <div class="tile"><span class="label">SWR ≤ 2</span><span class="value small">{{ swr2 ? formatFrequency(swr2.from, 3) + ' – ' + formatFrequency(swr2.to, 3) : 'none in band' }}</span></div>
+      <div class="tile" v-if="minPoint"><span class="label">Resonance (minimum SWR)</span><span class="value">{{ fmt(minPoint.swr) }}</span><span class="sub">at {{ formatFrequency(minPoint.freq, 4) }} · {{ fmt(minPoint.r) }} {{ minPoint.xr < 0 ? '−' : '+' }} j{{ fmt(Math.abs(minPoint.xr)) }} Ω</span></div>
+      <div class="tile"><span class="label">Bandwidth, SWR ≤ {{ store.swrLimit }}</span><span class="value small">{{ bwText }}</span><span v-if="bw" class="sub">{{ bwWidth }} wide{{ bw.lowOpen || bw.highOpen ? ' (reaches the end of the sweep)' : '' }}</span></div>
       <div class="tile" v-if="lowEdge"><span class="label">Lower band edge</span><span class="value">{{ fmt(lowEdge.swr) }}</span><span class="sub">{{ formatFrequency(band.start, 3) }}</span></div>
       <div class="tile" v-if="highEdge"><span class="label">Upper band edge</span><span class="value">{{ fmt(highEdge.swr) }}</span><span class="sub">{{ formatFrequency(band.stop, 3) }}</span></div>
     </div>
@@ -229,6 +241,8 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
 .axis { font-size: 12px; fill: var(--text-dim); }
 .curve { fill: none; stroke: var(--curve); stroke-width: 2; }
 .min { fill: #f44336; }
+.bw-area { fill: rgba(33, 150, 243, 0.2); }
+.limit-label { font-size: 11px; fill: rgba(244, 67, 54, 0.9); }
 .curve-x { fill: none; stroke: #ff9800; stroke-width: 2; }
 .extras { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .extra { display: flex; flex-direction: column; gap: 4px; }

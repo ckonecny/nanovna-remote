@@ -5,6 +5,7 @@ import { HAM_BANDS, bandSweep } from './lib/bands';
 import { CABLE_RANGES, portExtend, C } from './lib/cable';
 import { TDR_RANGES } from './lib/tdr';
 import { newerFirmware } from './lib/fwcheck';
+import { SWR_LIMITS } from './lib/resonance';
 import { appCal, applyCal, solveOSL, checkStandard, pullFromDevice, pushToDevice } from './lib/oslcal';
 
 // The bridge address: ?host=<name or ip> in the URL, or the host the page itself was served from (when it is the ESP32)
@@ -59,6 +60,7 @@ const defaultState = {
     calibrationRunning: false,
     appCalCovered: 1, // share of the displayed points that the app-side calibration covers
     hamBand: '2 m',
+    swrLimit: 2, // SWR limit of the usable bandwidth in the HAM and Multi views (1.5, 2 or 3)
     hamExtras: [], // additional charts under the SWR chart of the HAM view: 'rl', 'rx'
     multiBands: ['40 m', '20 m', '2 m'], // bands shown in the Multi view
     multiActive: false, // the Multi view is open: the update loop sweeps the selected bands one after another
@@ -111,6 +113,7 @@ function loadState() {
 
             if (parsed.hamBand !== undefined) state.hamBand = parsed.hamBand;
             if (Array.isArray(parsed.multiBands)) state.multiBands = parsed.multiBands;
+            if (SWR_LIMITS.includes(parsed.swrLimit)) state.swrLimit = parsed.swrLimit;
             if (Array.isArray(parsed.hamExtras)) state.hamExtras = parsed.hamExtras;
             if (CABLE_RANGES[parsed.cablePreset]) state.cablePreset = parsed.cablePreset;
             if (TDR_RANGES[parsed.tdrPreset]) state.tdrPreset = parsed.tdrPreset;
@@ -164,6 +167,7 @@ watch(store, (newState) => {
         singleFreq: newState.singleFreq,
         hamBand: newState.hamBand,
         multiBands: newState.multiBands,
+        swrLimit: newState.swrLimit,
         hamExtras: newState.hamExtras,
         cablePreset: newState.cablePreset,
         tdrPreset: newState.tdrPreset,

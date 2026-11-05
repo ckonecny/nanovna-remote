@@ -330,3 +330,9 @@ installer page on https cannot call a http device (mixed content); the installer
   firmware problem: the Feather answers Chrome-like requests correctly. Fix is on the phone (manual, section 4 and troubleshooting table); confirmed: after allowing "Nearby devices" Chrome loads the Feather.
 - `dev-tools/simulator.py` now answers `scan_bin` (binary record format of the NanoVNA-H firmware), because the app reads
   Multi, Cable, TDR and the app-side calibration with it; `shots.mjs` follows the guided calibration.
+
+## Resonance and bandwidth in HAM and Multi (2026-11)
+- `lib/resonance.js`: the bandwidth is the stretch **around the minimum SWR** (not the widest stretch in the band) where SWR stays at or
+  below the limit; edges are interpolated linearly between the neighbouring points, and the search runs over the whole sweep, not only
+  the band (the sweep is slightly wider). `lowOpen` / `highOpen` flag a stretch that reaches the end of the sweep (shown as "≥").
+- The limit (`store.swrLimit`: 1.5, 2 or 3, saved) is shared by HAM and Multi. The HAM tiles also show R + jX at the minimum.

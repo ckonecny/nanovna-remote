@@ -123,8 +123,11 @@ inductance or capacitance (series), |Γ| and the phase. A chart around the frequ
 
 <img src="../site/img/phone-ham-extras.png" width="280" alt="HAM view">
 
-Sweep over an amateur band: pick the band with the band buttons. The SWR curve shows the minimum, and the tiles name the minimum
-SWR with its frequency, the range where SWR ≤ 2 and the SWR at both band edges. Tap or click into the chart to place a cursor, or press
+Sweep over an amateur band: pick the band with the band buttons. The SWR curve shows the minimum, and the tiles name the resonance
+(the minimum SWR with its frequency and the impedance R + jX there), the bandwidth around it where SWR stays at or below the
+**SWR limit** (1.5, 2 or 3, chosen above the chart and remembered; the limit is drawn as a red line and the bandwidth shaded blue) and
+the SWR at both band edges. The bandwidth is read between the measured points by interpolation; if it runs to the end of the sweep,
+the tile says so and shows the width as "≥". Tap or click into the chart to place a cursor, or press
 **Frequency…** and type an exact frequency (for example 435 M); the cursor sits on the nearest measured point. The bar above the
 chart shows frequency, SWR, return loss, R and X there. **Min** and **Max** make the cursor follow the lowest or highest SWR in the
 band with every sweep (like the NanoVNA's marker search); **Manual** keeps it where it is, and tapping a chart or entering a
@@ -137,7 +140,7 @@ remembered. The calibration panel at the bottom is described in chapter 6.
 
 <img src="../site/img/phone-multi.png" width="280" alt="Multi view">
 
-Tick any number of bands; each gets a card with its SWR curve, minimum SWR and the range where SWR ≤ 2. The bands are swept one
+Tick any number of bands; each gets a card with its SWR curve, minimum SWR and the bandwidth around the minimum where SWR stays at or below the **SWR limit** (1.5, 2 or 3, the same choice as in HAM; the limit line is red, the bandwidth shaded blue). The bands are swept one
 after another (about one second each), so the refresh slows down with every band added. Every card says whether its band is
 "calibrated" (green) or "not calibrated" (red, uncorrected values), and a banner at the top summarises the selection. The
 calibration panel sits at the bottom of the Multi view as well. The selection is remembered.

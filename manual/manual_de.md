@@ -128,8 +128,11 @@ X, die Reaktanz als Induktivität oder Kapazität (in Reihe), |Γ| und die Phase
 
 <img src="../site/img/phone-ham-extras.png" width="280" alt="HAM-Ansicht">
 
-Sweep über ein Amateurfunkband: Das Band wählst du mit den Bandtasten. Die SWR-Kurve zeigt das Minimum, und die Kacheln nennen das
-minimale SWR mit seiner Frequenz, den Bereich mit SWR ≤ 2 und das SWR an beiden Bandgrenzen. Tippe oder klicke ins Diagramm, um
+Sweep über ein Amateurfunkband: Das Band wählst du mit den Bandtasten. Die SWR-Kurve zeigt das Minimum, und die Kacheln nennen die Resonanz
+(das minimale SWR mit seiner Frequenz und der Impedanz R + jX dort), die Bandbreite darum herum, in der das SWR höchstens dem
+**SWR limit** entspricht (1,5, 2 oder 3, über dem Diagramm gewählt und gemerkt; das Limit ist als rote Linie gezeichnet, die Bandbreite blau
+hinterlegt) und das SWR an beiden Bandgrenzen. Die Bandbreite wird zwischen den Messpunkten interpoliert; reicht sie bis zum Ende des
+Sweeps, steht das in der Kachel und die Breite erscheint mit „≥“. Tippe oder klicke ins Diagramm, um
 einen Cursor zu setzen, oder drücke **Frequency…** und gib eine genaue Frequenz ein (zum Beispiel 435 M); der Cursor sitzt dann auf
 dem nächsten Messpunkt. Die Leiste über dem Diagramm zeigt dort Frequenz, SWR, Rückflussdämpfung, R und X. **Min** und **Max** lassen den Cursor bei
 jedem Sweep dem niedrigsten oder höchsten SWR im Band folgen (wie die Marker-Suche des NanoVNA); **Manual** lässt ihn, wo er ist, und
@@ -143,7 +146,7 @@ Cursor mit dem SWR-Diagramm. Die Auswahl wird gemerkt. Das Kalibrierfeld unten i
 
 <img src="../site/img/phone-multi.png" width="280" alt="Multi-Ansicht">
 
-Beliebig viele Bänder antippen; jedes bekommt eine Karte mit SWR-Kurve, minimalem SWR und dem Bereich mit SWR ≤ 2. Die Bänder
+Beliebig viele Bänder antippen; jedes bekommt eine Karte mit SWR-Kurve, minimalem SWR und der Bandbreite um das Minimum, in der das SWR höchstens dem **SWR limit** entspricht (1,5, 2 oder 3, dieselbe Wahl wie in HAM; die Limitlinie ist rot, die Bandbreite blau hinterlegt). Die Bänder
 werden nacheinander gemessen (etwa eine Sekunde pro Band), die Aktualisierung wird also mit jedem Band langsamer. Jede Karte zeigt,
 ob ihr Band „calibrated“ (grün) oder „not calibrated“ (rot, unkorrigierte Werte) ist, ein Banner oben fasst die Auswahl zusammen.
 Das Kalibrierfeld steht auch unten in der Multi-Ansicht. Die Auswahl wird gemerkt.

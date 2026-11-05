@@ -8,7 +8,7 @@ This file holds only the current state and hints for the next session.
 - Solid state, everything committed and pushed; v1.2.0 released (full-screen charts, marker labels and Min/Max, guided
   calibration, scan_bin, status screen button order); the feature page and all screenshots are current.
 - Firmware: bridge, web app, OTA (`/update` page and `/api/ota`), calibration storage, multi-network WiFi, display UI,
-  QR codes. Flash 86.8 % of the app slot (over 85 %, 207 KB free; the user decided to leave it until it gets tight).
+  QR codes. Flash 87.3 % of the app slot (over 85 %, about 200 KB free; the user decided to leave it until it gets tight).
 - Web app: Single, HAM, Multi, Cable, TDR, Smith, Freq views, app-side OSL calibration, export. Live demo with a simulated
   NanoVNA: https://ckonecny.github.io/nanovna-remote/demo/ . Installer: .../install/ . Feature page: .../ .
 - Release: push a tag `v*`; `release.yml` builds `-first-flash.bin`, `-update.bin`, `SHA256SUMS`, then `pages.yml` republishes
@@ -32,6 +32,8 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
+- #11 limit line and bandwidth, #12 resonance readout (HAM tiles, Multi cards; limit 1.5 / 2 / 3): built, tested (`resonance.test.js`)
+  and checked in the demo; flashed via OTA (flash 87.3 %); not yet looked at on the phone. Both issues close with the commit.
 - Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
   "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first
   trace and its title names it ("Max CH0 swr · 250.2 MHz"). Not looked at on the iPhone.
@@ -48,7 +50,7 @@ This file holds only the current state and hints for the next session.
   `nanovna.js`), flashed and checked on the device (Multi, TDR, back to Freq). Single/Freq live loop and the segment scan are
   unchanged on purpose (see DECISIONS). Committed.
 - #44 port extension: done for S11 in metres only; open: input in ns, S21. Issue stays open (user to decide).
-- Feature backlog in GitHub issues (#6, #8-#15, #17, #20-#24, #26, #28, #29, #44, #45, #47-#51 (#46, #47 done); #16 and #18 are closed by the touch/theme commit). #27 is closed (device page `/update`). #29: screenshots in the manual (the user has not decided).
+- Feature backlog in GitHub issues (#6, #8-#10, #13-#15, #17, #20-#24, #26, #28, #29, #44, #45, #47-#51 (#46, #47 done); #16 and #18 are closed by the touch/theme commit). #27 is closed (device page `/update`). #29: screenshots in the manual (the user has not decided).
 - OSV ignore list (`client/osv-scanner.toml`, 3 build-tool findings in vite-plugin-pwa/workbox-build) expires 2027-02-02:
   check for a workbox-build update before then and drop the entries.
 - Optional: `dev-tools/screenshots/shots.mjs` could use the JS simulator (`client/src/lib/demo.js`) instead of
