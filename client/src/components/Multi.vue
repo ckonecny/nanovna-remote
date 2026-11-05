@@ -9,6 +9,7 @@ import CalPanel from './CalPanel.vue';
 import ChartFrame from './ChartFrame.vue';
 import { useFullChart } from '../lib/fullchart';
 import { calcSWR, formatFrequency } from '../lib/dsp';
+import { matchValue } from '../lib/valuefmt';
 import { resonance, SWR_LIMITS } from '../lib/resonance';
 
 const SWR_MAX = 5;
@@ -85,7 +86,7 @@ const grid = [1, 2, 3, 5];
         <div class="head">
           <span class="name">{{ c.band.name }}</span>
           <span v-if="c.measured" class="flag" :class="c.calibrated ? 'is-cal' : ''">{{ c.calibrated ? 'calibrated' : 'not calibrated' }}</span>
-          <span v-if="c.min" class="swr">{{ fmt(c.min.swr) }}</span>
+          <span v-if="c.min" class="swr">{{ store.matchMain === 'rl' ? matchValue(c.min.swr, 'rl').text : fmt(c.min.swr) }}</span>
         </div>
         <ChartFrame :title="'SWR ' + c.band.name" @change="(s) => fc.onFrame(c.band.name, s)">
         <svg :viewBox="`0 0 ${c.W} ${c.H}`" class="chart" :class="{ full: c.full }">

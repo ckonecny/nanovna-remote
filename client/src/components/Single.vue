@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { store } from '../store';
 import { calcSWR, calcLogMag, calcZ, calcLinear, calcPhase, formatFrequency } from '../lib/dsp';
+import { formatZ } from '../lib/valuefmt';
 
 const emit = defineEmits(['edit-frequency']);
 
@@ -57,13 +58,19 @@ function fmtInductance(l) {
     <div v-if="!values" class="empty">{{ store.status === 'connected' ? 'Waiting for measurement…' : 'Connect to the NanoVNA to measure' }}</div>
     <div v-else class="tiles">
       <div class="tile swr" :class="values.swrClass">
-        <span class="label">SWR</span>
-        <span class="value">{{ fmt(values.swr) }}</span>
+        <span class="label">{{ store.matchMain === 'rl' ? 'Return loss' : 'SWR' }}</span>
+        <span class="value">{{ store.matchMain === 'rl' ? fmt(values.rl) + ' dB' : fmt(values.swr) }}</span>
       </div>
-      <div class="tile"><span class="label">Return loss</span><span class="value">{{ fmt(values.rl) }} dB</span></div>
-      <div class="tile"><span class="label">|Z|</span><span class="value">{{ fmt(values.zabs) }} Ω</span></div>
-      <div class="tile"><span class="label">R</span><span class="value">{{ fmt(values.r) }} Ω</span></div>
-      <div class="tile"><span class="label">X</span><span class="value">{{ fmt(values.x) }} Ω</span></div>
+      <div class="tile"><span class="label">{{ store.matchMain === 'rl' ? 'SWR' : 'Return loss' }}</span><span class="value">{{ store.matchMain === 'rl' ? fmt(values.swr) : fmt(values.rl) + ' dB' }}</span></div>
+      <div class="tile z"><span class="label">Z</span><span class="value">{{ formatZ(values.r, values.x, store.zFormat) }}</span></div>
+      <template v-if="store.zFormat === 'polar'">
+        <div class="tile"><span class="label">R</span><span class="value">{{ fmt(values.r) }} Ω</span></div>
+        <div class="tile"><span class="label">X</span><span class="value">{{ fmt(values.x) }} Ω</span></div>
+      </template>
+      <template v-else>
+        <div class="tile"><span class="label">|Z|</span><span class="value">{{ fmt(values.zabs) }} Ω</span></div>
+        <div class="tile"><span class="label">Z angle</span><span class="value">{{ fmt(Math.atan2(values.x, values.r) * 180 / Math.PI, 1) }}°</span></div>
+      </template>
       <div class="tile"><span class="label">{{ values.reactive.label }} (series)</span><span class="value">{{ values.reactive.value }}</span></div>
       <div class="tile"><span class="label">|Γ|</span><span class="value">{{ fmt(values.gamma, 3) }}</span></div>
       <div class="tile"><span class="label">Phase</span><span class="value">{{ fmt(values.phase, 1) }}°</span></div>
@@ -79,7 +86,7 @@ function fmtInductance(l) {
 .tiles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 .tile { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 8px; background: var(--tile-bg); }
 .tile .value { font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }
-.tile.swr { grid-column: 1 / -1; align-items: center; }
+.tile.swr, .tile.z { grid-column: 1 / -1; align-items: center; }
 .tile.swr .value { font-size: 52px; }
 .tile.good { background: var(--good-bg); }
 .tile.warn { background: var(--warn-bg); }

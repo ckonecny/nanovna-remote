@@ -266,6 +266,9 @@ Der Menüknopf öffnet es. Einträge, die eine Verbindung brauchen, sind bis zum
   Diagramm abheben; der Marker ist eine Raute mit Ring. **→ Start**, **→ Stop** und
   **→ Center** setzen den Sweep-Bereich vom aktiven Marker; **→ Span** sweept vom niedrigsten bis zum höchsten sichtbaren Marker.
 - **Setup Scales**: Minimum und Maximum der senkrechten Achsen für LogMag (dB), SWR, Phase (°) und Linear.
+- **Value display...**: wie Werte angezeigt werden. Impedanz als **R + jX** oder als **|Z| und Winkel**; die Anpassung mit **SWR** oder **Return loss**
+  (Rückflussdämpfung) als Hauptwert (der andere bleibt in der Cursor-Anzeige, der Markertabelle und den Freq-Kacheln). Das gilt für die Freq-Kacheln,
+  die Markertabelle sowie Ergebnisse und Cursor in HAM und die Karten in Multi. Die Diagrammachsen ändern sich nicht. Die Wahl bleibt im Browser gespeichert.
 - **Add Trace**: siehe 5.8.
 - **Resolution...**: die Anzahl der Segmente mit je 101 Punkten pro Sweep. 1 bedeutet 101 Punkte; mehr Segmente geben einen
   feineren Sweep, dauern aber länger, und der Knopf in der Kopfzeile wechselt zu Update/Stop.

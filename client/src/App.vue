@@ -16,6 +16,7 @@ import Multi from './components/Multi.vue';
 import Cable from './components/Cable.vue';
 import Tdr from './components/Tdr.vue';
 import SweepDialog from './components/SweepDialog.vue';
+import ValueDialog from './components/ValueDialog.vue';
 import DemoPanel from './components/DemoPanel.vue';
 import { HAM_BANDS, bandSweep } from './lib/bands';
 import { bandFileName, chartsToPng, download, hamChartItems, multiChartItems, saveTouchstone } from './lib/export';
@@ -41,6 +42,7 @@ const currentTrace = ref(null);
 
 const showScaleDialog = ref(false);
 const showSweepDialog = ref(false);
+const showValueDialog = ref(false);
 const showCalibrationDialog = ref(false);
 const showAboutDialog = ref(false);
 const showMarkerDialog = ref(false);
@@ -457,6 +459,9 @@ const quit = () => {
         <button class="btn-nav" @click="showScaleDialog = true; menuVisible = false">
           <span class="icon">height</span> Setup Scales
         </button>
+        <button class="btn-nav" @click="showValueDialog = true; menuVisible = false">
+          <span class="icon">pin</span> Value display...
+        </button>
         <button class="btn-nav" @click="addTrace">
           <span class="icon">add</span> Add Trace
         </button>
@@ -624,6 +629,7 @@ const quit = () => {
                  @close="showTraceDialog = false" />
     
     <SweepDialog v-if="showSweepDialog" @close="showSweepDialog = false" />
+    <ValueDialog v-if="showValueDialog" @close="showValueDialog = false" />
     <ScaleDialog v-if="showScaleDialog" 
                  :show="showScaleDialog"
                  @close="showScaleDialog = false" />

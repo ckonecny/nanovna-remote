@@ -11,6 +11,7 @@ import { resonance, SWR_LIMITS } from '../lib/resonance';
 import { makeReference, referenceMin, compareMinima, sweepFitsBand, savedAt } from '../lib/reference';
 import { appCal } from '../lib/oslcal';
 import { calcSWR, calcZ, calcLogMag, formatFrequency } from '../lib/dsp';
+import { formatZ, matchValue } from '../lib/valuefmt';
 
 const emit = defineEmits(['select-band', 'edit-cursor']);
 
@@ -97,7 +98,8 @@ const toolsSummary = computed(() => {
     parts.push(cursor.value ? 'Cursor ' + formatFrequency(cursor.value.p.freq, 4) + ', SWR ' + fmt(cursor.value.p.swr) : 'Cursor ' + store.hamCursorMode);
     return parts.join(' · ');
 });
-const tilesSummary = computed(() => (minPoint.value ? 'Min SWR ' + fmt(minPoint.value.swr) + ' at ' + formatFrequency(minPoint.value.freq, 4) : ''));
+const match = (swr) => matchValue(swr, store.matchMain); // { label, text } of the main match value
+const tilesSummary = computed(() => (minPoint.value ? 'Best ' + match(minPoint.value.swr).label + ' ' + match(minPoint.value.swr).text + ' at ' + formatFrequency(minPoint.value.freq, 4) : ''));
 const extrasSummary = computed(() => (store.hamExtras.length ? store.hamExtras.map(id => EXTRAS.find(e => e[0] === id)[1]).join(', ') : 'none shown'));
 const calSummary = computed(() => (appCal.enabled && appCal.bands[band.value.name] ? 'Calibrated' : 'This band is not calibrated'));
 
@@ -210,10 +212,14 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
     <div class="cursorbar">
       <div v-if="cursor" class="cursor-values">
         <span class="cursor-freq">{{ formatFrequency(cursor.p.freq, 4) }}</span>
-        <span>SWR {{ fmt(cursor.p.swr) }}</span>
-        <span>RL {{ fmt(cursor.p.rl) }} dB</span>
-        <span>R {{ fmt(cursor.p.r) }} Ω</span>
-        <span>X {{ fmt(cursor.p.xr) }} Ω</span>
+        <span>{{ match(cursor.p.swr).label }} {{ match(cursor.p.swr).text }}</span>
+        <span v-if="store.matchMain === 'rl'">SWR {{ fmt(cursor.p.swr) }}</span>
+        <span v-else>RL {{ fmt(cursor.p.rl) }} dB</span>
+        <span v-if="store.zFormat === 'polar'">Z {{ formatZ(cursor.p.r, cursor.p.xr, 'polar') }}</span>
+        <template v-else>
+          <span>R {{ fmt(cursor.p.r) }} Ω</span>
+          <span>X {{ fmt(cursor.p.xr) }} Ω</span>
+        </template>
       </div>
       <span v-else class="sub">Tap a chart to place a cursor, enter a frequency, or let it follow the minimum or maximum SWR.</span>
       <div class="cursor-btns">
@@ -251,10 +257,10 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
     <Fold id="ham-tiles" group="ham" title="Results" :summary="tilesSummary">
     <div v-if="!points.length" class="empty">{{ store.status === 'connected' ? 'Waiting for measurement…' : 'Connect to the NanoVNA to measure' }}</div>
     <div v-else class="tiles">
-      <div class="tile" v-if="minPoint"><span class="label">Resonance (minimum SWR)</span><span class="value">{{ fmt(minPoint.swr) }}</span><span class="sub">at {{ formatFrequency(minPoint.freq, 4) }} · {{ fmt(minPoint.r) }} {{ minPoint.xr < 0 ? '−' : '+' }} j{{ fmt(Math.abs(minPoint.xr)) }} Ω</span><span v-if="vsRefText" class="sub">{{ vsRefText }}</span></div>
+      <div class="tile" v-if="minPoint"><span class="label">Resonance (best match)</span><span class="value">{{ match(minPoint.swr).text }}</span><span class="sub">{{ match(minPoint.swr).label }} at {{ formatFrequency(minPoint.freq, 4) }} · {{ formatZ(minPoint.r, minPoint.xr, store.zFormat, 2) }}</span><span v-if="vsRefText" class="sub">{{ vsRefText }}</span></div>
       <div class="tile"><span class="label">Bandwidth, SWR ≤ {{ store.swrLimit }}</span><span class="value small">{{ bwText }}</span><span v-if="bw" class="sub">{{ bwWidth }} wide{{ bw.lowOpen || bw.highOpen ? ' (reaches the end of the sweep)' : '' }}</span></div>
-      <div class="tile" v-if="lowEdge"><span class="label">Lower band edge</span><span class="value">{{ fmt(lowEdge.swr) }}</span><span class="sub">{{ formatFrequency(band.start, 3) }}</span></div>
-      <div class="tile" v-if="highEdge"><span class="label">Upper band edge</span><span class="value">{{ fmt(highEdge.swr) }}</span><span class="sub">{{ formatFrequency(band.stop, 3) }}</span></div>
+      <div class="tile" v-if="lowEdge"><span class="label">Lower band edge</span><span class="value">{{ match(lowEdge.swr).text }}</span><span class="sub">{{ formatFrequency(band.start, 3) }}</span></div>
+      <div class="tile" v-if="highEdge"><span class="label">Upper band edge</span><span class="value">{{ match(highEdge.swr).text }}</span><span class="sub">{{ formatFrequency(band.stop, 3) }}</span></div>
     </div>
     </Fold>
 

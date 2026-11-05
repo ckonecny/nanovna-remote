@@ -3,6 +3,7 @@ import { computed, onUnmounted, watch } from 'vue';
 import { store } from '../store';
 import * as dsp from '../lib/dsp';
 import { nearestIndex, readout, delta, eng, follow, retrack, release } from '../lib/marker';
+import { formatZ } from '../lib/valuefmt';
 
 const props = defineProps({ view: { type: String, default: 'frequency' } }); // 'smith' or 'frequency'
 
@@ -22,6 +23,7 @@ const d = (x) => (ref.value && x !== ref.value ? delta(ref.value.r, x.r) : null)
 
 const f = (v, digits, unit = '') => (v === null || !Number.isFinite(v) ? (v === Infinity ? '∞' : '-') : v.toFixed(digits) + unit);
 const sgn = (v, digits, unit = '') => (v === null ? '-' : (v >= 0 ? '+' : '') + v.toFixed(digits) + unit);
+const zText = (r) => (store.zFormat === 'polar' ? formatZ(r.r, r.x, 'polar') : f(r.r, 1) + (r.x < 0 ? ' − ' : ' + ') + f(Math.abs(r.x), 1) + 'j');
 const reactive = (r) => (r.ls !== null ? eng(r.ls, 'H') : r.cs !== null ? eng(r.cs, 'F') : '-');
 const parallel = (r) => eng(r.rp, 'Ω') + ' ‖ ' + (r.lp !== null ? eng(r.lp, 'H') : r.cp !== null ? eng(r.cp, 'F') : '-');
 
@@ -86,9 +88,8 @@ const setRange = (what) => {
         </tr>
       </thead>
       <tbody>
-        <tr><td>Z</td><td v-for="x in rows" :key="x.m.id">{{ d(x) ? sgn(d(x).r, 1) + ' ' + sgn(d(x).x, 1) + 'j' : f(x.r.r, 1) + (x.r.x < 0 ? ' − ' : ' + ') + f(Math.abs(x.r.x), 1) + 'j' }}</td></tr>
-        <tr><td>SWR</td><td v-for="x in rows" :key="x.m.id">{{ d(x) ? sgn(d(x).swr, 2) : f(x.r.swr, 2) }}</td></tr>
-        <tr><td>RL</td><td v-for="x in rows" :key="x.m.id">{{ d(x) ? sgn(d(x).rl, 1, ' dB') : f(x.r.rl, 1, ' dB') }}</td></tr>
+        <tr><td>Z</td><td v-for="x in rows" :key="x.m.id">{{ d(x) ? sgn(d(x).r, 1) + ' ' + sgn(d(x).x, 1) + 'j' : zText(x.r) }}</td></tr>
+        <tr v-for="k in (store.matchMain === 'rl' ? ['rl', 'swr'] : ['swr', 'rl'])" :key="k"><td>{{ k === 'rl' ? 'RL' : 'SWR' }}</td><td v-for="x in rows" :key="x.m.id">{{ k === 'rl' ? (d(x) ? sgn(d(x).rl, 1, ' dB') : f(x.r.rl, 1, ' dB')) : (d(x) ? sgn(d(x).swr, 2) : f(x.r.swr, 2)) }}</td></tr>
         <tr><td>Phase</td><td v-for="x in rows" :key="x.m.id">{{ d(x) ? sgn(d(x).phase, 1, '°') : f(x.r.phase, 1, '°') }}</td></tr>
         <tr><td>Q</td><td v-for="x in rows" :key="x.m.id">{{ f(x.r.q, 2) }}</td></tr>
         <tr><td>Series</td><td v-for="x in rows" :key="x.m.id">{{ f(x.r.r, 1) }} Ω + {{ reactive(x.r) }}</td></tr>

@@ -8,6 +8,7 @@ import { newerFirmware } from './lib/fwcheck';
 import { SWR_LIMITS } from './lib/resonance';
 import { validReference } from './lib/reference';
 import { DEFAULT_ORDER, normalizeOrder } from './lib/order';
+import { Z_FORMATS, MATCH_MAINS } from './lib/valuefmt';
 import { appCal, applyCal, solveOSL, checkStandard, pullFromDevice, pushToDevice } from './lib/oslcal';
 
 // The bridge address: ?host=<name or ip> in the URL, or the host the page itself was served from (when it is the ESP32)
@@ -64,6 +65,8 @@ const defaultState = {
     hamBand: '2 m',
     order: {}, // view ('ham', 'multi') -> ids of its sections in the order the user chose (see lib/order.js)
     folds: {}, // id of a foldable section -> open (true) or folded (false); a missing id uses the default of the section
+    zFormat: 'rx', // impedance shown as R + jX ('rx') or as |Z| and angle ('polar')
+    matchMain: 'swr', // main match value: 'swr' or 'rl' (return loss)
     swrLimit: 2, // SWR limit of the usable bandwidth in the HAM and Multi views (1.5, 2 or 3)
     hamRef: {}, // band name -> reference sweep of the HAM view { at, calibrated, show, points: [{ freq, swr }] }
     hamExtras: [], // additional charts under the SWR chart of the HAM view: 'rl', 'rx'
@@ -124,6 +127,8 @@ function loadState() {
             if (parsed.order && typeof parsed.order === 'object') {
                 for (const g of Object.keys(DEFAULT_ORDER)) if (Array.isArray(parsed.order[g])) state.order[g] = normalizeOrder(g, parsed.order[g]);
             }
+            if (Z_FORMATS.includes(parsed.zFormat)) state.zFormat = parsed.zFormat;
+            if (MATCH_MAINS.includes(parsed.matchMain)) state.matchMain = parsed.matchMain;
             if (SWR_LIMITS.includes(parsed.swrLimit)) state.swrLimit = parsed.swrLimit;
             if (parsed.hamRef && typeof parsed.hamRef === 'object') {
                 for (const [name, r] of Object.entries(parsed.hamRef)) if (validReference(r)) state.hamRef[name] = r;
@@ -183,6 +188,8 @@ watch(store, (newState) => {
         multiBands: newState.multiBands,
         folds: newState.folds,
         order: newState.order,
+        zFormat: newState.zFormat,
+        matchMain: newState.matchMain,
         swrLimit: newState.swrLimit,
         hamRef: newState.hamRef,
         hamExtras: newState.hamExtras,

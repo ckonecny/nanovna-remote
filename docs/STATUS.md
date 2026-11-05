@@ -48,7 +48,7 @@ This file holds only the current state and hints for the next session.
   `nanovna.js`), flashed and checked on the device (Multi, TDR, back to Freq). Single/Freq live loop and the segment scan are
   unchanged on purpose (see DECISIONS). Committed.
 - #44 port extension: done for S11 in metres only; open: input in ns, S21. Issue stays open (user to decide).
-- Feature backlog in GitHub issues (#6, #8, #10, #13-#15, #17, #20-#24, #26, #28, #29, #44, #45, #47-#51 (#46, #47 done); #16 and #18 are closed by the touch/theme commit). #27 is closed (device page `/update`). #29: screenshots in the manual (the user has not decided).
+- Feature backlog in GitHub issues (#6, #8, #10, #13-#15, #17, #21-#24, #26, #28, #29, #44, #45, #47-#51 (#46, #47 done); #16 and #18 are closed by the touch/theme commit). #27 is closed (device page `/update`). #29: screenshots in the manual (the user has not decided).
 - OSV ignore list (`client/osv-scanner.toml`, 3 build-tool findings in vite-plugin-pwa/workbox-build) expires 2027-02-02:
   check for a workbox-build update before then and drop the entries.
 - Optional: `dev-tools/screenshots/shots.mjs` could use the JS simulator (`client/src/lib/demo.js`) instead of

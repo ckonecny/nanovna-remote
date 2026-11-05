@@ -3,6 +3,7 @@
 Finished items, moved here from `docs/STATUS.md` (newest first).
 
 ## 2026-11
+- Switchable display of impedance (R + jX or |Z| and angle) and match (SWR or return loss) (#20): sidebar dialog, `lib/valuefmt.js`, manual EN + DE. Flashed and tried on the phone, works.
 - Reference sweep per band in HAM (#9: save, show/hide, replace, delete, comparison with the live minimum, date if not from today) and foldable, movable sections in HAM and Multi (`Fold.vue`, `lib/order.js`; calibration status as green header / orange banner): flashed and tried on the phone, works.
 - SWR limit (1.5 / 2 / 3), limit line, bandwidth around the resonance and R + jX at the minimum in HAM and Multi (#11, #12): `lib/resonance.js`, tests, manual EN + DE; flashed and tried on the phone, works.
 - Live demo (simulated NanoVNA in the browser, GitHub Pages `/demo/`), Dependabot/OSV/CodeQL cleanup, branch ruleset on `main`.

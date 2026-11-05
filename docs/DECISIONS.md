@@ -356,3 +356,9 @@ installer page on https cannot call a http device (mixed content); the installer
 - Folded sections use `v-show`, so their charts stay mounted but have no size; `hamChartItems` leaves out charts that are not displayed.
 - Calibration status in HAM: `CalStatus` shows only a missing calibration (never an OK banner, and nothing when no band is selected: that was misleading in Multi); the Calibration fold header is green instead (`tone`). `lib/calstate.js` holds the rule for both views.
   A missing calibration is an orange banner (amber for "none" and "partly" alike, also in Multi, instead of red).
+
+## Switchable value display (2026-11)
+- `store.zFormat` ('rx' | 'polar') and `store.matchMain` ('swr' | 'rl'), set in the sidebar dialog `ValueDialog.vue` (Graph > Value display...), saved per browser and validated in `loadState`. Client only, no firmware change.
+- `lib/valuefmt.js`: `formatZ`, `matchValue`, `rlFromSwr`. Return loss is derived from the SWR where only the SWR is at hand (Multi cards, band edges), so all views agree.
+- Applies to Freq tiles, the marker table, the HAM results, cursor and summary, and the Multi cards. Chart axes and the SWR limit stay SWR: the charts and the limit line are SWR charts by design (the RL chart is an extra chart).
+- Where RL is the main value, "minimum SWR" reads "best match" (same point, the highest return loss).

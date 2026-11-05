@@ -252,6 +252,9 @@ The menu button opens it. Entries that need a connection are greyed out until yo
   border and a lighter background so that they show against the chart in the dark scheme too; the marker is a diamond with a ring. **→ Start**, **→ Stop** and **→ Center** set the sweep
   range from the active marker; **→ Span** sweeps from the lowest to the highest shown marker.
 - **Setup Scales**: minimum and maximum of the vertical axes for LogMag (dB), SWR, Phase (°) and Linear.
+- **Value display...**: how values are shown. Impedance as **R + jX** or as **|Z| and angle**; the match with **SWR** or **Return loss** as the main value
+  (the other stays in the cursor readout, the marker table and the Freq tiles). It applies to the Freq tiles, the marker table, and the HAM results,
+  cursor and Multi cards. Chart axes do not change. The choice is kept in the browser.
 - **Add Trace**: see 5.8.
 - **Resolution...**: the number of 101-point segments per sweep. 1 means 101 points; more segments give a finer sweep but take
   longer, and the header button changes to Update/Stop.
