@@ -1,12 +1,12 @@
 # Status
 
-Repo: github.com/ckonecny/nanovna-remote (public), latest release v1.2.0. Open features and bugs: GitHub issues
+Repo: github.com/ckonecny/nanovna-remote (public), latest release v1.3.0. Open features and bugs: GitHub issues
 (CLAUDE.md rule 9). Finished work: `docs/STATUS-ARCHIVE.md`. Decisions and hardware findings: `docs/DECISIONS.md`.
 This file holds only the current state and hints for the next session.
 
-## Current state (2026-11-03)
-- Solid state, everything committed and pushed; v1.2.0 released (full-screen charts, marker labels and Min/Max, guided
-  calibration, scan_bin, status screen button order); the feature page and all screenshots are current.
+## Current state (2026-11-05)
+- Solid state, everything committed and pushed; v1.3.0 released (log over time and Keep screen on in Single, SWR limit and bandwidth,
+  reference sweep, foldable sections, value display choice, "WiFi + browser" on the Feather); the feature page, README, manual and all screenshots are current.
 - Firmware: bridge, web app, OTA (`/update` page and `/api/ota`), calibration storage, multi-network WiFi, display UI,
   QR codes. Flash 87.3 % of the app slot (over 85 %, about 200 KB free; the user decided to leave it until it gets tight).
 - Web app: Single, HAM, Multi, Cable, TDR, Smith, Freq views, app-side OSL calibration, export. Live demo with a simulated
@@ -15,7 +15,6 @@ This file holds only the current state and hints for the next session.
   the site with the installer manifest (about 10 min, Pages caches 10 min). Tagging needs the user's explicit OK.
 
 ## Open checks
-- Single-frequency log (#13, raw values, eight formats) and Keep screen on: built, tested in the demo (log, reload restores it, every format); flashed. Not yet tried on the phone: IndexedDB after a reload, a long run, and whether the wake lock really is unavailable over HTTP (the menu entry should be greyed out and say so).
 - iPhone Safari in landscape: the readout overlapped the inputs and chips (user screenshot). Fixed by putting inputs and readout in one `.side-column` grid cell; Chromium checked at 844x390 and portrait, flashed; the user still has to look at it in Safari.
 - Compiler warnings in `web.cpp` fixed (route helper) and `dns.cpp` no longer logs every query: flashed, device runs.
 - Modern look (system font, new colours, rounded shapes; light and dark): built and flashed; not yet looked at on the phone. Yellow trace colour replaced by orange.

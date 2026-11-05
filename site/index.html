@@ -228,24 +228,26 @@ footer p { margin: 8px 0; max-width: 780px; }
 <section id="new">
   <div class="wrap">
     <div class="eyebrow"><span lang="en">What is new</span><span lang="de">Neu</span></div>
-    <h2><span lang="en">Version 1.2: sharper, faster, easier to read.</span><span lang="de">Version 1.2: übersichtlicher, schneller, besser lesbar.</span></h2>
+    <h2><span lang="en">Version 1.3: logging over time, tidier views.</span><span lang="de">Version 1.3: Messen über der Zeit, aufgeräumtere Ansichten.</span></h2>
     <div class="split">
       <ul class="points">
-        <li><span lang="en"><b>Full-screen charts.</b> One button blows any chart up to the whole screen.</span><span lang="de"><b>Diagramme im Vollbild.</b> Ein Knopf zieht jedes Diagramm auf den ganzen Bildschirm.</span></li>
-        <li><span lang="en"><b>Markers that follow the extremum.</b> Min and Max track the lowest or highest value on every sweep and say so in the label; with several curves the label names the first trace, which decides.</span><span lang="de"><b>Marker, die dem Extremum folgen.</b> Min und Max verfolgen bei jedem Sweep den tiefsten oder höchsten Wert und stehen so im Label; bei mehreren Kurven nennt das Label die erste Kurve, die entscheidet.</span></li>
-        <li><span lang="en"><b>Marker readout.</b> Delta, search, sweep range from markers, Q, series and parallel circuit.</span><span lang="de"><b>Marker-Anzeige.</b> Delta, Suche, Sweep-Bereich aus Markern, Q, Reihen- und Parallelersatzschaltung.</span></li>
-        <li><span lang="en"><b>More trace formats.</b> Rp, Xp, Q, group delay, Y Smith and polar.</span><span lang="de"><b>Mehr Kurvenformate.</b> Rp, Xp, Q, Gruppenlaufzeit, Y-Smith und Polar.</span></li>
-        <li><span lang="en"><b>Guided calibration.</b> Step by step, with a check that warns when the wrong standard is attached.</span><span lang="de"><b>Geführte Kalibrierung.</b> Schritt für Schritt, mit einer Prüfung, die warnt, wenn der falsche Abschluss angesteckt ist.</span></li>
-        <li><span lang="en"><b>Faster sweeps.</b> Multi, Cable, TDR and the calibration read the data in binary.</span><span lang="de"><b>Schnellere Sweeps.</b> Multi, Kabel, TDR und die Kalibrierung lesen die Daten binär.</span></li>
-        <li><span lang="en"><b>Zoom and a modern look.</b> Two-finger zoom, mouse wheel and drag on the desktop, a new colour scheme in dark and light.</span><span lang="de"><b>Zoom und modernes Aussehen.</b> Zoomen mit zwei Fingern, am Desktop mit Mausrad und Ziehen, ein neues Farbschema in Dunkel und Hell.</span></li>
-        <li><span lang="en"><b>More tools.</b> Port extension, sweep quality dialog (bandwidth, smoothing, power) and a note when the NanoVNA firmware is out of date.</span><span lang="de"><b>Mehr Werkzeuge.</b> Port-Extension, Sweep-Qualität (Bandbreite, Glättung, Leistung) und ein Hinweis, wenn die NanoVNA-Firmware veraltet ist.</span></li>
-        <li><span lang="en"><b>Robust.</b> The app recovers when the connection to the NanoVNA drops, and the Feather's display lists its buttons in the order they sit on the board.</span><span lang="de"><b>Robust.</b> Die App erholt sich, wenn die Verbindung zum NanoVNA abbricht, und das Display des Feathers nennt die Tasten in der Reihenfolge, in der sie auf der Platine sitzen.</span></li>
+        <li><span lang="en"><b>Log over time.</b> In the Single view, start and stop a log of the chosen frequency with an interval you choose. Watch SWR, return loss, R and X, |Z|, Rp and Xp, Q, |Γ| or phase over time, pick the time window, export a CSV. The log is kept in the browser and survives a reload.</span><span lang="de"><b>Messen über der Zeit.</b> In der Single-Ansicht lässt sich ein Log der gewählten Frequenz mit frei wählbarem Intervall starten und stoppen. SWR, Rückflussdämpfung, R und X, |Z|, Rp und Xp, Q, |Γ| oder Phase über der Zeit, wählbares Zeitfenster, Export als CSV. Das Log bleibt im Browser und übersteht ein Neuladen.</span></li>
+        <li><span lang="en"><b>Keep screen on.</b> Stops the phone from turning the screen off during a long log (where the browser allows it).</span><span lang="de"><b>Bildschirm anlassen.</b> Verhindert bei einem langen Log, dass das Handy den Bildschirm ausschaltet (wo der Browser es erlaubt).</span></li>
+        <li><span lang="en"><b>SWR limit and bandwidth.</b> HAM and Multi draw a limit line at SWR 1.5, 2 or 3 and show the bandwidth around the resonance and the impedance at the minimum.</span><span lang="de"><b>SWR-Grenze und Bandbreite.</b> HAM und Multi zeichnen eine Grenzlinie bei SWR 1,5, 2 oder 3 und zeigen die Bandbreite um die Resonanz und die Impedanz im Minimum.</span></li>
+        <li><span lang="en"><b>Reference sweep per band.</b> Save a sweep of an antenna, show it behind the live curve and compare the minimum before and after an adjustment.</span><span lang="de"><b>Referenz-Sweep pro Band.</b> Einen Sweep einer Antenne speichern, hinter der Live-Kurve anzeigen und das Minimum vor und nach einer Änderung vergleichen.</span></li>
+        <li><span lang="en"><b>Foldable, movable sections.</b> Fold what you do not need and drag the sections of HAM and Multi into your own order; the app remembers both. The Calibration header turns green when calibrated.</span><span lang="de"><b>Faltbare, verschiebbare Bereiche.</b> Was du nicht brauchst, klappst du zu, und die Bereiche von HAM und Multi ziehst du in deine Reihenfolge; die App merkt sich beides. Der Kalibrierungs-Kopf wird grün, wenn kalibriert ist.</span></li>
+        <li><span lang="en"><b>Your choice of values.</b> Impedance as R + jX or as |Z| and angle, match as SWR or return loss.</span><span lang="de"><b>Werte nach Wahl.</b> Impedanz als R + jX oder als |Z| und Winkel, Anpassung als SWR oder Rückflussdämpfung.</span></li>
+        <li><span lang="en"><b>On the Feather.</b> The status screen says "WiFi + browser" while a browser is connected.</span><span lang="de"><b>Am Feather.</b> Der Statusbildschirm zeigt „WiFi + browser“, solange ein Browser verbunden ist.</span></li>
       </ul>
-      <div class="phone"><img loading="lazy" src="img/phone-freq.png" alt="Freq view with a marker following the maximum" width="780" height="1688"></div>
+      <div class="phone"><img loading="lazy" src="img/phone-single-log.png" alt="The log over time in the Single view: SWR over 25 seconds" width="780" height="1688"></div>
     </div>
     <div class="themes">
-      <div class="phone"><img loading="lazy" src="img/phone-freq-full.png" alt="The Freq chart in full screen" width="780" height="1688"></div>
+      <div class="phone"><img loading="lazy" src="img/phone-ham.png" alt="HAM view with foldable sections and a limit line at SWR 2" width="780" height="1688"></div>
     </div>
+    <p class="sub">
+      <span lang="en">Version 1.2 brought full-screen charts, markers that follow the extremum, more trace formats, a guided calibration and faster sweeps.</span>
+      <span lang="de">Version 1.2 brachte Diagramme im Vollbild, Marker, die dem Extremum folgen, mehr Kurvenformate, eine geführte Kalibrierung und schnellere Sweeps.</span>
+    </p>
   </div>
 </section>
 
@@ -259,7 +261,7 @@ footer p { margin: 8px 0; max-width: 780px; }
     </p>
     <div class="gallery">
       <div class="shot"><div class="phone"><img loading="lazy" src="img/phone-single.png" alt="Single frequency view" width="780" height="1688"></div>
-        <b>Single</b><span lang="en">SWR, return loss, R and X at one frequency</span><span lang="de">SWR, Rückflussdämpfung, R und X bei einer Frequenz</span></div>
+        <b>Single</b><span lang="en">SWR, return loss, R and X at one frequency, with a log over time</span><span lang="de">SWR, Rückflussdämpfung, R und X bei einer Frequenz, mit Log über der Zeit</span></div>
       <div class="shot"><div class="phone"><img loading="lazy" src="img/phone-ham-extras.png" alt="HAM view with return loss and R/X charts" width="780" height="1688"></div>
         <b>HAM</b><span lang="en">A whole band with its minimum, SWR ≤ 2 range and extra charts</span><span lang="de">Ein ganzes Band mit Minimum, SWR-≤-2-Bereich und Zusatzdiagrammen</span></div>
       <div class="shot"><div class="phone"><img loading="lazy" src="img/phone-multi.png" alt="Multi view with band cards" width="780" height="1688"></div>

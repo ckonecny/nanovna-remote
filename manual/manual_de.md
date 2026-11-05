@@ -127,6 +127,10 @@ X, die Reaktanz als Induktivität oder Kapazität (in Reihe), |Γ| und die Phase
 **Log over time (Verlauf).** Der Bereich ganz unten (zu Beginn eingeklappt) zeichnet die Messwerte der gewählten Frequenz auf und zeigt sie über der
 Zeit, um eine Drift zu beobachten (Temperatur, nasse Antenne) oder ein Anpassnetzwerk mit Live-Rückmeldung abzustimmen.
 
+<img src="../site/img/phone-single-log.png" width="260" alt="Das Log über der Zeit in der Single-Ansicht">
+
+<sub>Das Log über der Zeit (simulierte Werte): SWR der gewählten Frequenz, hier mit einer anderen Last, die für ein paar Sekunden angeschlossen war.</sub>
+
 - **Start** / **Stop** beginnen und beenden die Aufzeichnung; **Continue** setzt ein vorhandenes Log fort. **Every** stellt den Abstand zweier
   Punkte ein (jede Messung des Geräts, 1 s, 5 s, 30 s oder 1 min). Aufgezeichnet wird nur, solange die Single-Ansicht offen ist, bei der
   angezeigten Frequenz und nicht während einer Kalibrierung; eine Lücke (andere Ansicht, Pause) wird im Diagramm nicht verbunden.

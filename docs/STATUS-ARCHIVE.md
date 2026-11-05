@@ -3,6 +3,8 @@
 Finished items, moved here from `docs/STATUS.md` (newest first).
 
 ## 2026-11
+- Release v1.3.0 (feature page, README, manual and screenshots refreshed; the screenshot script also shoots the log). Status screen shows "WiFi + browser" while a browser holds the bridge (checked on the Feather), D1/D2 hint order fixed.
+- Single-frequency log over time (#13: start/stop, interval, raw values, eight formats, IndexedDB, CSV) and Keep screen on (Wake Lock, HTTPS only): flashed and tried on the phone, works. Time labels of the log chart now fit the width (no overlap on a phone).
 - Switchable display of impedance (R + jX or |Z| and angle) and match (SWR or return loss) (#20): sidebar dialog, `lib/valuefmt.js`, manual EN + DE. Flashed and tried on the phone, works.
 - Reference sweep per band in HAM (#9: save, show/hide, replace, delete, comparison with the live minimum, date if not from today) and foldable, movable sections in HAM and Multi (`Fold.vue`, `lib/order.js`; calibration status as green header / orange banner): flashed and tried on the phone, works.
 - SWR limit (1.5 / 2 / 3), limit line, bandwidth around the resonance and R + jX at the minimum in HAM and Multi (#11, #12): `lib/resonance.js`, tests, manual EN + DE; flashed and tried on the phone, works.

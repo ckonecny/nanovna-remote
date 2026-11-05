@@ -117,6 +117,20 @@ for (const c of '7.1') await click(page, '.key-btn', c);
 await click(page, '.key-btn', 'M');
 await shot(page, 'phone-single');
 
+// the log over time: open the section, run it for a while, scroll it into view
+await page.evaluate(() => { const b = document.querySelector('.slog .head'); if (b.getAttribute('aria-expanded') !== 'true') b.click(); });
+await sleep(500);
+await click(page, 'button.pill', 'Start');
+await sleep(8000);
+await dut('cable-open'); // something to see in the curve: another load for a few seconds
+await sleep(8000);
+await dut('antenna');
+await sleep(9000);
+await page.evaluate(() => document.querySelector('.slog').scrollIntoView({ block: 'start' }));
+await shot(page, 'phone-single-log');
+await click(page, 'button.pill', 'Stop');
+await page.evaluate(() => window.scrollTo(0, 0));
+
 await tab(page, 'HAM');
 await band(page, '20 m');
 await shot(page, 'phone-ham');

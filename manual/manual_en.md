@@ -122,6 +122,10 @@ inductance or capacitance (series), |Γ| and the phase. A chart around the frequ
 **Log over time.** The section at the bottom (folded at first) records the readings of the chosen frequency and draws them over time, to watch
 drift (temperature, a wet antenna) or to tune a matching network with live feedback.
 
+<img src="../site/img/phone-single-log.png" width="260" alt="The log over time in the Single view">
+
+<sub>The log over time (simulated values): SWR of the chosen frequency, here with another load connected for a few seconds.</sub>
+
 - **Start** / **Stop** begin and end the recording; **Continue** carries on with an existing log. **Every** sets the time between two points
   (every reading of the device, 1 s, 5 s, 30 s or 1 min). It records only while the Single view is open, at the frequency shown, and not
   during a calibration; a gap (another view, paused) is not joined up in the chart.

@@ -20,9 +20,11 @@ More pictures and a short tour: **[feature page](https://ckonecny.github.io/nano
 
 ## What it does
 
-- **Single frequency:** SWR, return loss, impedance (R + jX), |Γ| and phase at one frequency.
-- **Ham bands (HAM):** sweep a band, see the SWR curve, the minimum, the range with SWR ≤ 2, plus return loss and R / X charts.
-- **Multi:** compare several bands side by side, each swept in turn.
+- **Single frequency:** SWR, return loss, impedance (R + jX or |Z| and angle), |Γ| and phase at one frequency, with a **log over time**
+  (start/stop, your interval, eight formats, CSV export, kept in the browser).
+- **Ham bands (HAM):** sweep a band, see the SWR curve with a limit line (1.5, 2 or 3), the minimum, the bandwidth around the resonance,
+  plus return loss and R / X charts, and a saved reference sweep per band to compare before and after an adjustment.
+- **Multi:** compare several bands side by side, each swept in turn. HAM and Multi have foldable sections you can move.
 - **Calibration once for all bands:** open, short and load, each connected once. The app corrects all 14 ham bands from
   160 m to 70 cm, the result is stored in the device and every browser uses it.
 - **Cables:** length, velocity factor, loss and characteristic impedance of a coax cable, stub lengths.
@@ -30,7 +32,7 @@ More pictures and a short tour: **[feature page](https://ckonecny.github.io/nano
 - **Smith and Freq:** your own sweep as a Smith chart or as curves, with markers, scales and several traces.
 - **Export:** Touchstone `.s1p` / `.s2p` files and PNG pictures of the charts.
 - **Phone first:** dark and light theme, a layout that follows the screen size, works on desktop too.
-- **Device display and buttons:** the Feather shows the WiFi, the address and the USB state; three buttons choose the
+- **Device display and buttons:** the Feather shows the WiFi (and whether a browser is connected), the address and the USB state; three buttons choose the
   network. Up to eight WiFi networks can be stored (home, hotspot, ...), with a setup WiFi as fallback.
 - **Updates over WiFi**, no cable needed after the first flash.
 
@@ -41,7 +43,7 @@ More pictures and a short tour: **[feature page](https://ckonecny.github.io/nano
 ```
 
 <p align="center">
-  <img src="site/img/feather-status.jpg" width="330" alt="The Feather's status screen: WiFi connected, USB device found">
+  <img src="site/img/feather-status.jpg" width="330" alt="The Feather's status screen: WiFi, address and USB device found">
   <img src="site/img/feather-menu.jpg" width="330" alt="The Feather's menu">
 </p>
 

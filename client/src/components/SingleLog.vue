@@ -81,7 +81,8 @@ const curves = computed(() => series.value.map((s) => {
     return { cls: s.cls, d };
 }));
 
-const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(f => ({ x: L + f * (W.value - L - R), label: clockLabel(t0.value + f * span.value, span.value) })));
+const xticks = computed(() => { const n = Math.max(1, Math.min(4, Math.floor((W.value - L - R) / 90))); // a clock label is about 80 px wide with some air
+    return Array.from({ length: n + 1 }, (_, i) => i / n).map(f => ({ x: L + f * (W.value - L - R), label: clockLabel(t0.value + f * span.value, span.value) })); });
 
 const unit = computed(() => cfg.value.unit);
 const chartTitle = computed(() => cfg.value.title + ' over time');
