@@ -29,7 +29,7 @@ The display shows the status: WiFi network and IP address, whether a USB device 
 The bottom line of every screen shows what D1 does. After 30 seconds without a key the display
 returns to the status screen.
 
-**Status screen:** D1 short opens the WiFi list; D1 long opens the menu; D2 shows a **QR code** (see below).
+**Status screen:** D1 short opens the WiFi list; D1 long opens the menu; D2 shows a **QR code** (see below). The first line reads "WiFi connected", and "WiFi + browser" while a browser is connected to the NanoVNA through the device.
 
 **QR code:** while the setup WiFi is open there are two codes (D1 switches between them): the first joins that WiFi (point the
 phone's camera at it and confirm), the second opens the setup page `http://192.168.4.1/wifi`. Some phones open the setup page by

@@ -29,7 +29,7 @@ Das Display zeigt den Status: WLAN-Netz und IP-Adresse, ob ein USB-Gerät angesc
 Die unterste Zeile jedes Bildschirms zeigt, was D1 tut. Nach 30 Sekunden ohne Tastendruck springt das Display
 zurück auf den Status-Bildschirm.
 
-**Status-Bildschirm:** D1 kurz öffnet die WLAN-Liste, D1 lang das Menü, D2 zeigt einen **QR-Code** (siehe unten).
+**Status-Bildschirm:** D1 kurz öffnet die WLAN-Liste, D1 lang das Menü, D2 zeigt einen **QR-Code** (siehe unten). Die erste Zeile lautet „WiFi connected“, und „WiFi + browser“, solange ein Browser über das Gerät mit dem NanoVNA verbunden ist.
 
 **QR-Code:** Solange das Einrichtungs-WLAN offen ist, gibt es zwei Codes (D1 wechselt): der erste verbindet mit diesem WLAN
 (Handy-Kamera draufhalten und bestätigen), der zweite öffnet die Einrichtungsseite `http://192.168.4.1/wifi`. Manche Handys

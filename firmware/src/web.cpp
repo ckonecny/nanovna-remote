@@ -494,6 +494,11 @@ esp_err_t redirect_handler(httpd_req_t *req, httpd_err_code_t) {
 
 void web_log_capture() { log_previous = esp_log_set_vprintf(log_hook); }
 
+bool web_browser_connected() {
+    std::lock_guard<std::mutex> lock(bridge_mutex);
+    return bridge_fd >= 0;
+}
+
 void web_start() {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     config.stack_size = 8192;

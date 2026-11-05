@@ -15,6 +15,7 @@
 #include "freertos/task.h"
 #include "version.h"
 #include "vna.h"
+#include "web.h"
 #include "wifi_mgr.h"
 #include "wifi_setup.h"
 
@@ -285,7 +286,7 @@ struct StatusScreen : Screen {
         out[0] = title_row("NanoVNA Remote");
         switch (st.state) {
             case WIFI_STA:
-                out[1] = {"WiFi connected", GREEN};
+                out[1] = {web_browser_connected() ? "WiFi + browser" : "WiFi connected", GREEN};
                 out[2] = {clip(st.ssid), WHITE};
                 out[3] = {st.ip, CYAN};
                 out[4] = {"nanovna.local", GREY};
@@ -305,11 +306,12 @@ struct StatusScreen : Screen {
         }
         bool usb = vna_usb_attached();
         out[5] = {usb ? "USB: device found" : "USB: no device", usb ? GREEN : GREY};
-        // the hints follow the physical order of the buttons: D1 above D2, or D2 above D1 when the display is turned
+        // the hints follow the physical order of the buttons. The display is rotated by default (ui_flipped_get() = 1), and then
+        // D1 sits above D2; with the display turned back it is D2 above D1.
         Row d1 = hint_row("D1:WiFi long:Menu");
         Row d2 = {"D2: show QR code", GREY};
         bool qr = st.state == WIFI_STA || st.state == WIFI_AP;
-        if (ui_flipped_get()) {
+        if (!ui_flipped_get()) {
             out[6] = qr ? d2 : Row{"", GREY};
             out[7] = d1;
         } else {
