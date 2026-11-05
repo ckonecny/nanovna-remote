@@ -1,8 +1,10 @@
 <script setup>
 import { computed } from 'vue';
-import { store } from '../store';
+import { store, calRun } from '../store';
 import { HAM_BANDS } from '../lib/bands';
 import CalStatus from './CalStatus.vue';
+import Fold from './Fold.vue';
+import { calState } from '../lib/calstate';
 import CalPanel from './CalPanel.vue';
 import ChartFrame from './ChartFrame.vue';
 import { useFullChart } from '../lib/fullchart';
@@ -48,6 +50,11 @@ const cards = computed(() => {
     }).filter(Boolean);
 });
 
+const cal = computed(() => calState(store.multiBands));
+const calSummary = computed(() => (!store.multiBands.length ? 'No band selected' : cal.value.text.replace('NOT calibrated: values are uncorrected', 'No band is calibrated')));
+const bandsSummary = computed(() => store.multiBands.join(', ') || 'none selected');
+const cardsSummary = computed(() => (store.multiBands.length ? store.multiBands.length + (store.multiBands.length > 1 ? ' bands' : ' band') : 'none selected'));
+
 const fmt = (v) => (!isFinite(v) ? '∞' : v > 99 ? '> 99' : v.toFixed(2));
 const grid = [1, 2, 3, 5];
 </script>
@@ -56,15 +63,21 @@ const grid = [1, 2, 3, 5];
   <div class="multi">
     <CalStatus :bands="store.multiBands" />
 
+    <Fold id="multi-bands" group="multi" title="Bands" :summary="bandsSummary">
     <div class="bands">
       <button v-for="b in HAM_BANDS" :key="b.name" class="band pill" :class="{ active: store.multiBands.includes(b.name) }" @click="toggle(b.name)">{{ b.name }}</button>
     </div>
+    <div class="sub">Select the bands to watch. Each band is swept in turn, so the more bands, the slower the refresh.</div>
+    </Fold>
+
+    <Fold id="multi-tools" group="multi" title="Tools" :summary="'SWR limit ' + store.swrLimit" :start-open="false">
     <div class="bands">
       <span class="sub lim">SWR limit</span>
       <button v-for="l in SWR_LIMITS" :key="l" class="band pill" :class="{ active: store.swrLimit === l }" @click="store.swrLimit = l">{{ l }}</button>
     </div>
-    <div class="sub">Select the bands to watch. Each band is swept in turn, so the more bands, the slower the refresh.</div>
+    </Fold>
 
+    <Fold id="multi-cards" group="multi" title="Measurements" :summary="cardsSummary">
     <div v-if="!store.multiBands.length" class="empty">Select at least one band</div>
     <div v-else-if="store.status !== 'connected'" class="empty">Connect to the NanoVNA to measure</div>
     <div class="cards">
@@ -95,8 +108,11 @@ const grid = [1, 2, 3, 5];
         </div>
       </div>
     </div>
+    </Fold>
 
+    <Fold id="multi-cal" group="multi" title="Calibration" :summary="calSummary" :start-open="false" :open="calRun.guided" :tone="cal.state === 'ok' ? 'ok' : ''">
     <CalPanel />
+    </Fold>
   </div>
 </template>
 

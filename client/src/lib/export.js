@@ -78,13 +78,18 @@ export async function chartsToPng(items, { scale = 2 } = {}) {
 
 // the charts of the HAM view (SWR plus the extra charts) and of the Multi view (one per band card), with titles
 export function hamChartItems(root, band) {
-    const svgs = [...root.querySelectorAll('svg.chart')];
-    const extra = [...root.querySelectorAll('.extra .label')].map(e => e.textContent.trim());
-    return svgs.map((svg, i) => ({ title: i ? extra[i - 1] : band + ' SWR', svg }));
+    // charts in a folded section are not displayed and have no size: leave them out
+    const shown = (el) => el.getClientRects().length > 0;
+    const svgs = [...root.querySelectorAll('svg.chart')].filter(shown);
+    // the sections can be in any order: an additional chart carries its own title, the other one is the SWR chart
+    return svgs.map(svg => {
+        const label = svg.closest('.extra')?.querySelector('.label');
+        return { title: label ? label.textContent.trim() : band + ' SWR', svg };
+    });
 }
 
 export function multiChartItems(root) {
-    return [...root.querySelectorAll('.card')].map(card => {
+    return [...root.querySelectorAll('.card')].filter(c => c.getClientRects().length > 0).map(card => {
         const name = card.querySelector('.name').textContent.trim(), swr = card.querySelector('.swr');
         return { title: name + (swr ? '  min SWR ' + swr.textContent.trim() : ''), svg: card.querySelector('svg.chart') };
     });

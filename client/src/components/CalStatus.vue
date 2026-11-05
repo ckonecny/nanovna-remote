@@ -1,27 +1,19 @@
 <script setup>
 import { computed } from 'vue';
-import { appCal } from '../lib/oslcal';
+import { calState } from '../lib/calstate';
 
-// bands: names of the bands the view is showing
+// bands: names of the bands the view is showing.
+// A warning only: it appears when a band is missing its calibration. Calibrated is shown by the green header of the
+// Calibration section of the view, and with no band selected there is nothing to say.
 const props = defineProps({ bands: { type: Array, required: true } });
-
-const done = computed(() => props.bands.filter(n => appCal.enabled && appCal.bands[n]).length);
-const state = computed(() => (!props.bands.length ? 'none' : done.value === props.bands.length ? 'ok' : done.value ? 'part' : 'none'));
-const text = computed(() => {
-    if (state.value === 'ok') return props.bands.length > 1 ? `Calibrated (${done.value} of ${props.bands.length} bands)` : 'Calibrated';
-    if (state.value === 'part') return `Partly calibrated: ${done.value} of ${props.bands.length} bands`;
-    return 'NOT calibrated: values are uncorrected';
-});
+const st = computed(() => calState(props.bands));
 </script>
 
 <template>
-  <div class="cal-status" :class="state"><span class="icon">{{ state === 'ok' ? 'check_circle' : 'warning' }}</span>{{ text }}</div>
+  <div v-if="bands.length && st.state !== 'ok'" class="cal-status" :class="st.state"><span class="icon">warning</span>{{ st.text }}</div>
 </template>
 
 <style scoped>
-.cal-status { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 500; border-left: 4px solid; }
+.cal-status { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 500; border-left: 4px solid; background: rgba(255, 152, 0, 0.18); border-color: #ff9800; }
 .cal-status .icon { font-size: 20px; }
-.ok { background: rgba(76, 175, 80, 0.15); border-color: #4caf50; }
-.part { background: rgba(255, 152, 0, 0.18); border-color: #ff9800; }
-.none { background: rgba(244, 67, 54, 0.15); border-color: #f44336; }
 </style>

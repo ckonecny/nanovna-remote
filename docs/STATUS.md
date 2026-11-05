@@ -32,6 +32,9 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
+- #9 reference sweep (HAM only, one per band): built, tested (`reference.test.js`), checked in the demo; flashing and the phone check follow.
+  Foldable, movable sections in HAM and Multi (`Fold.vue`, drag handle, thin chevron, `lib/order.js`; Multi gets Bands / Tools / Measurements / Calibration; green Calibration header, orange banner only when a calibration is missing): built, checked in the demo (390 px, dark),
+  flashing follows; not yet on the phone. Open: whether Freq / Smith get a reference later (not planned).
 - Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
   "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first
   trace and its title names it ("Max CH0 swr · 250.2 MHz"). Not looked at on the iPhone.

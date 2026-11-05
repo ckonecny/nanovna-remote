@@ -6,6 +6,8 @@ import { CABLE_RANGES, portExtend, C } from './lib/cable';
 import { TDR_RANGES } from './lib/tdr';
 import { newerFirmware } from './lib/fwcheck';
 import { SWR_LIMITS } from './lib/resonance';
+import { validReference } from './lib/reference';
+import { DEFAULT_ORDER, normalizeOrder } from './lib/order';
 import { appCal, applyCal, solveOSL, checkStandard, pullFromDevice, pushToDevice } from './lib/oslcal';
 
 // The bridge address: ?host=<name or ip> in the URL, or the host the page itself was served from (when it is the ESP32)
@@ -60,7 +62,10 @@ const defaultState = {
     calibrationRunning: false,
     appCalCovered: 1, // share of the displayed points that the app-side calibration covers
     hamBand: '2 m',
+    order: {}, // view ('ham', 'multi') -> ids of its sections in the order the user chose (see lib/order.js)
+    folds: {}, // id of a foldable section -> open (true) or folded (false); a missing id uses the default of the section
     swrLimit: 2, // SWR limit of the usable bandwidth in the HAM and Multi views (1.5, 2 or 3)
+    hamRef: {}, // band name -> reference sweep of the HAM view { at, calibrated, show, points: [{ freq, swr }] }
     hamExtras: [], // additional charts under the SWR chart of the HAM view: 'rl', 'rx'
     multiBands: ['40 m', '20 m', '2 m'], // bands shown in the Multi view
     multiActive: false, // the Multi view is open: the update loop sweeps the selected bands one after another
@@ -113,7 +118,16 @@ function loadState() {
 
             if (parsed.hamBand !== undefined) state.hamBand = parsed.hamBand;
             if (Array.isArray(parsed.multiBands)) state.multiBands = parsed.multiBands;
+            if (parsed.folds && typeof parsed.folds === 'object') {
+                for (const [id, v] of Object.entries(parsed.folds)) if (typeof v === 'boolean') state.folds[id] = v;
+            }
+            if (parsed.order && typeof parsed.order === 'object') {
+                for (const g of Object.keys(DEFAULT_ORDER)) if (Array.isArray(parsed.order[g])) state.order[g] = normalizeOrder(g, parsed.order[g]);
+            }
             if (SWR_LIMITS.includes(parsed.swrLimit)) state.swrLimit = parsed.swrLimit;
+            if (parsed.hamRef && typeof parsed.hamRef === 'object') {
+                for (const [name, r] of Object.entries(parsed.hamRef)) if (validReference(r)) state.hamRef[name] = r;
+            }
             if (Array.isArray(parsed.hamExtras)) state.hamExtras = parsed.hamExtras;
             if (CABLE_RANGES[parsed.cablePreset]) state.cablePreset = parsed.cablePreset;
             if (TDR_RANGES[parsed.tdrPreset]) state.tdrPreset = parsed.tdrPreset;
@@ -167,7 +181,10 @@ watch(store, (newState) => {
         singleFreq: newState.singleFreq,
         hamBand: newState.hamBand,
         multiBands: newState.multiBands,
+        folds: newState.folds,
+        order: newState.order,
         swrLimit: newState.swrLimit,
+        hamRef: newState.hamRef,
         hamExtras: newState.hamExtras,
         cablePreset: newState.cablePreset,
         tdrPreset: newState.tdrPreset,

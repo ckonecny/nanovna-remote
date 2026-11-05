@@ -1,12 +1,15 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import { store } from '../store';
+import { store, calRun } from '../store';
 import CalStatus from './CalStatus.vue';
 import CalPanel from './CalPanel.vue';
+import Fold from './Fold.vue';
 import ChartFrame from './ChartFrame.vue';
 import { useFullChart } from '../lib/fullchart';
 import { HAM_BANDS } from '../lib/bands';
 import { resonance, SWR_LIMITS } from '../lib/resonance';
+import { makeReference, referenceMin, compareMinima, sweepFitsBand, savedAt } from '../lib/reference';
+import { appCal } from '../lib/oslcal';
 import { calcSWR, calcZ, calcLogMag, formatFrequency } from '../lib/dsp';
 
 const emit = defineEmits(['select-band', 'edit-cursor']);
@@ -66,6 +69,38 @@ const highEdge = computed(() => nearest(band.value.stop));
 // lowest SWR in the band and the stretch around it that stays at or below the chosen limit
 const res = computed(() => resonance(points.value, inBand.value, store.swrLimit));
 const bw = computed(() => (res.value ? res.value.bandwidth : null));
+
+// reference sweep of this band: saved from the live sweep, drawn as a grey line behind it
+const refSweep = computed(() => store.hamRef[band.value.name] || null);
+const refPath = computed(() => (refSweep.value && refSweep.value.show ? refSweep.value.points.map((p, i) => (i ? 'L' : 'M') + x(p.freq).toFixed(1) + ' ' + y(p.swr).toFixed(1)).join(' ') : ''));
+const calibratedNow = computed(() => !!(appCal.enabled && appCal.bands[band.value.name]));
+const canSave = computed(() => sweepFitsBand(points.value, band.value));
+const saveRef = () => { store.hamRef[band.value.name] = makeReference(points.value, calibratedNow.value); };
+const clearRef = () => { delete store.hamRef[band.value.name]; };
+const refMin = computed(() => (refSweep.value ? referenceMin(refSweep.value, band.value) : null));
+const refInfo = computed(() => {
+    if (!refSweep.value) return '';
+    return savedAt(refSweep.value.at) + (refMin.value ? ', min SWR ' + fmt(refMin.value.swr) + ' at ' + formatFrequency(refMin.value.freq, 4) : '');
+});
+const refMismatch = computed(() => refSweep.value && refSweep.value.calibrated !== calibratedNow.value);
+const vsRef = computed(() => (refSweep.value && refSweep.value.show ? compareMinima(minPoint.value, refMin.value) : null));
+const signed = (v, d) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d);
+const vsRefText = computed(() => {
+    const d = vsRef.value;
+    if (!d) return '';
+    const df = Math.abs(d.freq) >= 1e6 ? signed(d.freq / 1e6, 3) + ' MHz' : signed(d.freq / 1e3, 1) + ' kHz';
+    return 'vs reference: SWR ' + signed(d.swr, 2) + ', ' + df;
+});
+
+const toolsSummary = computed(() => {
+    const parts = ['Limit ' + store.swrLimit, refSweep.value ? (refSweep.value.show ? 'Reference on' : 'Reference off') : 'No reference'];
+    parts.push(cursor.value ? 'Cursor ' + formatFrequency(cursor.value.p.freq, 4) + ', SWR ' + fmt(cursor.value.p.swr) : 'Cursor ' + store.hamCursorMode);
+    return parts.join(' · ');
+});
+const tilesSummary = computed(() => (minPoint.value ? 'Min SWR ' + fmt(minPoint.value.swr) + ' at ' + formatFrequency(minPoint.value.freq, 4) : ''));
+const extrasSummary = computed(() => (store.hamExtras.length ? store.hamExtras.map(id => EXTRAS.find(e => e[0] === id)[1]).join(', ') : 'none shown'));
+const calSummary = computed(() => (appCal.enabled && appCal.bands[band.value.name] ? 'Calibrated' : 'This band is not calibrated'));
+
 const bwText = computed(() => {
     const b = bw.value;
     if (!b) return 'none';
@@ -148,14 +183,29 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
   <div class="ham" ref="wrap">
     <CalStatus :bands="[store.hamBand]" />
 
+    <Fold id="ham-bands" group="ham" title="Band" :summary="band.name">
     <div class="bands">
       <button v-for="b in HAM_BANDS" :key="b.name" class="band pill" :class="{ active: b.name === store.hamBand }" @click="emit('select-band', b)">{{ b.name }}</button>
     </div>
+    </Fold>
 
+    <Fold id="ham-tools" group="ham" title="Tools" :summary="toolsSummary" :start-open="false">
     <div class="extras">
       <span class="label">SWR limit</span>
       <button v-for="l in SWR_LIMITS" :key="l" class="band pill" :class="{ active: store.swrLimit === l }" @click="store.swrLimit = l">{{ l }}</button>
     </div>
+
+    <div class="extras">
+      <span class="label">Reference</span>
+      <button v-if="!refSweep" class="pill" :disabled="!canSave" @click="saveRef">Save current sweep</button>
+      <template v-else>
+        <button class="band pill" :class="{ active: refSweep.show }" @click="refSweep.show = !refSweep.show">{{ refSweep.show ? 'Shown' : 'Hidden' }}</button>
+        <button class="pill" :disabled="!canSave" @click="saveRef">Replace</button>
+        <button class="pill" @click="clearRef">Delete</button>
+        <span class="sub">{{ refInfo }}</span>
+      </template>
+    </div>
+    <div v-if="refMismatch && refSweep.show" class="sub warn">The reference was saved {{ refSweep.calibrated ? 'with' : 'without' }} calibration, the live sweep is {{ calibratedNow ? 'calibrated' : 'not calibrated' }}: the curves are not comparable.</div>
 
     <div class="cursorbar">
       <div v-if="cursor" class="cursor-values">
@@ -174,7 +224,9 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
         <button v-if="store.hamCursorMode === 'manual' && cursor" class="pill" @click="store.hamCursor = null">Clear</button>
       </div>
     </div>
+    </Fold>
 
+    <Fold id="ham-swr" group="ham" title="SWR chart" :summary="'SWR ' + band.name">
     <ChartFrame :title="'SWR ' + band.name" @change="(s) => fc.onFrame('swr', s)">
     <svg :viewBox="`0 0 ${W} ${H}`" :width="W" :height="H" class="chart" @click="onChartClick">
       <rect :x="x(band.start)" :y="T" :width="Math.max(0, x(band.stop) - x(band.start))" :height="H - T - B" class="band-area" />
@@ -186,6 +238,7 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
       <line :x1="L" :x2="W - R" :y1="y(store.swrLimit)" :y2="y(store.swrLimit)" class="grid2" />
       <text :x="W - R - 4" :y="y(store.swrLimit) - 4" class="limit-label" text-anchor="end">SWR {{ store.swrLimit }}</text>
       <text v-for="f in xticks" :key="f" :x="x(f)" :y="H - 8" class="axis" text-anchor="middle">{{ (f / 1e6).toFixed(f < 20e6 ? 3 : 2) }}</text>
+      <path v-if="refPath" :d="refPath" class="ref-curve" />
       <path :d="path" class="curve" />
       <circle v-if="minPoint" :cx="x(minPoint.freq)" :cy="y(minPoint.swr)" r="5" class="min" />
       <line v-if="cursor" :x1="x(cursor.p.freq)" :x2="x(cursor.p.freq)" :y1="T" :y2="H - B" class="cursor" />
@@ -193,15 +246,19 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
       <text v-if="cursor" :x="x(cursor.p.freq) + (x(cursor.p.freq) > W / 2 ? -10 : 10)" :y="T + 14" class="cursor-label" :text-anchor="x(cursor.p.freq) > W / 2 ? 'end' : 'start'">SWR {{ fmt(cursor.p.swr) }}</text>
     </svg>
     </ChartFrame>
+    </Fold>
 
+    <Fold id="ham-tiles" group="ham" title="Results" :summary="tilesSummary">
     <div v-if="!points.length" class="empty">{{ store.status === 'connected' ? 'Waiting for measurement…' : 'Connect to the NanoVNA to measure' }}</div>
     <div v-else class="tiles">
-      <div class="tile" v-if="minPoint"><span class="label">Resonance (minimum SWR)</span><span class="value">{{ fmt(minPoint.swr) }}</span><span class="sub">at {{ formatFrequency(minPoint.freq, 4) }} · {{ fmt(minPoint.r) }} {{ minPoint.xr < 0 ? '−' : '+' }} j{{ fmt(Math.abs(minPoint.xr)) }} Ω</span></div>
+      <div class="tile" v-if="minPoint"><span class="label">Resonance (minimum SWR)</span><span class="value">{{ fmt(minPoint.swr) }}</span><span class="sub">at {{ formatFrequency(minPoint.freq, 4) }} · {{ fmt(minPoint.r) }} {{ minPoint.xr < 0 ? '−' : '+' }} j{{ fmt(Math.abs(minPoint.xr)) }} Ω</span><span v-if="vsRefText" class="sub">{{ vsRefText }}</span></div>
       <div class="tile"><span class="label">Bandwidth, SWR ≤ {{ store.swrLimit }}</span><span class="value small">{{ bwText }}</span><span v-if="bw" class="sub">{{ bwWidth }} wide{{ bw.lowOpen || bw.highOpen ? ' (reaches the end of the sweep)' : '' }}</span></div>
       <div class="tile" v-if="lowEdge"><span class="label">Lower band edge</span><span class="value">{{ fmt(lowEdge.swr) }}</span><span class="sub">{{ formatFrequency(band.start, 3) }}</span></div>
       <div class="tile" v-if="highEdge"><span class="label">Upper band edge</span><span class="value">{{ fmt(highEdge.swr) }}</span><span class="sub">{{ formatFrequency(band.stop, 3) }}</span></div>
     </div>
+    </Fold>
 
+    <Fold id="ham-extras" group="ham" title="Additional charts" :summary="extrasSummary">
     <div class="extras">
       <span class="label">Also show</span>
       <button v-for="[id, name] in EXTRAS" :key="id" class="band pill" :class="{ active: store.hamExtras.includes(id) }" @click="toggleExtra(id)">{{ name }}</button>
@@ -225,8 +282,11 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
       </svg>
       </ChartFrame>
     </div>
+    </Fold>
 
+    <Fold id="ham-cal" group="ham" title="Calibration" :summary="calSummary" :start-open="false" :open="calRun.guided" :tone="calibratedNow ? 'ok' : ''">
     <CalPanel />
+    </Fold>
   </div>
 </template>
 
@@ -241,6 +301,8 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
 .axis { font-size: 12px; fill: var(--text-dim); }
 .curve { fill: none; stroke: var(--curve); stroke-width: 2; }
 .min { fill: #f44336; }
+.ref-curve { fill: none; stroke: var(--text-dim); stroke-width: 1.5; opacity: 0.8; }
+.warn { color: #f44336; }
 .bw-area { fill: rgba(33, 150, 243, 0.2); }
 .limit-label { font-size: 11px; fill: rgba(244, 67, 54, 0.9); }
 .curve-x { fill: none; stroke: #ff9800; stroke-width: 2; }

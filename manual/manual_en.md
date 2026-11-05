@@ -123,6 +123,18 @@ inductance or capacitance (series), |Γ| and the phase. A chart around the frequ
 
 <img src="../site/img/phone-ham-extras.png" width="280" alt="HAM view">
 
+**Foldable, movable sections.** The HAM view has six sections with a header you can tap: **Band** (the band buttons), **Tools** (SWR limit,
+reference, cursor controls), **SWR chart**, **Results** (the tiles), **Additional charts** and **Calibration**. A folded section shows its state in one
+line: the chosen band, or for example "Limit 2 · Reference on · Cursor 14.1204 MHz, SWR 1.14". Tools and Calibration start folded, the
+others open; the choice is remembered per browser. A guided calibration that is running opens the Calibration section by itself.
+**Save Charts As .png** leaves out the charts of a folded section.
+
+To put a section somewhere else, drag it by the dotted handle at the left of its header and drop it between the others (with the
+keyboard: focus the handle and press the up or down arrow). The order is remembered per browser and per view; the warning banner stays at the top.
+
+**Calibration status.** When the chosen band is calibrated, the Calibration header is green and there is no banner. Without a
+calibration an orange banner at the top says so ("NOT calibrated: values are uncorrected"), because the values are then not corrected.
+
 Sweep over an amateur band: pick the band with the band buttons. The SWR curve shows the minimum, and the tiles name the resonance
 (the minimum SWR with its frequency and the impedance R + jX there), the bandwidth around it where SWR stays at or below the
 **SWR limit** (1.5, 2 or 3, chosen above the chart and remembered; the limit is drawn as a red line and the bandwidth shaded blue) and
@@ -134,7 +146,13 @@ band with every sweep (like the NanoVNA's marker search); **Manual** keeps it wh
 frequency also switches to Manual. **Clear** removes a manual cursor. In the additional charts the cursor shows its value as a dot,
 and the title of each chart repeats the exact value. The markers of the side menu (5.9) do not apply to this view. Under the chart, **Also show** adds a return loss chart (dB) and an
 R / X chart (resistance and reactance in Ω); both share the frequency axis and the cursor of the SWR chart. The choice is
-remembered. The calibration panel at the bottom is described in chapter 6.
+remembered. **Reference.** The **Reference** row under the SWR limit keeps one sweep per band for comparison, for example before and after
+you trim an antenna. **Save current sweep** stores the live SWR curve (it is only enabled once the sweep of the selected band is on
+screen); it is drawn as a grey line behind the live one, and the row says when it was saved (with the date if that was not today) and where its minimum lies. **Shown /
+Hidden** switches the line on or off, **Replace** stores the live sweep instead, **Delete** removes it. While the line is shown the
+Resonance tile adds the change against the reference (SWR and frequency of the minimum). The reference is kept per band in the browser,
+so a phone and a computer have their own; if it was saved with a different calibration state than the live sweep, a warning says so.
+The calibration panel at the bottom is described in chapter 6.
 
 ### 5.4 Multi
 
@@ -142,8 +160,10 @@ remembered. The calibration panel at the bottom is described in chapter 6.
 
 Tick any number of bands; each gets a card with its SWR curve, minimum SWR and the bandwidth around the minimum where SWR stays at or below the **SWR limit** (1.5, 2 or 3, the same choice as in HAM; the limit line is red, the bandwidth shaded blue). The bands are swept one
 after another (about one second each), so the refresh slows down with every band added. Every card says whether its band is
-"calibrated" (green) or "not calibrated" (red, uncorrected values), and a banner at the top summarises the selection. The
-calibration panel sits at the bottom of the Multi view as well. The selection is remembered.
+"calibrated" (green) or "not calibrated" (red, uncorrected values). The view is built like HAM: foldable, movable sections **Bands**
+(the selection, shown in the header while folded), **Tools** (the SWR limit, folded at first), **Measurements** (the cards) and
+**Calibration** (green header when all selected bands are calibrated). An orange banner at the top appears only when a selected band
+is not calibrated (or only some of them are); with no band selected there is no banner. The selection is remembered.
 
 ### 5.5 Cable
 

@@ -128,6 +128,19 @@ X, die Reaktanz als Induktivität oder Kapazität (in Reihe), |Γ| und die Phase
 
 <img src="../site/img/phone-ham-extras.png" width="280" alt="HAM-Ansicht">
 
+**Einklappbare, verschiebbare Bereiche.** Die HAM-Ansicht hat sechs Bereiche mit einer antippbaren Kopfzeile: **Band** (die Bandtasten), **Tools**
+(SWR-Limit, Referenz, Cursor-Bedienung), **SWR chart**, **Results** (die Kacheln), **Additional charts** und **Calibration**. Ein eingeklappter
+Bereich zeigt seinen Zustand in einer Zeile: das gewählte Band, oder zum Beispiel „Limit 2 · Reference on · Cursor 14.1204 MHz, SWR 1.14".
+Tools und Calibration sind zu Beginn eingeklappt, die anderen offen; die Wahl wird pro Browser gemerkt. Läuft eine geführte
+Kalibrierung, öffnet sich der Bereich Calibration von selbst. **Save Charts As .png** lässt die Diagramme eines eingeklappten Bereichs weg.
+
+Um einen Bereich an eine andere Stelle zu setzen, ziehst du ihn am gepunkteten Anfasser links in der Kopfzeile zwischen die anderen
+(mit der Tastatur: Anfasser fokussieren und Pfeil nach oben oder unten drücken). Die Reihenfolge wird pro Browser und Ansicht
+gemerkt; das Warnbanner bleibt oben.
+
+**Kalibrierstatus.** Ist das gewählte Band kalibriert, ist die Kopfzeile Calibration grün und es gibt kein Banner. Ohne Kalibrierung
+weist oben ein oranges Banner darauf hin („NOT calibrated: values are uncorrected"), weil die Werte dann nicht korrigiert sind.
+
 Sweep über ein Amateurfunkband: Das Band wählst du mit den Bandtasten. Die SWR-Kurve zeigt das Minimum, und die Kacheln nennen die Resonanz
 (das minimale SWR mit seiner Frequenz und der Impedanz R + jX dort), die Bandbreite darum herum, in der das SWR höchstens dem
 **SWR limit** entspricht (1,5, 2 oder 3, über dem Diagramm gewählt und gemerkt; das Limit ist als rote Linie gezeichnet, die Bandbreite blau
@@ -140,7 +153,15 @@ auch ein Tipp ins Diagramm oder eine Frequenzeingabe schaltet auf Manual. **Clea
 zusätzlichen Diagrammen zeigt ein Punkt den Wert des Cursors, und der Titel jedes Diagramms nennt den genauen Wert. Die Marker
 des Seitenmenüs (5.9) gelten in dieser Ansicht nicht. Unter dem Diagramm ergänzt **Also show**
 ein Diagramm der Rückflussdämpfung (dB) und eines für R / X (Wirk- und Blindwiderstand in Ω); beide teilen sich Frequenzachse und
-Cursor mit dem SWR-Diagramm. Die Auswahl wird gemerkt. Das Kalibrierfeld unten ist in Kapitel 6 beschrieben.
+Cursor mit dem SWR-Diagramm. Die Auswahl wird gemerkt.
+
+**Referenz.** Die Zeile **Reference** unter dem SWR-Limit hält pro Band einen Sweep zum Vergleich fest, zum Beispiel vor und nach dem
+Abgleich einer Antenne. **Save current sweep** speichert die aktuelle SWR-Kurve (die Taste ist erst aktiv, wenn der Sweep des gewählten
+Bandes auf dem Bildschirm ist); sie wird als graue Linie hinter der Live-Kurve gezeichnet, und die Zeile nennt Uhrzeit (mit Datum, wenn es nicht heute war) und Lage ihres
+Minimums. **Shown / Hidden** blendet die Linie ein oder aus, **Replace** speichert stattdessen den aktuellen Sweep, **Delete** entfernt
+sie. Solange die Linie sichtbar ist, ergänzt die Kachel Resonance die Änderung gegenüber der Referenz (SWR und Frequenz des Minimums).
+Die Referenz wird pro Band im Browser gemerkt, Handy und Computer haben also jeweils eine eigene; wurde sie mit einem anderen
+Kalibrierzustand als der Live-Sweep gespeichert, weist eine Warnung darauf hin. Das Kalibrierfeld unten ist in Kapitel 6 beschrieben.
 
 ### 5.4 Multi
 
@@ -148,8 +169,11 @@ Cursor mit dem SWR-Diagramm. Die Auswahl wird gemerkt. Das Kalibrierfeld unten i
 
 Beliebig viele Bänder antippen; jedes bekommt eine Karte mit SWR-Kurve, minimalem SWR und der Bandbreite um das Minimum, in der das SWR höchstens dem **SWR limit** entspricht (1,5, 2 oder 3, dieselbe Wahl wie in HAM; die Limitlinie ist rot, die Bandbreite blau hinterlegt). Die Bänder
 werden nacheinander gemessen (etwa eine Sekunde pro Band), die Aktualisierung wird also mit jedem Band langsamer. Jede Karte zeigt,
-ob ihr Band „calibrated“ (grün) oder „not calibrated“ (rot, unkorrigierte Werte) ist, ein Banner oben fasst die Auswahl zusammen.
-Das Kalibrierfeld steht auch unten in der Multi-Ansicht. Die Auswahl wird gemerkt.
+ob ihr Band „calibrated“ (grün) oder „not calibrated“ (rot, unkorrigierte Werte) ist. Die Ansicht ist wie HAM aufgebaut: einklappbare,
+verschiebbare Bereiche **Bands** (die Auswahl, eingeklappt in der Kopfzeile zu sehen), **Tools** (das SWR-Limit, zu Beginn eingeklappt),
+**Measurements** (die Karten) und **Calibration** (grüne Kopfzeile, wenn alle gewählten Bänder kalibriert sind). Ein orangefarbenes Banner
+oben erscheint nur, wenn ein gewähltes Band nicht (oder nur ein Teil davon) kalibriert ist; ohne gewähltes Band gibt es kein Banner.
+Die Auswahl wird gemerkt.
 
 ### 5.5 Cable
 

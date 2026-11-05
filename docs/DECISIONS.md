@@ -336,3 +336,23 @@ installer page on https cannot call a http device (mixed content); the installer
   below the limit; edges are interpolated linearly between the neighbouring points, and the search runs over the whole sweep, not only
   the band (the sweep is slightly wider). `lowOpen` / `highOpen` flag a stretch that reaches the end of the sweep (shown as "≥").
 - The limit (`store.swrLimit`: 1.5, 2 or 3, saved) is shared by HAM and Multi. The HAM tiles also show R + jX at the minimum.
+
+## Reference sweep in the HAM view (2026-11)
+- `lib/reference.js`, `store.hamRef`: one reference per band, kept in localStorage (frequency and SWR of each point, the calibration flag, a
+  `show` flag and the time). Only HAM draws it (grey line behind the live curve, change of the minimum in the Resonance tile); Multi, Freq and
+  Smith do not. Several references per band are #10 (named profiles).
+- Saving is only allowed while the live sweep belongs to the band (`sweepFitsBand`: covers the band, at most 3 times its width): right after a
+  switch of band or view the previous sweep (for example the full range) is still in `store.data` and was once saved by mistake.
+
+## Foldable, movable sections in the HAM and Multi views (2026-11)
+- `Fold.vue` + `store.folds` (id -> open, saved per browser): Band (the band buttons, summary = chosen band), Tools (limit, reference, cursor controls; closed by default), Results, Additional
+  charts, Calibration (closed by default, forced open while a guided calibration runs). Band buttons, calibration status and the SWR chart
+  stay. A closed section shows a one-line summary. HAM and Multi (Bands, Tools = SWR limit, Measurements, Calibration); the other views have far fewer elements.
+- Moving: a drag handle in the header (pointer events with capture, works for touch; arrow keys on the focused handle). Order = CSS `order` of the
+  section, kept in `store.order[view]` (`lib/order.js`: defaults, `normalizeOrder` drops unknown ids and appends new sections). While dragging, a section
+  swaps with a neighbour once the pointer passes that neighbour's middle (stable for sections of different height). The warning banner is not a
+  section and stays first. The SWR chart is a section too (`ham-swr`); the PNG export titles a chart by its own `.extra` label, not by its position.
+- Header look: a thin CSS chevron at the right (down when closed, up when open) in the dim text colour instead of the Material arrow icons.
+- Folded sections use `v-show`, so their charts stay mounted but have no size; `hamChartItems` leaves out charts that are not displayed.
+- Calibration status in HAM: `CalStatus` shows only a missing calibration (never an OK banner, and nothing when no band is selected: that was misleading in Multi); the Calibration fold header is green instead (`tone`). `lib/calstate.js` holds the rule for both views.
+  A missing calibration is an orange banner (amber for "none" and "partly" alike, also in Multi, instead of red).
