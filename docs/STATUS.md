@@ -32,6 +32,7 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
+- Enclosure (`enclosure/`, side task): variant `round` printed, fits perfectly, frozen (`variants/round/`, do not change). Both variants are published (committed and pushed, CC BY-SA 4.0, README and PROJECT list them). Variant `slot` (obround button holes 6.4 x 5.0) is not printed yet; the user will add a photo of the print with the display on: user wants to see how it looks and whether the buttons stay usable. Remaining: display window vs the real active area.
 - Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
   "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first
   trace and its title names it ("Max CH0 swr · 250.2 MHz"). Not looked at on the iPhone.

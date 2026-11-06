@@ -58,6 +58,7 @@ calibration, runs in the browser.
 - A **NanoVNA-H** (the text shell over USB; other NanoVNA models may work but are untested)
 - An **Adafruit ESP32-S3 Reverse TFT Feather**, [product 5691](https://www.adafruit.com/product/5691)
 - A **USB-C cable** between the two (the Feather is the host)
+- Optional: a printed [case](enclosure/README.md) for the Feather
 - Power for the Feather (USB-C power or a LiPo battery) and the **calibration kit** (open, short, load) that came with the NanoVNA
 - To flash the ready-made release: Python with `pip install esptool`. To build it yourself: [Node.js](https://nodejs.org/) and [PlatformIO](https://platformio.org/)
 
@@ -102,6 +103,7 @@ in `client/`); `dev-tools/simulator.py` is the same simulation as a server, used
   calibration and the cable tools above. See [client/README.md](client/README.md).
 - **manual/** - user manual, English and German.
 - **dev-tools/** - Python scripts for testing the bridge from a computer, the simulator and the screenshot script.
+- **enclosure/** - 3D-printable two-part case for the Feather, in two variants (round or slotted button holes): STL, STEP, SolidCraft parts and the CadQuery source. See [enclosure/README.md](enclosure/README.md).
 - **site/** - the feature page (GitHub Pages).
 - **docs/** - project notes: [PROJECT.md](docs/PROJECT.md), [STATUS.md](docs/STATUS.md), [DECISIONS.md](docs/DECISIONS.md).
   Contributor notes for Claude sessions: `CLAUDE.md`.
@@ -116,6 +118,7 @@ Ideas, bug reports and feature requests are welcome as [GitHub issues](https://g
 - `client/` is GPL-2.0 (see `client/COPYING`, upstream cho45/NanoVNA-WebClient). It is built separately and only
   embedded into the firmware image as data, so both licenses stay apart.
 
+- `enclosure/` (the case designs) is CC BY-SA 4.0, see `enclosure/LICENSE.md`.
 - The QR code on the Feather's display is drawn with Nayuki's [QR Code generator](https://github.com/nayuki/QR-Code-generator) (MIT, `firmware/src/third_party/qrcodegen/`).
 - The browser installer vendors [ESP Web Tools](https://github.com/esphome/esp-web-tools) (Apache-2.0, `site/install/vendor/`).
 
