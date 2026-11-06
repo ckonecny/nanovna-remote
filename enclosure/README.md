@@ -11,7 +11,7 @@ Both fit the same board and differ only in the four button holes of the front sh
 
 | Variant | Button holes | Status |
 |---|---|---|
-| [`variants/round/`](variants/round/) | round, 6.4 mm | **printed and approved**, frozen: do not change |
+| [`variants/round/`](variants/round/) | round, 6.4 mm | **printed and approved** (PLA and PETG), frozen: do not change |
 | [`variants/slot/`](variants/slot/) | obround (slot), 6.4 mm long x 5.0 mm wide, following the pill-shaped caps | made for looks, not printed yet; the buttons may be harder to press |
 
 ![Round variant, display side](images/round_display_side.png)
@@ -37,9 +37,9 @@ Requires `pip install cadquery`.
 Outer size 56.8 x 27.7 x 11.1 mm (board 50.8 x 22.9 mm).
 
 ## Printing (Bambu Lab)
-PLA or PETG, 0.2 mm layers, no supports, no brim. Both shells print with the outer face on the bed. Walls 3 loops.
+Printed successfully in both PLA and PETG, 0.2 mm layers, no supports, no brim. Both shells print with the outer face on the bed. Walls 3 loops.
 If the shells fit too tight or too loose, change `GAP` (sliding gap between lip and ring, now 0.15) and re-export.
-The `round` variant is the third print and fits perfectly. History and reasons: `docs/DECISIONS.md`.
+The `round` variant is the third print and fits perfectly in both materials. History and reasons: `docs/DECISIONS.md`.
 Snap strength: `RIDGE_H` (ridge height) and `GROOVE_D`; the lid has to click, not slide off when lifted.
 
 ## Assembly
