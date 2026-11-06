@@ -32,7 +32,7 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
-- Enclosure (`enclosure/`, side task): both variants (`round`, `slot`) printed, fit perfectly, published (CC BY-SA 4.0). Open: add the user's photo of the print with the display on to the README, check the display window against the real active area.
+- Enclosure (`enclosure/`, side task): both variants (`round`, `slot`) printed, fit perfectly, published (CC BY-SA 4.0). Photo of the slot print is in the README (WiFi name and IP pixelated). Open: check the display window against the real active area.
 - Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
   "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first
   trace and its title names it ("Max CH0 swr · 250.2 MHz"). Not looked at on the iPhone.

@@ -14,6 +14,8 @@ Both fit the same board and differ only in the four button holes of the front sh
 | [`variants/round/`](variants/round/) | round, 6.4 mm | **printed and approved** (PLA and PETG), frozen: do not change |
 | [`variants/slot/`](variants/slot/) | obround (slot), 6.4 mm long x 5.0 mm wide, following the pill-shaped caps | **printed and approved**: fits perfectly; chosen for looks, as the slots follow the pill-shaped caps |
 
+![Slot variant as printed, with the Feather running](images/slot_printed.jpg)
+
 ![Round variant, display side](images/round_display_side.png)
 ![Slot variant, display side](images/slot_display_side.png)
 ![Round variant, USB-C side](images/round_usb_side.png)
