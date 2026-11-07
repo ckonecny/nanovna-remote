@@ -33,7 +33,7 @@ This file holds only the current state and hints for the next session.
 
 ## Next steps
 - #54 resonance (X = 0) in HAM and Multi (Multi: second line and marker per card, colour unchanged; length hint "antenna about x % too long/short" in HAM, in Multi only outside the band): built, unit-tested (`reactanceZero`), checked in the demo (tile, marker lines in the SWR and R / X chart), manual EN + DE and DECISIONS updated. Committed (`4caa464`). Flashed via OTA (flash 87.9 %, over 85 %). Open: try it on the real antenna; the HAM screenshots in `dev-tools/screenshots/` and the feature page still show the old tile name if they include it.
-- Enclosure (`enclosure/`, side task): only the slot variant is left (round removed 2026-11-07). The printed slot case fits; the new version has 2 mm chamfers on the outer edge of both shells (no window chamfer): not printed yet, not committed. Open: print it, check the window against the real active area.
+- Enclosure (`enclosure/`, side task): only the slot variant is left (round removed 2026-11-07). The version with 2 mm chamfers on the outer edge of both shells (no window chamfer) is printed (fifth print, photo in the README). Open: check the window against the real active area.
 - Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
   "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first
   trace and its title names it ("Max CH0 swr · 250.2 MHz"). Not looked at on the iPhone.

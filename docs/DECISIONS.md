@@ -419,3 +419,4 @@ installer page on https cannot call a http device (mixed content); the installer
   data lines off. This is electrical, not a firmware limit: the host stack and `CONFIG_USB_HOST_HUBS_SUPPORTED` / `..._MULTI_LEVEL` are on, and a
   plain OTG adapter containing a hub (class 09) enumerates it and the device behind it. No firmware "host mode" can change this.
 - Supported ways to power the Feather: a full OTG adapter (data and power, no PD) or the LiPo battery. Documented in the manuals and README.
+- Enclosure fifth print (2026-11-07): the version with the 2 mm outer chamfers was printed (user report: the photo shows the chamfers and looks good); the files in `enclosure/` match the print.
