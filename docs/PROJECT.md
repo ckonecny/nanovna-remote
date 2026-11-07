@@ -22,7 +22,7 @@ NanoVNA-H --USB-- ESP32-S3 Feather --WiFi-- browser (all evaluation happens here
   calibration over all HAM bands (`src/lib/oslcal.js`), band definitions
   (`src/lib/bands.js`), dark mode, no-data notice.
 - `dev-tools/` — Python scripts for testing the bridge from a computer.
-- `enclosure/` — 3D-printable snap-fit case for the Feather (CC BY-SA 4.0): `make_enclosure.py` (CadQuery source), `variants/round` (printed, frozen) and `variants/slot` (obround button holes) with STL, STEP and SolidCraft `.sc`, `images/` renders.
+- `enclosure/` — 3D-printable snap-fit case for the Feather (CC BY-SA 4.0): `make_enclosure.py` (CadQuery source), STL, STEP and SolidCraft `.sc` of the slot case (obround button holes), `images/` renders and photo.
 - `manual/` — end-user manual in English and German.
 - `docs/` — `STATUS.md` (current state and next steps), `STATUS-ARCHIVE.md`
   (finished items), `DECISIONS.md` (why things are built this way, hardware findings).

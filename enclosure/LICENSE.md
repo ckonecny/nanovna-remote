@@ -1,4 +1,4 @@
-The files in this folder (`make_enclosure.py`, `variants/`, `images/`, `README.md`) are licensed under the
+The files in this folder (`make_enclosure.py`, the STL, STEP and `.sc` files, `images/`, `README.md`) are licensed under the
 Creative Commons Attribution-ShareAlike 4.0 International licence (CC BY-SA 4.0).
 
 Full text: https://creativecommons.org/licenses/by-sa/4.0/legalcode

@@ -103,7 +103,7 @@ in `client/`); `dev-tools/simulator.py` is the same simulation as a server, used
   calibration and the cable tools above. See [client/README.md](client/README.md).
 - **manual/** - user manual, English and German.
 - **dev-tools/** - Python scripts for testing the bridge from a computer, the simulator and the screenshot script.
-- **enclosure/** - 3D-printable two-part case for the Feather, in two variants (round or slotted button holes): STL, STEP, SolidCraft parts and the CadQuery source. See [enclosure/README.md](enclosure/README.md).
+- **enclosure/** - 3D-printable two-part case for the Feather, with slotted button holes: STL, STEP, SolidCraft parts and the CadQuery source. See [enclosure/README.md](enclosure/README.md).
 - **site/** - the feature page (GitHub Pages).
 - **docs/** - project notes: [PROJECT.md](docs/PROJECT.md), [STATUS.md](docs/STATUS.md), [DECISIONS.md](docs/DECISIONS.md).
   Contributor notes for Claude sessions: `CLAUDE.md`.

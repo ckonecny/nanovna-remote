@@ -42,8 +42,9 @@ FRONT_GAP = 0.3      # display front -> floor inside face (display must never be
 TOP_GAP = 0.7        # tallest top part -> roof inside face
 LIP_H = 3.0          # rabbet depth; the lip is 0.2 shorter
 WINDOW = (26.5, 16.5, 1.0)             # w, h, corner radius (active area 24.9 x 14.9)
-BTN_HOLE_D = 6.4     # round hole for the pill-shaped buttons, same diameter all the way through
-BTN_SLOT_W = 5.0     # variant "slot": obround hole, 6.4 long along x (same as the round hole), this wide along y
+BTN_SLOT_L = 6.4     # button hole: obround (slot) following the pill-shaped caps, this long along x ...
+BTN_SLOT_W = 5.0     # ... and this wide along y, the same all the way through
+EDGE_CH = 2.0        # chamfer on the outer edge of both shells (the face that lies on the print bed)
 PIN_D, POST_D, HOLD_D = 1.8, 4.4, 3.6  # locating pin, front post, hold-down post
 HOLD_CLEAR = 0.3     # air between the PCB top and the hold-down posts
 RIDGE_H, GROOVE_D = 0.45, 0.35          # snap ridge height / groove depth (past the sliding gap)
@@ -108,9 +109,9 @@ def usb_cutter():
             .edges("|X").fillet(USB_OPEN_R))
 
 
-def front_shell(variant="round"):
+def front_shell():
     s = rr(WALL, Z_OUT_F, ZP)
-    s = s.faces("<Z").edges().chamfer(0.4).faces(">Z").edges().chamfer(0.3)
+    s = s.faces("<Z").edges().chamfer(EDGE_CH).faces(">Z").edges().chamfer(0.3)
     s = s.cut(rr(0, FLOOR_IN, ZP + 1))                    # board cavity
     s = s.cut(rr(LIP + GAP, ZP - LIP_H, ZP + 1))          # rabbet for the lip
     for (x, y) in HOLES:                                  # support post + locating pin
@@ -120,11 +121,8 @@ def front_shell(variant="round"):
            .rect(WINDOW[0], WINDOW[1]).extrude(FLOOR + 1.1).edges("|Z").fillet(WINDOW[2]))
     s = s.cut(win)
     for i, (x, y) in enumerate(BUTTONS):                  # button access holes
-        if variant == "slot":
-            ang = 90 if i == 3 else 0                     # the reset button (D0 side) sits rotated by 90 degrees
-            s = s.cut(slot(x, y, BTN_HOLE_D, BTN_SLOT_W, Z_OUT_F - 1, FLOOR_IN + 0.05, ang))
-        else:
-            s = s.cut(cyl(x, y, BTN_HOLE_D, Z_OUT_F - 1, FLOOR_IN + 0.05))
+        ang = 90 if i == 3 else 0                         # the reset button (D0 side) sits rotated by 90 degrees
+        s = s.cut(slot(x, y, BTN_SLOT_L, BTN_SLOT_W, Z_OUT_F - 1, FLOOR_IN + 0.05, ang))
     zc = ZP - 1.4                                         # snap grooves, long sides
     for xc in (CX - 12, CX + 12):
         for side, ys in ((-1, Y0 - (LIP + GAP)), (1, Y1 + (LIP + GAP))):
@@ -136,7 +134,7 @@ def front_shell(variant="round"):
 
 def back_shell():
     s = rr(WALL, ZP, Z_OUT_B)
-    s = s.faces(">Z").edges().chamfer(0.4).faces("<Z").edges().chamfer(0.3)
+    s = s.faces(">Z").edges().chamfer(EDGE_CH).faces("<Z").edges().chamfer(0.3)
     s = s.cut(rr(0, ZP - 1, ROOF_IN))
     lip = rr(LIP, ZP - (LIP_H - 0.2), ZP + 0.01).cut(rr(0, ZP - LIP_H, ZP + 1))
     s = s.union(lip)
@@ -164,15 +162,13 @@ def check_fit(front, back, board_step):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--board", help="Adafruit 5691 STEP model, for an interference check")
-    ap.add_argument("--variant", choices=("round", "slot"), default="round",
-                    help="button holes: round (frozen, printed and approved) or slot (obround)")
-    ap.add_argument("--out", default=None, help="default: variants/<variant> next to this script")
+    ap.add_argument("--out", default=None, help="default: next to this script")
     a = ap.parse_args()
     if a.out is None:
-        a.out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "variants", a.variant)
+        a.out = os.path.dirname(os.path.abspath(__file__))
     os.makedirs(a.out, exist_ok=True)
 
-    f, b = front_shell(a.variant), back_shell()
+    f, b = front_shell(), back_shell()
     outer_w, outer_h = CW + 2 * WALL, CH + 2 * WALL
     print(f"outer size {outer_w:.1f} x {outer_h:.1f} x {Z_OUT_B - Z_OUT_F:.2f} mm")
     if a.board:
