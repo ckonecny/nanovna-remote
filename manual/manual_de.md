@@ -10,7 +10,10 @@ und stellt die Mess-App bereit. Du musst nichts installieren: Adresse des Feathe
 
 - Adafruit ESP32-S3 Reverse TFT Feather (Produkt 5691), an dessen USB-C-Buchse der NanoVNA-H hängt
   (USB-C-auf-USB-C- oder Adapterkabel; der Feather ist der USB-Host).
-- Stromversorgung des Feathers: USB-C über den NanoVNA oder ein LiPo-Akku am Feather.
+- Stromversorgung des Feathers: ein vollwertiger OTG-Adapter, der Strom und den NanoVNA gleichzeitig durchreicht, oder ein LiPo-Akku am Feather.
+- USB-C-Hubs, Docks und Multiport-Adapter mit Power Delivery (PD) funktionieren **nicht**: Sie versorgen den Feather mit Strom, schalten
+  aber ihre Datenleitungen nicht zu ihm durch, sodass weder der Hub noch der NanoVNA erscheint. Entweder ein richtiger OTG-Adapter
+  (reicht Daten und Strom durch, ohne PD-Verhandlung) oder den Feather per Akku betreiben und den NanoVNA direkt an die USB-C-Buchse stecken.
 
 ## 3. Display und Tasten des Feathers
 

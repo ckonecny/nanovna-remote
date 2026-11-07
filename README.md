@@ -59,7 +59,7 @@ calibration, runs in the browser.
 - An **Adafruit ESP32-S3 Reverse TFT Feather**, [product 5691](https://www.adafruit.com/product/5691)
 - A **USB-C cable** between the two (the Feather is the host)
 - Optional: a printed [case](enclosure/README.md) for the Feather
-- Power for the Feather (USB-C power or a LiPo battery) and the **calibration kit** (open, short, load) that came with the NanoVNA
+- Power for the Feather (a full OTG adapter that passes power and the NanoVNA at the same time, or a LiPo battery; USB-C PD hubs and docks do not work) and the **calibration kit** (open, short, load) that came with the NanoVNA
 - To flash the ready-made release: Python with `pip install esptool`. To build it yourself: [Node.js](https://nodejs.org/) and [PlatformIO](https://platformio.org/)
 
 ## Quick start
