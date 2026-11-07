@@ -74,10 +74,10 @@ def cyl(x, y, d, z0, z1):
             .circle(d / 2).extrude(z1 - z0))
 
 
-def slot(x, y, length, width, z0, z1):
-    """Obround hole (stadium), long axis along x."""
+def slot(x, y, length, width, z0, z1, angle=0):
+    """Obround hole (stadium), long axis along x (angle 0) or y (angle 90)."""
     return (cq.Workplane("XY").workplane(offset=z0).center(x, y)
-            .slot2D(length, width, 0).extrude(z1 - z0))
+            .slot2D(length, width, angle).extrude(z1 - z0))
 
 
 def box(x0, x1, y0, y1, z0, z1):
@@ -119,9 +119,10 @@ def front_shell(variant="round"):
     win = (cq.Workplane("XY").workplane(offset=Z_OUT_F - 1).center(*DISP_ACTIVE_C)
            .rect(WINDOW[0], WINDOW[1]).extrude(FLOOR + 1.1).edges("|Z").fillet(WINDOW[2]))
     s = s.cut(win)
-    for (x, y) in BUTTONS:                                # button access holes
+    for i, (x, y) in enumerate(BUTTONS):                  # button access holes
         if variant == "slot":
-            s = s.cut(slot(x, y, BTN_HOLE_D, BTN_SLOT_W, Z_OUT_F - 1, FLOOR_IN + 0.05))
+            ang = 90 if i == 3 else 0                     # the reset button (D0 side) sits rotated by 90 degrees
+            s = s.cut(slot(x, y, BTN_HOLE_D, BTN_SLOT_W, Z_OUT_F - 1, FLOOR_IN + 0.05, ang))
         else:
             s = s.cut(cyl(x, y, BTN_HOLE_D, Z_OUT_F - 1, FLOOR_IN + 0.05))
     zc = ZP - 1.4                                         # snap grooves, long sides
