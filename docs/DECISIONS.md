@@ -392,3 +392,20 @@ installer page on https cannot call a http device (mixed content); the installer
 - The `round` variant was printed successfully in both PLA and PETG (user report, 2026-11-06); the slot variant was printed too and fits perfectly (user report, 2026-11-06).
 - Slot variant, reset button (2026-11-07): the fourth button (44.45, 11.43) is soldered rotated by 90 degrees against the other three, so its slot runs along y (5.0 along x, 6.4 along y). Seen in the user's photo of the print. `round` is untouched. CadQuery: `slot(..., angle=90)`; SolidCraft: `BtnSlot4Sk` redone. Volumes unchanged (front 2098.4 mm³ in SolidCraft).
 - Slot variant with the reset slot turned by 90 degrees was printed and fits (user report, 2026-11-07).
+
+## Resonance (X = 0) next to the SWR minimum in HAM (2026-11, #54)
+- The lowest SWR is the best match, not resonance: they coincide only when R is close to the line impedance. HAM now names the old tile
+  "Best match (min SWR)" and adds "Resonance (X = 0 Ω)": `reactanceZero` in `lib/resonance.js` takes the **rising** zero crossing of X
+  (series resonance; a falling one is a parallel resonance with high R), interpolated linearly between neighbouring points inside the band,
+  with R and SWR interpolated the same way. With several, the one nearest to the SWR minimum. Marked as an orange dotted line in the SWR
+  and the R / X chart; the tile shows the offset to the SWR minimum.
+- Deliberately **no** X tolerance window or "X bandwidth": there is no common practice for it, and the SWR limit already combines R and X.
+  The usable bandwidth stays defined by the SWR limit.
+- Multi (#54): every card gets a second line and an orange dotted marker for the series resonance (inside the band, else outside the band
+  but in the sweep, else none), shown by a small dot (blue / orange / grey). The card colour stays on the minimum SWR only: it keeps one
+  meaning (the match); a low SWR with the resonance far away is visible from the dot instead of being mixed into the colour.
+- Length hint (#54): `lengthHint` in `lib/resonance.js`, a rule of thumb for simple resonant antennas (resonance inversely proportional to length):
+  `|centre / f_res - 1|` in percent, "too long" below the band centre, "too short" above, nothing within 0.2 %. Target is the band centre
+  (a fixed target frequency, e.g. for FT8, is not built). HAM shows it in the Resonance tile (also when the crossing is outside the band but
+  inside the sweep); Multi only when the resonance is outside the band. Never in the card colour. Coils, traps and surroundings break the rule,
+  so the manual calls it a guide.

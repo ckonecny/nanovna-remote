@@ -7,7 +7,7 @@ import Fold from './Fold.vue';
 import ChartFrame from './ChartFrame.vue';
 import { useFullChart } from '../lib/fullchart';
 import { HAM_BANDS } from '../lib/bands';
-import { resonance, SWR_LIMITS } from '../lib/resonance';
+import { resonance, reactanceZero, lengthHint, SWR_LIMITS } from '../lib/resonance';
 import { makeReference, referenceMin, compareMinima, sweepFitsBand, savedAt } from '../lib/reference';
 import { appCal } from '../lib/oslcal';
 import { calcSWR, calcZ, calcLogMag, formatFrequency } from '../lib/dsp';
@@ -70,6 +70,22 @@ const highEdge = computed(() => nearest(band.value.stop));
 // lowest SWR in the band and the stretch around it that stays at or below the chosen limit
 const res = computed(() => resonance(points.value, inBand.value, store.swrLimit));
 const bw = computed(() => (res.value ? res.value.bandwidth : null));
+
+// series resonance: X crosses 0 Ω (rising); with several crossings the one closest to the SWR minimum
+const xNear = computed(() => (minPoint.value ? minPoint.value.freq : null));
+const xIn = computed(() => reactanceZero(inBand.value, xNear.value));
+const xOut = computed(() => (xIn.value ? null : reactanceZero(points.value, xNear.value))); // in the sweep, but outside the band
+const xZero = computed(() => xIn.value || xOut.value);
+const lenHint = computed(() => {
+    const h = xZero.value ? lengthHint(xZero.value.freq, (band.value.start + band.value.stop) / 2) : null;
+    return h ? 'Rule of thumb: antenna about ' + h.pct.toFixed(1) + ' % too ' + h.dir + ' for the band centre' : '';
+});
+const xZeroOffset = computed(() => {
+    if (!xZero.value || !minPoint.value) return '';
+    const d = xZero.value.freq - minPoint.value.freq;
+    const t = Math.abs(d) >= 1e6 ? (d / 1e6).toFixed(3) + ' MHz' : (d / 1e3).toFixed(1) + ' kHz';
+    return (d > 0 ? '+' : d < 0 ? '−' : '') + t.replace('-', '') + ' from the SWR minimum';
+});
 
 // reference sweep of this band: saved from the live sweep, drawn as a grey line behind it
 const refSweep = computed(() => store.hamRef[band.value.name] || null);
@@ -246,6 +262,7 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
       <text v-for="f in xticks" :key="f" :x="x(f)" :y="H - 8" class="axis" text-anchor="middle">{{ (f / 1e6).toFixed(f < 20e6 ? 3 : 2) }}</text>
       <path v-if="refPath" :d="refPath" class="ref-curve" />
       <path :d="path" class="curve" />
+      <line v-if="xZero" :x1="x(xZero.freq)" :x2="x(xZero.freq)" :y1="T" :y2="H - B" class="xzero" />
       <circle v-if="minPoint" :cx="x(minPoint.freq)" :cy="y(minPoint.swr)" r="5" class="min" />
       <line v-if="cursor" :x1="x(cursor.p.freq)" :x2="x(cursor.p.freq)" :y1="T" :y2="H - B" class="cursor" />
       <circle v-if="cursor" :cx="x(cursor.p.freq)" :cy="y(cursor.p.swr)" r="6" class="cursor-dot" />
@@ -257,7 +274,8 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
     <Fold id="ham-tiles" group="ham" title="Results" :summary="tilesSummary">
     <div v-if="!points.length" class="empty">{{ store.status === 'connected' ? 'Waiting for measurement…' : 'Connect to the NanoVNA to measure' }}</div>
     <div v-else class="tiles">
-      <div class="tile" v-if="minPoint"><span class="label">Resonance (best match)</span><span class="value">{{ match(minPoint.swr).text }}</span><span class="sub">{{ match(minPoint.swr).label }} at {{ formatFrequency(minPoint.freq, 4) }} · {{ formatZ(minPoint.r, minPoint.xr, store.zFormat, 2) }}</span><span v-if="vsRefText" class="sub">{{ vsRefText }}</span></div>
+      <div class="tile" v-if="minPoint"><span class="label">Best match (min SWR)</span><span class="value">{{ match(minPoint.swr).text }}</span><span class="sub">{{ match(minPoint.swr).label }} at {{ formatFrequency(minPoint.freq, 4) }} · {{ formatZ(minPoint.r, minPoint.xr, store.zFormat, 2) }}</span><span v-if="vsRefText" class="sub">{{ vsRefText }}</span></div>
+      <div class="tile"><span class="label">Resonance (X = 0 Ω)</span><template v-if="xZero"><span class="value small">{{ formatFrequency(xZero.freq, 4) }}</span><span class="sub">R {{ fmt(xZero.r) }} Ω · SWR {{ fmt(xZero.swr) }}</span><span v-if="xOut" class="sub">outside the band</span><span class="sub">{{ xZeroOffset }}</span><span v-if="lenHint" class="sub">{{ lenHint }}</span></template><span v-else class="value small">none</span><span v-if="!xZero" class="sub">X does not cross 0 Ω rising in the sweep</span></div>
       <div class="tile"><span class="label">Bandwidth, SWR ≤ {{ store.swrLimit }}</span><span class="value small">{{ bwText }}</span><span v-if="bw" class="sub">{{ bwWidth }} wide{{ bw.lowOpen || bw.highOpen ? ' (reaches the end of the sweep)' : '' }}</span></div>
       <div class="tile" v-if="lowEdge"><span class="label">Lower band edge</span><span class="value">{{ match(lowEdge.swr).text }}</span><span class="sub">{{ formatFrequency(band.start, 3) }}</span></div>
       <div class="tile" v-if="highEdge"><span class="label">Upper band edge</span><span class="value">{{ match(highEdge.swr).text }}</span><span class="sub">{{ formatFrequency(band.stop, 3) }}</span></div>
@@ -279,6 +297,7 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
           <text :x="L - 6" :y="t.y + 4" class="axis" text-anchor="end">{{ t.label }}</text>
         </g>
         <line v-if="c.zero !== null" :x1="L" :x2="W - R" :y1="c.zero" :y2="c.zero" class="grid2" />
+        <line v-if="xZero && c.id === 'rx'" :x1="x(xZero.freq)" :x2="x(xZero.freq)" :y1="T" :y2="ehOf(c.id) - B" class="xzero" />
         <path v-for="(cv, i) in c.curves" :key="i" :d="cv.d" :class="cv.cls" />
         <line v-if="cursor" :x1="x(cursor.p.freq)" :x2="x(cursor.p.freq)" :y1="T" :y2="ehOf(c.id) - B" class="cursor" />
         <g v-if="cursor">
@@ -307,6 +326,7 @@ const xticks = computed(() => [0, 0.25, 0.5, 0.75, 1].map(t => fmin.value + t * 
 .axis { font-size: 12px; fill: var(--text-dim); }
 .curve { fill: none; stroke: var(--curve); stroke-width: 2; }
 .min { fill: #f44336; }
+.xzero { stroke: #ff9800; stroke-width: 1.5; stroke-dasharray: 2 3; }
 .ref-curve { fill: none; stroke: var(--text-dim); stroke-width: 1.5; opacity: 0.8; }
 .warn { color: #f44336; }
 .bw-area { fill: rgba(33, 150, 243, 0.2); }

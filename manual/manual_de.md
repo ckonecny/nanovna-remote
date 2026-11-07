@@ -166,10 +166,15 @@ gemerkt; das Warnbanner bleibt oben.
 **Kalibrierstatus.** Ist das gewählte Band kalibriert, ist die Kopfzeile Calibration grün und es gibt kein Banner. Ohne Kalibrierung
 weist oben ein oranges Banner darauf hin („NOT calibrated: values are uncorrected"), weil die Werte dann nicht korrigiert sind.
 
-Sweep über ein Amateurfunkband: Das Band wählst du mit den Bandtasten. Die SWR-Kurve zeigt das Minimum, und die Kacheln nennen die Resonanz
-(das minimale SWR mit seiner Frequenz und der Impedanz R + jX dort), die Bandbreite darum herum, in der das SWR höchstens dem
+Sweep über ein Amateurfunkband: Das Band wählst du mit den Bandtasten. Die SWR-Kurve zeigt das Minimum, und die Kacheln nennen den besten Abgleich
+(das minimale SWR mit seiner Frequenz und der Impedanz R + jX dort), die Resonanz (siehe unten), die Bandbreite darum herum, in der das SWR höchstens dem
 **SWR limit** entspricht (1,5, 2 oder 3, über dem Diagramm gewählt und gemerkt; das Limit ist als rote Linie gezeichnet, die Bandbreite blau
-hinterlegt) und das SWR an beiden Bandgrenzen. Die Bandbreite wird zwischen den Messpunkten interpoliert; reicht sie bis zum Ende des
+hinterlegt) und das SWR an beiden Bandgrenzen. **Resonanz und bester Abgleich sind nicht dasselbe.** Beim niedrigsten SWR ist der Abgleich am besten, resonant ist die Antenne aber dort,
+wo die Reaktanz X von unten nach oben durch 0 Ω geht (darüber induktiv, darunter kapazitiv). Beides fällt nur zusammen, wenn der Fußpunktwiderstand
+dort nahe 50 Ω liegt. Die Kachel **Resonance (X = 0 Ω)** nennt diese Frequenz mit R und SWR dort und dem Abstand zum SWR-Minimum; im SWR-Diagramm
+und im R / X-Diagramm ist sie als orange gepunktete Linie eingezeichnet. Bei mehreren Nulldurchgängen erscheint der, der dem SWR-Minimum am
+nächsten liegt; geht X im Band nicht durch 0 Ω, steht in der Kachel „none“. Beim Abstimmen kürzt oder verlängerst du die Antenne, bis beide
+Punkte im Band zusammenfallen. Die nutzbare Bandbreite bestimmt weiterhin das SWR-Limit. **Längenhinweis.** Unter den Resonanzwerten steht in der Kachel eine Faustregel: Bei einer einfachen Antenne (Dipol, Groundplane, Langdraht) verschiebt sich die Resonanz umgekehrt proportional zur Länge. Liegt die Resonanz unter der Bandmitte, ist die Antenne um etwa so viel Prozent zu lang (kürzen), darüber zu kurz (verlängern). Das ist nur ein Richtwert: Verlängerungsspulen, Traps, Fächerdipole, Boden und Umgebung verschieben die Resonanz anders, und innerhalb von 0,2 % um die Bandmitte wird nichts angezeigt. Geht X nur außerhalb des Bandes (aber im Sweep) durch 0 Ω, sagt die Kachel das und gibt den Hinweis trotzdem. Die Bandbreite wird zwischen den Messpunkten interpoliert; reicht sie bis zum Ende des
 Sweeps, steht das in der Kachel und die Breite erscheint mit „≥“. Tippe oder klicke ins Diagramm, um
 einen Cursor zu setzen, oder drücke **Frequency…** und gib eine genaue Frequenz ein (zum Beispiel 435 M); der Cursor sitzt dann auf
 dem nächsten Messpunkt. Die Leiste über dem Diagramm zeigt dort Frequenz, SWR, Rückflussdämpfung, R und X. **Min** und **Max** lassen den Cursor bei
@@ -184,7 +189,7 @@ Cursor mit dem SWR-Diagramm. Die Auswahl wird gemerkt.
 Abgleich einer Antenne. **Save current sweep** speichert die aktuelle SWR-Kurve (die Taste ist erst aktiv, wenn der Sweep des gewählten
 Bandes auf dem Bildschirm ist); sie wird als graue Linie hinter der Live-Kurve gezeichnet, und die Zeile nennt Uhrzeit (mit Datum, wenn es nicht heute war) und Lage ihres
 Minimums. **Shown / Hidden** blendet die Linie ein oder aus, **Replace** speichert stattdessen den aktuellen Sweep, **Delete** entfernt
-sie. Solange die Linie sichtbar ist, ergänzt die Kachel Resonance die Änderung gegenüber der Referenz (SWR und Frequenz des Minimums).
+sie. Solange die Linie sichtbar ist, ergänzt die Kachel Best match die Änderung gegenüber der Referenz (SWR und Frequenz des Minimums).
 Die Referenz wird pro Band im Browser gemerkt, Handy und Computer haben also jeweils eine eigene; wurde sie mit einem anderen
 Kalibrierzustand als der Live-Sweep gespeichert, weist eine Warnung darauf hin. Das Kalibrierfeld unten ist in Kapitel 6 beschrieben.
 
@@ -192,7 +197,7 @@ Kalibrierzustand als der Live-Sweep gespeichert, weist eine Warnung darauf hin. 
 
 <img src="../site/img/phone-multi.png" width="280" alt="Multi-Ansicht">
 
-Beliebig viele Bänder antippen; jedes bekommt eine Karte mit SWR-Kurve, minimalem SWR und der Bandbreite um das Minimum, in der das SWR höchstens dem **SWR limit** entspricht (1,5, 2 oder 3, dieselbe Wahl wie in HAM; die Limitlinie ist rot, die Bandbreite blau hinterlegt). Die Bänder
+Beliebig viele Bänder antippen; jedes bekommt eine Karte mit SWR-Kurve, minimalem SWR und der Bandbreite um das Minimum, in der das SWR höchstens dem **SWR limit** entspricht (1,5, 2 oder 3, dieselbe Wahl wie in HAM; die Limitlinie ist rot, die Bandbreite blau hinterlegt). Unter dem Diagramm nennt eine zweite Zeile die **Resonanz** des Bandes (wo die Reaktanz X von unten nach oben durch 0 Ω geht, mit R und SWR dort, wie in HAM) und zeichnet sie als orange gepunktete Linie ein; der Punkt davor ist blau, wenn die Resonanz im Band liegt, orange, wenn sie außerhalb des Bandes liegt (die Frequenz wird genannt), und grau, wenn X im Sweep nicht durch 0 Ω geht. Die Kartenfarbe (grün, orange, rot) sagt weiterhin nur etwas über die Anpassung, das niedrigste SWR, aus. Liegt die Resonanz außerhalb des Bandes, ergänzt die Zeile denselben Längenhinweis wie in HAM („Antenne etwa 2,3 % zu lang“, in der App englisch). Die Bänder
 werden nacheinander gemessen (etwa eine Sekunde pro Band), die Aktualisierung wird also mit jedem Band langsamer. Jede Karte zeigt,
 ob ihr Band „calibrated“ (grün) oder „not calibrated“ (rot, unkorrigierte Werte) ist. Die Ansicht ist wie HAM aufgebaut: einklappbare,
 verschiebbare Bereiche **Bands** (die Auswahl, eingeklappt in der Kopfzeile zu sehen), **Tools** (das SWR-Limit, zu Beginn eingeklappt),

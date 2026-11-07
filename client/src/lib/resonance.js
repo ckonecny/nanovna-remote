@@ -26,3 +26,30 @@ export function resonance(points, inBand, limit) {
     const to = highOpen ? points[hi].freq : crossing(points[hi], points[hi + 1], limit);
     return { min, bandwidth: { from, to, width: to - from, lowOpen, highOpen } };
 }
+
+// Series resonance: the frequency where the reactance X crosses 0 Ω going up (capacitive below, inductive above), found between
+// neighbouring points of `inBand` by linear interpolation. R and SWR at that frequency are interpolated the same way. A falling
+// crossing is a parallel resonance (high R) and is not an antenna's series resonance, so it is ignored. With several rising
+// crossings the one closest to `near` (a frequency, usually the SWR minimum) is returned. Points need `freq`, `xr`, `r`, `swr`.
+// Returns null when X does not cross zero inside the band.
+export function reactanceZero(inBand, near = null) {
+    let best = null;
+    for (let i = 1; i < inBand.length; i++) {
+        const a = inBand[i - 1], b = inBand[i];
+        if (!(a.xr < 0 && b.xr >= 0) || !isFinite(a.xr) || !isFinite(b.xr)) continue;
+        const t = b.xr === a.xr ? 0 : (0 - a.xr) / (b.xr - a.xr);
+        const hit = { freq: a.freq + t * (b.freq - a.freq), r: a.r + t * (b.r - a.r), swr: a.swr + t * (b.swr - a.swr) };
+        if (!best || (near !== null && Math.abs(hit.freq - near) < Math.abs(best.freq - near))) best = hit;
+    }
+    return best;
+}
+
+// Rule of thumb for a simple resonant antenna: the resonance moves inversely with the length, so a resonance below the target means
+// the antenna is too long by about (target / f - 1), above it too short. `target` is the band centre. Returns null when the
+// resonance is within 0.2 % of the target (nothing to do); otherwise { dir: 'long' | 'short', pct } with pct > 0.
+export function lengthHint(freq, target) {
+    if (!(freq > 0) || !(target > 0)) return null;
+    const pct = Math.abs(target / freq - 1) * 100;
+    if (pct < 0.2) return null;
+    return { dir: freq < target ? 'long' : 'short', pct };
+}

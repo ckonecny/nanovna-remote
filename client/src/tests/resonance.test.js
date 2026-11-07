@@ -42,3 +42,45 @@ describe('resonance', () => {
         expect(resonance(pts([1.5]), [], 2)).toBeNull();
     });
 });
+
+import { reactanceZero, lengthHint } from '../lib/resonance';
+
+const zp = (xs, f0 = 100, step = 10) => xs.map((xr, i) => ({ freq: f0 + i * step, xr, r: 40 + i, swr: 1 + i / 10 }));
+
+describe('reactanceZero', () => {
+    it('interpolates the rising crossing and the values there', () => {
+        const z = reactanceZero(zp([-30, -10, 10, 30]));
+        expect(z.freq).toBeCloseTo(115, 6); // halfway between 110 (-10) and 120 (+10)
+        expect(z.r).toBeCloseTo(41.5, 6);
+        expect(z.swr).toBeCloseTo(1.15, 6);
+    });
+    it('ignores a falling crossing (parallel resonance)', () => {
+        expect(reactanceZero(zp([30, 10, -10, -30]))).toBeNull();
+    });
+    it('is null without a crossing', () => {
+        expect(reactanceZero(zp([10, 20, 30]))).toBeNull();
+        expect(reactanceZero([])).toBeNull();
+    });
+    it('takes the crossing closest to the given frequency', () => {
+        const p = zp([-10, 10, -10, 10, -10, 10]); // rising at 105, 125, 145
+        expect(reactanceZero(p, 130).freq).toBeCloseTo(125, 6);
+        expect(reactanceZero(p, 100).freq).toBeCloseTo(105, 6);
+    });
+});
+
+describe('lengthHint', () => {
+    it('resonance below the target: too long', () => {
+        const h = lengthHint(7.0, 7.1);
+        expect(h.dir).toBe('long');
+        expect(h.pct).toBeCloseTo((7.1 / 7.0 - 1) * 100, 6);
+    });
+    it('resonance above the target: too short', () => {
+        const h = lengthHint(14.4, 14.175);
+        expect(h.dir).toBe('short');
+        expect(h.pct).toBeCloseTo((1 - 14.175 / 14.4) * 100, 6);
+    });
+    it('nothing to say within 0.2 %', () => {
+        expect(lengthHint(7.1, 7.105)).toBeNull();
+        expect(lengthHint(0, 7.1)).toBeNull();
+    });
+});

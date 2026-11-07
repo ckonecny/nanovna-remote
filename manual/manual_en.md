@@ -160,10 +160,15 @@ keyboard: focus the handle and press the up or down arrow). The order is remembe
 **Calibration status.** When the chosen band is calibrated, the Calibration header is green and there is no banner. Without a
 calibration an orange banner at the top says so ("NOT calibrated: values are uncorrected"), because the values are then not corrected.
 
-Sweep over an amateur band: pick the band with the band buttons. The SWR curve shows the minimum, and the tiles name the resonance
-(the minimum SWR with its frequency and the impedance R + jX there), the bandwidth around it where SWR stays at or below the
+Sweep over an amateur band: pick the band with the band buttons. The SWR curve shows the minimum, and the tiles name the best match
+(the minimum SWR with its frequency and the impedance R + jX there), the resonance (below), the bandwidth around it where SWR stays at or below the
 **SWR limit** (1.5, 2 or 3, chosen above the chart and remembered; the limit is drawn as a red line and the bandwidth shaded blue) and
-the SWR at both band edges. The bandwidth is read between the measured points by interpolation; if it runs to the end of the sweep,
+the SWR at both band edges. **Resonance and best match are not the same.** The lowest SWR is where the match is best, but an antenna is resonant where
+the reactance X crosses 0 Ω going up (inductive above, capacitive below). The two coincide only if the feed resistance there is close to
+50 Ω. The **Resonance (X = 0 Ω)** tile gives that frequency with R and SWR there and how far it lies from the SWR minimum; it is drawn
+as an orange dotted line in the SWR chart and in the R / X chart. With several crossings the one nearest to the SWR minimum is shown, and
+the tile says "none" if X does not cross 0 Ω in the band. When tuning, shorten or lengthen the antenna until both points meet inside the
+band. The usable bandwidth is still defined by the SWR limit. **Length hint.** Below the resonance figures the tile adds a rule of thumb: for a simple antenna (dipole, ground plane, long wire) the resonance moves inversely with the length, so a resonance below the band centre means the antenna is about that many percent too long (shorten it), above it too short (lengthen it). It is only a guide: loading coils, traps, fan dipoles, the ground and the surroundings shift the resonance differently, and nothing is shown within 0.2 % of the band centre. If X crosses 0 Ω only outside the band (but inside the sweep), the tile says so and still gives the hint. The bandwidth is read between the measured points by interpolation; if it runs to the end of the sweep,
 the tile says so and shows the width as "≥". Tap or click into the chart to place a cursor, or press
 **Frequency…** and type an exact frequency (for example 435 M); the cursor sits on the nearest measured point. The bar above the
 chart shows frequency, SWR, return loss, R and X there. **Min** and **Max** make the cursor follow the lowest or highest SWR in the
@@ -175,7 +180,7 @@ remembered. **Reference.** The **Reference** row under the SWR limit keeps one s
 you trim an antenna. **Save current sweep** stores the live SWR curve (it is only enabled once the sweep of the selected band is on
 screen); it is drawn as a grey line behind the live one, and the row says when it was saved (with the date if that was not today) and where its minimum lies. **Shown /
 Hidden** switches the line on or off, **Replace** stores the live sweep instead, **Delete** removes it. While the line is shown the
-Resonance tile adds the change against the reference (SWR and frequency of the minimum). The reference is kept per band in the browser,
+Best match tile adds the change against the reference (SWR and frequency of the minimum). The reference is kept per band in the browser,
 so a phone and a computer have their own; if it was saved with a different calibration state than the live sweep, a warning says so.
 The calibration panel at the bottom is described in chapter 6.
 
@@ -183,7 +188,7 @@ The calibration panel at the bottom is described in chapter 6.
 
 <img src="../site/img/phone-multi.png" width="280" alt="Multi view">
 
-Tick any number of bands; each gets a card with its SWR curve, minimum SWR and the bandwidth around the minimum where SWR stays at or below the **SWR limit** (1.5, 2 or 3, the same choice as in HAM; the limit line is red, the bandwidth shaded blue). The bands are swept one
+Tick any number of bands; each gets a card with its SWR curve, minimum SWR and the bandwidth around the minimum where SWR stays at or below the **SWR limit** (1.5, 2 or 3, the same choice as in HAM; the limit line is red, the bandwidth shaded blue). Below the chart a second line gives the **resonance** of the band (where the reactance X crosses 0 Ω going up, with R and SWR there, as in HAM) and draws it as an orange dotted line; the dot in front is blue when the resonance lies inside the band, orange when it lies outside the band (the frequency is named) and grey when X does not cross 0 Ω in the sweep. The card colour (green, orange, red) stays a statement about the match, the lowest SWR, only. When the resonance lies outside the band, the line adds the same length hint as in HAM ("antenna about 2.3 % too long"). The bands are swept one
 after another (about one second each), so the refresh slows down with every band added. Every card says whether its band is
 "calibrated" (green) or "not calibrated" (red, uncorrected values). The view is built like HAM: foldable, movable sections **Bands**
 (the selection, shown in the header while folded), **Tools** (the SWR limit, folded at first), **Measurements** (the cards) and

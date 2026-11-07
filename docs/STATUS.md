@@ -32,6 +32,7 @@ This file holds only the current state and hints for the next session.
   freeze, client on an iPhone, the old Feather (pre-display firmware) over WiFi.
 
 ## Next steps
+- #54 resonance (X = 0) in HAM and Multi (Multi: second line and marker per card, colour unchanged; length hint "antenna about x % too long/short" in HAM, in Multi only outside the band): built, unit-tested (`reactanceZero`), checked in the demo (tile, marker lines in the SWR and R / X chart), manual EN + DE and DECISIONS updated. Not committed yet. Flashed via OTA (flash 87.9 %, over 85 %). Open: try it on the real antenna; the HAM screenshots in `dev-tools/screenshots/` and the feature page still show the old tile name if they include it.
 - Enclosure (`enclosure/`, side task): both variants (`round`, `slot`) printed, fit perfectly, published (CC BY-SA 4.0). Photo of the slot print is in the README (WiFi name and IP pixelated). Open: check the display window against the real active area.
 - Marker labels in the dark scheme (border, lighter background, ring around the point) and Min/Max following the extremum with a
   "Min"/"Max" label: built, checked in the demo (dark and light), flashed. With several traces the tooltip sits on the first

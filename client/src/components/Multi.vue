@@ -8,9 +8,9 @@ import { calState } from '../lib/calstate';
 import CalPanel from './CalPanel.vue';
 import ChartFrame from './ChartFrame.vue';
 import { useFullChart } from '../lib/fullchart';
-import { calcSWR, formatFrequency } from '../lib/dsp';
+import { calcSWR, calcZ, formatFrequency } from '../lib/dsp';
 import { matchValue } from '../lib/valuefmt';
-import { resonance, SWR_LIMITS } from '../lib/resonance';
+import { resonance, reactanceZero, lengthHint, SWR_LIMITS } from '../lib/resonance';
 
 const SWR_MAX = 5;
 const W = 300, H = 110, L = 22, R = 6, T = 6, B = 6;
@@ -29,11 +29,16 @@ const cards = computed(() => {
         const band = HAM_BANDS.find(b => b.name === name);
         const m = store.multi[name];
         if (!band) return null;
-        const points = m ? m.points.map(p => ({ freq: p.freq, swr: calcSWR(p) })) : [];
+        const points = m ? m.points.map((p) => { const [r, xr] = calcZ(p); return { freq: p.freq, swr: calcSWR(p), r, xr }; }) : [];
         const inBand = points.filter(p => p.freq >= band.start && p.freq <= band.stop);
         const res = resonance(points, inBand, store.swrLimit);
         const min = res ? res.min : null;
         const bw = res ? res.bandwidth : null;
+        // series resonance (X = 0 Ω, rising): inside the band, else anywhere in the sweep ("outside"), else none
+        const near = min ? min.freq : null;
+        const xin = reactanceZero(inBand, near), xout = xin ? null : reactanceZero(points, near);
+        const xz = xin || xout;
+        const hint = xout ? lengthHint(xout.freq, (band.start + band.stop) / 2) : null; // only when the resonance is outside the band
         const f0 = points.length ? points[0].freq : band.start, f1 = points.length ? points[points.length - 1].freq : band.stop;
         const [w, h] = fc.sizeOf(name, W, H);
         const x = (f) => L + (f - f0) / (f1 - f0 || 1) * (w - L - R);
@@ -46,6 +51,7 @@ const cards = computed(() => {
             y,
             bwX: bw ? x(bw.from) : 0, bwW: bw ? Math.max(1, x(bw.to) - x(bw.from)) : 0,
             minX: min ? x(min.freq) : 0,
+            xz, hint, xzState: xin ? 'in' : xout ? 'out' : 'none', xzX: xz ? x(xz.freq) : 0,
             cls: !min ? '' : min.swr < 1.5 ? 'good' : min.swr < 3 ? 'warn' : 'bad',
         };
     }).filter(Boolean);
@@ -98,6 +104,7 @@ const grid = [1, 2, 3, 5];
           <rect v-if="c.bw" :x="c.bwX" :y="T" :width="c.bwW" :height="c.H - T - B" class="bw-area" />
           <line :x1="L" :x2="c.W - R" :y1="c.y(store.swrLimit)" :y2="c.y(store.swrLimit)" class="grid2" />
           <path :d="c.path" class="curve" />
+          <line v-if="c.xz" :x1="c.xzX" :x2="c.xzX" :y1="T" :y2="c.H - B" class="xzero" />
           <circle v-if="c.min" :cx="c.minX" :cy="c.y(c.min.swr)" r="3.5" class="min" />
         </svg>
         </ChartFrame>
@@ -106,6 +113,12 @@ const grid = [1, 2, 3, 5];
           <template v-if="c.min">min at {{ formatFrequency(c.min.freq, 4) }}</template>
           <template v-if="c.bw"> · SWR ≤ {{ store.swrLimit }}: {{ formatFrequency(c.bw.from, 3) }} – {{ formatFrequency(c.bw.to, 3) }}</template>
           <template v-else> · SWR ≤ {{ store.swrLimit }}: none</template>
+        </div>
+        <div v-if="c.measured" class="sub res" :class="'res-' + c.xzState">
+          <span class="dot"></span>
+          <template v-if="c.xzState === 'in'">Resonance (X = 0 Ω) at {{ formatFrequency(c.xz.freq, 4) }} · R {{ fmt(c.xz.r) }} Ω · SWR {{ fmt(c.xz.swr) }}</template>
+          <template v-else-if="c.xzState === 'out'">Resonance (X = 0 Ω) outside the band, at {{ formatFrequency(c.xz.freq, 3) }}<template v-if="c.hint"> · antenna about {{ c.hint.pct.toFixed(1) }} % too {{ c.hint.dir }}</template></template>
+          <template v-else>Resonance (X = 0 Ω): none in the sweep</template>
         </div>
       </div>
     </div>
@@ -130,6 +143,11 @@ const grid = [1, 2, 3, 5];
 .name { font-size: 16px; font-weight: 500; }
 .flag { font-size: 12px; color: #f44336; }
 .flag.is-cal { color: #4caf50; }
+.xzero { stroke: #ff9800; stroke-width: 1.5; stroke-dasharray: 2 3; }
+.res { display: flex; align-items: center; gap: 6px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--text-dim); }
+.res-in .dot { background: #2196f3; }
+.res-out .dot { background: #ff9800; }
 .swr { margin-left: auto; font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .chart { display: block; width: 100%; height: auto; }
 .chart.full { height: 100%; }
