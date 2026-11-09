@@ -209,6 +209,11 @@ straight line (a plausibility check) and the one-way loss at three frequencies (
 **Zero: nothing attached** with the cable removed: the NanoVNA has a delay of its own that would otherwise be added to the length;
 the zero is remembered per sweep. A cable longer than the limit of the sweep shows a wrong, shorter length without any warning.
 
+To compensate the feedline of an antenna, measure it here with its far end open and press **Use as port extension**: the measured
+delay becomes the port extension (see *Port extension...* in the menu), so the velocity factor does not need to be known. Then
+connect the antenna and measure as usual. **Clear port extension** switches it off again. Do not measure through a balun or matching
+unit that belongs to the antenna; the button is greyed out while the phase is not a straight line.
+
 Below the results, **Characteristic impedance** needs two measurements of the same cable with the same sweep: press **Measure
 open** with the far end open and **Measure short** with it shorted (in either order; **Clear** starts again). The impedance is the
 geometric mean of the two readings, taken over the frequencies where both are well measurable; a cable that is too short for the
@@ -301,6 +306,8 @@ The menu button opens it. Entries that need a connection are greyed out until yo
   off). The app turns the measured reflection back by the delay of that line (length and the velocity factor of the Cable
   view), so Smith chart, impedance and SWR refer to the end of the line. It applies to the reflection in Single, HAM, Multi,
   Smith and the charts, not to the Cable and TDR views or to transmission (CH1). Calibrate at the NanoVNA's port, not at the end of the line.
+  In the input dialog, **Measure it…** opens the Cable view: with the feedline's far end open, press **Use as port extension**
+  there to measure the length instead of typing it (section 5.5).
 
 **Device**
 - **Connect** / **Disconnect**.

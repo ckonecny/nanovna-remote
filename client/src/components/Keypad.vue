@@ -75,6 +75,7 @@ const submitWithUnit = (factor) => {
       </table>
       </div>
       <div class="dialog-actions">
+        <slot name="actions" />
         <button class="btn btn-primary" @click="$emit('close')">Cancel</button>
       </div>
     </div>

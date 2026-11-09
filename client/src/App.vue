@@ -629,7 +629,11 @@ const quit = () => {
             :modelValue="keypadValue" 
             :unit="keypadUnit"
             @submit="handleKeypadSubmit" 
-            @close="showKeypad = false" />
+            @close="showKeypad = false">
+      <template #actions v-if="keypadTarget === 'portext'">
+        <button class="btn" @click="showKeypad = false; menuVisible = false; selectView('cable')">Measure it…</button>
+      </template>
+    </Keypad>
     
     <TraceDialog v-if="showTraceDialog" 
                  :show="showTraceDialog"

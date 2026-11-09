@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { analyseCable, C, CABLE_RANGES } from '../lib/cable';
+import { analyseCable, portExtend, portExtensionFromDelay, C, CABLE_RANGES } from '../lib/cable';
 
 // reflection of an open-ended line of length l (m), velocity factor vf and one-way loss (dB at 1 MHz, growing with sqrt(f))
 const line = (l, vf, { loss = 0, range = CABLE_RANGES.long } = {}) => {
@@ -48,5 +48,21 @@ describe('cable zero', () => {
         });
         const r = analyseCable(withOffset, { vf: 0.66, length: 0, zero: 2e-9 });
         expect(r.length).toBeCloseTo(10, 2);
+    });
+
+    it('measured feedline delay gives a port extension that removes the line from an open end', () => {
+        const vf = 0.66, l = 7.3;
+        const r = analyseCable(line(l, vf), { vf, length: 0 });
+        const ext = portExtensionFromDelay(r.delay, vf);
+        expect(ext).toBeCloseTo(l, 2);
+        // the same line used as feedline: the reflection of the open end turned back is 1 + 0j at every frequency
+        const back = portExtend(line(l, vf), ext / (C * vf));
+        for (const p of back) { expect(p.real).toBeCloseTo(1, 2); expect(p.imag).toBeCloseTo(0, 2); }
+    });
+
+    it('the extension does not depend on the velocity factor assumed', () => {
+        const l = 7.3, vf = 0.66;
+        const tau = (vf2) => portExtensionFromDelay(analyseCable(line(l, vf), { vf: vf2, length: 0 }).delay, vf2) / (C * vf2);
+        expect(tau(0.8)).toBeCloseTo(tau(0.5), 11);
     });
 });

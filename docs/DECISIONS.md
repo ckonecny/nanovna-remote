@@ -224,6 +224,9 @@ installer page on https cannot call a http device (mixed content); the installer
   itself (see app-side OSL). So the port extension is done in the client (`portExtend` in `lib/cable.js`): the corrected
   reflection is turned by +4 pi f tau, tau = length / (c * VF), applied to the main sweep and to Multi. Not to Cable/TDR
   (own delay maths) and not yet to CH1 (#44 stays open for S21).
+- Auto-detect (#55): the Cable view's "Use as port extension" stores the measured delay of the open feedline as
+  `portExtLength = delay * c * VF` (`portExtensionFromDelay`, rounded to 1 mm). `portDelay` divides by the same VF, so the
+  factor cancels and need not be known. Cable loss is not corrected (phase only). Unit-tested on a modelled open line.
 - Firmware note (`lib/fwcheck.js`): only for `Board: NanoVNA-H` / `NanoVNA-H 4` (projects hugen79/NanoVNA-H and -H4, tag =
   `version` output, e.g. 1.2.50); other forks use their own numbering. GitHub API from the browser; silent on any error, never in
   the demo build. A device with 1.2.50 / build 2026-05-16 was the latest release when this was written.

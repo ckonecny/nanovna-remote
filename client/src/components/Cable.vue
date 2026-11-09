@@ -3,7 +3,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { store } from '../store';
 import ChartFrame from './ChartFrame.vue';
 import { useFullChart } from '../lib/fullchart';
-import { CABLE_RANGES, CABLE_TYPES, analyseCable, analyseImpedance, stubLength, wavelength } from '../lib/cable';
+import { CABLE_RANGES, CABLE_TYPES, analyseCable, analyseImpedance, portExtensionFromDelay, stubLength, wavelength } from '../lib/cable';
 import { formatFrequency } from '../lib/dsp';
 
 const mode = ref('length'); // 'length': velocity factor known, 'vf': length known
@@ -51,6 +51,10 @@ const chart = computed(() => {
         xticks: [0, 0.5, 1].map(t => ({ x: x(f0 + t * (f1 - f0)), label: (f0 + t * (f1 - f0)) / 1e6 })),
     };
 });
+
+// the measured delay of the open feedline becomes the port extension (the velocity factor cancels out)
+const usePortExt = () => { if (result.value && result.value.valid) store.portExtLength = portExtensionFromDelay(result.value.delay, store.velocityFactor); };
+const clearPortExt = () => { store.portExtLength = 0; };
 
 // one-way loss at a few frequencies
 const lossRows = computed(() => {
@@ -146,6 +150,12 @@ const fmt = (v, d = 2) => (isFinite(v) ? v.toFixed(d) : '–');
         <div class="tile" v-else><span class="label">Velocity factor</span><span class="value">{{ fmt(result.vf, 3) }}</span><span class="sub">for {{ fmt(store.cableLength, 1) }} m</span></div>
         <div class="tile"><span class="label">One-way delay</span><span class="value">{{ fmt(result.delay * 1e9, 1) }} ns</span></div>
         <div class="tile" :class="{ bad: !result.good }"><span class="label">Fit</span><span class="value small">{{ result.good ? 'phase is a straight line' : 'not a straight line' }}</span><span class="sub">{{ result.good ? 'result is plausible' : 'cable not open/short, or not connected' }}</span></div>
+      </div>
+
+      <div v-if="result.valid" class="zero">
+        <button class="btn-small pill" :disabled="!result.good" @click="usePortExt">Use as port extension</button>
+        <button class="btn-small pill" :disabled="!(store.portExtLength > 0)" @click="clearPortExt">Clear port extension</button>
+        <span class="sub">{{ store.portExtLength > 0 ? 'Port extension now ' + fmt(store.portExtLength, 3) + ' m (at velocity factor ' + fmt(store.velocityFactor) + ')' : 'For a feedline to an antenna: leave its end open, press this, then connect the antenna.' }}</span>
       </div>
 
       <ChartFrame v-if="chart" title="Cable phase" @change="(s) => fc.onFrame('chart', s)">

@@ -220,6 +220,11 @@ einfache Laufzeit, ob die Phase eine Gerade ist (Plausibilitätsprüfung) und di
 Laufzeit, die sonst zur Länge addiert würde; der Nullwert wird pro Sweep gemerkt. Ein Kabel, das länger als die Grenze des Sweeps
 ist, zeigt ohne Warnung eine falsche, kürzere Länge.
 
+Um die Zuleitung einer Antenne zu kompensieren, wird sie hier bei offenem Ende gemessen und **Use as port extension** gedrückt: Die
+gemessene Laufzeit wird zur Port Extension (siehe *Port extension...* im Menü), der Verkürzungsfaktor muss dafür nicht bekannt sein.
+Danach die Antenne anstecken und wie gewohnt messen. **Clear port extension** schaltet sie wieder ab. Nicht durch einen Balun oder ein
+Anpassglied messen, das zur Antenne gehört; der Knopf ist grau, solange die Phase keine Gerade ist.
+
 Darunter braucht der **Wellenwiderstand** zwei Messungen am selben Kabel mit demselben Sweep: **Measure open** bei offenem und
 **Measure short** bei kurzgeschlossenem Ende (Reihenfolge egal; **Clear** beginnt von vorn). Der Wellenwiderstand ist das
 geometrische Mittel der beiden Messwerte, ausgewertet bei den Frequenzen, bei denen beide gut messbar sind; ein für den Sweep zu
@@ -316,6 +321,8 @@ Der Menüknopf öffnet es. Einträge, die eine Verbindung brauchen, sind bis zum
   App dreht die gemessene Reflexion um die Laufzeit dieser Leitung zurück (Länge und Verkürzungsfaktor der Ansicht Cable),
   sodass Smith-Diagramm, Impedanz und SWR sich auf das Leitungsende beziehen. Es gilt für die Reflexion in Single, HAM, Multi,
   Smith und den Diagrammen, nicht für die Ansichten Cable und TDR und nicht für die Transmission (CH1). Kalibriert wird am Anschluss des NanoVNA, nicht am Leitungsende.
+  Im Eingabedialog öffnet **Measure it…** die Ansicht Cable: Bei offenem Ende der Zuleitung dort **Use as port extension** drücken,
+  dann wird die Länge gemessen statt eingetippt (Abschnitt 5.5).
 
 **Device**
 - **Connect** / **Disconnect**.

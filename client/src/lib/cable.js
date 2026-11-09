@@ -59,6 +59,9 @@ export function fitPhase(points, phases) {
 export const delayFromSlope = (slope) => -slope / (4 * Math.PI);
 
 export const lengthFromDelay = (delay, vf) => delay * C * vf;
+// Port extension length (m, rounded to the mm) that gives back exactly this delay at the velocity factor in use: the extension is
+// stored as a length and turned into a delay with the same factor, so the factor cancels out.
+export const portExtensionFromDelay = (delay, vf) => Math.round(lengthFromDelay(delay, vf) * 1000) / 1000;
 export const velocityFactorFromDelay = (delay, length) => length / (delay * C);
 
 // one-way loss in dB at every usable point: the reflection of an open or short end has the loss of the way there and back
