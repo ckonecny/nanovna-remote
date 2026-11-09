@@ -154,6 +154,7 @@ class Vna {
         const parts = line.trim().split(/\s+/).filter(Boolean);
         if (!parts.length) return enc('');
         const [cmd, ...args] = parts;
+        if (cmd === 'vbat') return enc('3920 mV\r\n');
         if (cmd === 'version') return enc('1.2.0\r\n');
         if (cmd === 'info') return enc('Kernel: simulator\r\nBoard: NanoVNA-H (simulated)\r\nVersion: 1.2.0\r\nPlatform: simulated\r\n');
         if (cmd === 'bandwidth' || cmd === 'smooth' || cmd === 'power') {

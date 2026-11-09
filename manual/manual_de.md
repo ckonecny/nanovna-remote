@@ -97,7 +97,7 @@ modelliert, nicht gemessen, und die Kalibrierung bleibt nur in deinem Browser.
 
 **Kopfzeile.** Links der Menüknopf (öffnet das Seitenmenü, 5.9). Dann der Farbschema-Knopf (Antippen schaltet der Reihe nach
 *folgt dem System* (A), *hell* (Sonne) und *dunkel* (Mond) durch; das helle Schema hat einen hohen Kontrast für den Einsatz im
-Sonnenlicht; die Wahl merkt sich der Browser) und je nach Zustand **connect** /
+Sonnenlicht; die Wahl merkt sich der Browser), die **Batterie des NanoVNA** (Symbol mit Prozentangabe, rot ab 15 % abwärts, ein Blitz beim Laden oder an externer Versorgung; die Spannung zeigt der Tooltip; Prozent und Ladezustand werden nur aus der Spannung geschätzt) und je nach Zustand **connect** /
 **connecting...**. Bei bestehender Verbindung steuert der Knopf daneben die Messung: **Pause** / **Resume** bei Sweeps bis 101
 Punkten (die App misst laufend), **Update** / **Stop** bei längeren Sweeps (siehe *Resolution* in 5.9; der Knopf zeigt den
 Fortschritt in Segmenten).

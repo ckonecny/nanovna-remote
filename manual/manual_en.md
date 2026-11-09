@@ -93,7 +93,7 @@ calibration stays in your browser only.
 
 **Header.** Left: the menu button (opens the side menu, 5.9). Then the colour scheme button (tap it to cycle through
 *follows the system* (A), *light* (sun) and *dark* (moon); the light scheme has a high contrast for use in sunlight; the choice
-is remembered in the browser) and, depending on the state, **connect** / **connecting...**. When connected, the button next to it controls the measurement: **Pause** / **Resume** for
+is remembered in the browser), the **battery of the NanoVNA** (symbol with percentage, red at 15 % or less, a bolt while it is charging or on external power; tap and hold or hover for the voltage; the percentage and the charging state are estimated from the voltage alone) and, depending on the state, **connect** / **connecting...**. When connected, the button next to it controls the measurement: **Pause** / **Resume** for
 sweeps of up to 101 points (the app measures continuously), **Update** / **Stop** for longer sweeps (see *Resolution* in 5.9;
 the button shows the progress in segments).
 

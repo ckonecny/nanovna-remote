@@ -141,6 +141,7 @@ class Vna:
         parts = line.split()
         if not parts: return b""
         cmd, args = parts[0], parts[1:]
+        if cmd == "vbat": return b"3920 mV\r\n"
         if cmd == "version": return b"1.2.0\r\n"
         if cmd == "info":
             return (b"Kernel: simulator\r\nBoard: NanoVNA-H (simulated)\r\nVersion: 1.2.0\r\nPlatform: simulated\r\n")

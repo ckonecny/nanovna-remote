@@ -406,6 +406,13 @@ const quit = () => {
         <span class="icon">{{ { auto: 'brightness_auto', light: 'light_mode', dark: 'dark_mode' }[store.theme] }}</span>
       </button>
 
+      <span v-if="store.battery && store.status === 'connected'" class="battery" :class="{ low: store.battery.percent <= 15 && !store.battery.charging }"
+        :title="'NanoVNA battery ' + store.battery.mV + ' mV' + (store.battery.charging ? ' (charging or on external power, estimated from the voltage)' : '')">
+        <span class="battery-body"><span class="battery-fill" :style="{ width: store.battery.percent + '%' }"></span></span>
+        <span class="battery-tip"></span>
+        <span class="battery-text"><span v-if="store.battery.charging" class="icon battery-bolt">bolt</span>{{ store.battery.percent }} %</span>
+      </span>
+
       <button class="btn btn-primary" v-if="store.status === 'disconnected'" @click="handleConnect">
         <span class="icon">usb</span>&nbsp;connect
       </button>

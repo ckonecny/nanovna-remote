@@ -443,3 +443,11 @@ installer page on https cannot call a http device (mixed content); the installer
   ("taken over"). The client (`NanoVNA_WebSocket.onclose`) turns it into `store.takenOver` and shows a notice with "Take over again".
 - The app never reconnects by itself after a loss, so two open browsers do not kick each other in a loop. Refusing the second browser and sharing
   the bridge were rejected as the minimal compromise: take over keeps the newest user in control. Checked on the device: the first of two clients gets 4001.
+
+## NanoVNA battery in the header (#50)
+- Probed on the NanoVNA-H 1.2.50 (read only): `vbat` answers `4210 mV`; `vbat_offset 450`, `tcxo 26000000` (Hz of the Si5351 reference),
+  `threshold 300000110`, `offset 12000`, `time 2026/11/09 ...`, `power`, `smooth`, `edelay`, `s21offset`, `usart_cfg`, `config` (usage only, no brightness) all answer.
+  Only the battery is built; TCXO, threshold and offset stay off (a wrong value detunes the device).
+- The device gives only the voltage, no charge state. `lib/battery.js`: percent from a typical single-cell Li-Ion curve (3.3 V = 0 %, 4.2 V = 100 %),
+  "charging" is a guess (voltage at 4.15 V or more, or rising by 15 mV against the last four readings). Read on connect and every 30 s (`refreshBattery`).
+  Not yet checked with the NanoVNA running on its battery (no charge bolt expected then).

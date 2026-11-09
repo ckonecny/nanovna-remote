@@ -425,3 +425,12 @@ h6 {
     max-height: 60dvh;
   }
 }
+
+/* battery of the NanoVNA in the title bar */
+.battery { display: inline-flex; align-items: center; gap: 0; margin-right: 10px; font-size: 0.8em; white-space: nowrap; }
+.battery-body { position: relative; width: 24px; height: 12px; border: 1.5px solid currentColor; border-radius: 3px; padding: 1px; box-sizing: border-box; }
+.battery-fill { display: block; height: 100%; background: currentColor; border-radius: 1px; }
+.battery-tip { width: 2px; height: 5px; background: currentColor; border-radius: 0 1px 1px 0; margin-right: 4px; }
+.battery-text { display: inline-flex; align-items: center; }
+.battery-bolt { font-size: 14px; }
+.battery.low { color: #d93025; }

@@ -219,6 +219,13 @@ export class NanoVNA_Base {
         await this.sendCommand(`power ${power}\r`, async () => await this.getMultiline());
     }
 
+    // battery voltage in mV (`vbat`), null when the reply is not understood
+    async getBatteryMv() {
+        const text = await this.sendCommand('vbat\r', async () => await this.getMultiline());
+        const m = /(\d+)\s*mV/.exec(text);
+        return m ? +m[1] : null;
+    }
+
     // current IF bandwidth divider, smoothing and output power of the device; a value is null when the reply is not understood
     async getSweepSettings() {
         const ask = async (cmd) => await this.sendCommand(`${cmd}\r`, async () => await this.getMultiline());

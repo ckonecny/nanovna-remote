@@ -5,6 +5,7 @@ import { HAM_BANDS, bandSweep } from './lib/bands';
 import { CABLE_RANGES, portExtend, C } from './lib/cable';
 import { TDR_RANGES } from './lib/tdr';
 import { newerFirmware } from './lib/fwcheck';
+import { batteryPercent, batteryCharging } from './lib/battery';
 import { SWR_LIMITS } from './lib/resonance';
 import { validReference } from './lib/reference';
 import { DEFAULT_ORDER, normalizeOrder } from './lib/order';
@@ -88,6 +89,7 @@ const defaultState = {
     themeEffective: 'light',
     lastDataAt: 0, // when the last measurement arrived
     silentSecs: 0, // seconds without a new measurement while one is expected
+    battery: null, // { mV, percent, charging } of the NanoVNA, null until read
     takenOver: false, // another browser took over the bridge (only one browser can use the NanoVNA at a time)
     deviceFrozen: false, // the NanoVNA keeps returning exactly the same values
     singleFreq: 145e6, // frequency of the Single view
@@ -251,6 +253,23 @@ export async function getWorker() {
     return workerProxy;
 }
 
+// battery of the NanoVNA: read on connect and every 30 s
+const batteryHistory = [];
+export async function refreshBattery() {
+    try {
+        const mV = await (await getWorker()).getBatteryMv();
+        if (!mV) return;
+        store.battery = { mV, percent: batteryPercent(mV), charging: batteryCharging(mV, batteryHistory) };
+        batteryHistory.push(mV);
+        if (batteryHistory.length > 6) batteryHistory.shift();
+    } catch (e) {
+        log('Cannot read the battery: ' + e);
+    }
+}
+setInterval(() => {
+    if (store.status === 'connected' && !store.calibrationRunning) refreshBattery();
+}, 30000);
+
 // the sweep time depends on the IF bandwidth of the device
 export async function refreshBandwidth() {
     try {
@@ -352,6 +371,7 @@ export async function connect() {
         store.info = await workerProxy.getInfo();
         store.fwNew = null;
         refreshBandwidth();
+        refreshBattery();
         if (!import.meta.env.VITE_DEMO) newerFirmware(store.version, store.info).then((r) => { store.fwNew = r; });
         startUpdateLoop();
     } catch (e) {
@@ -369,6 +389,8 @@ export async function disconnect() {
     // whatever the update loop or a calibration was waiting for will never arrive: let go of it so that a new connection starts clean
     loopGeneration++;
     loopRunning = false;
+    store.battery = null;
+    batteryHistory.length = 0;
     store.updating = false;
     if (calRun.running) {
         calRun.running = false;

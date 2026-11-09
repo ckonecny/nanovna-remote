@@ -149,6 +149,10 @@ class NanoVNAWorker {
         };
     }
 
+    async getBatteryMv() {
+        return await this.nanovna.getBatteryMv();
+    }
+
     async getSweepSettings() {
         return await this.nanovna.getSweepSettings();
     }
