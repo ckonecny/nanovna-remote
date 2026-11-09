@@ -288,6 +288,13 @@ installer page on https cannot call a http device (mixed content); the installer
   the old `TextDecoder('ascii')` is windows-1252 and turned bytes 0x80-0x9f into other characters, which also affected `capture`.
 - Left on `scan`/`data`: the Single/Freq live loop (gradual refresh looks smoother) and the segment scan (existing tests pin its sequence).
 
+## Point count and `measure` on the NanoVNA-H 1.2.50 (#51, 2026-11, measured on the device)
+- The point count is fixed at a maximum of 101 (`info`: `p:101`). `scan`/`scan_bin` with more answer `sweep points exceeds range 101`
+  (so `scan_bin` replies with text, not a record); fewer points work (11 and 51 tried, 0.05 s for 11 points, 0.2 s for 101).
+  More resolution is only possible by several sweeps over sub-ranges (what the segment scan already does).
+- `measure {none|lc|lcshunt|lcseries|xtal|filter|cable|resonance}` only switches an on-device evaluation shown on the LCD: over the
+  serial line it prints nothing (no result to read), so the app cannot reuse it; the client's own evaluations (Cable, resonance, Q) cover it.
+
 ## Guided calibration (#19, 2026-11)
 - `CalPanel.vue` leads through Open, Short, Load (state in `calRun`: `guided`, `next`, `suspect`); only the current standard can be
   measured, the panel advances after each, **Back** repeats the previous one (not after the last: the solved bands have dropped their
