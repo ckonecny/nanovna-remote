@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "driver/gpio.h"
+#include "driver/ledc.h"
 #include "driver/spi_master.h"
 #include "esp_heap_caps.h"
 #include "esp_lcd_panel_io.h"
@@ -50,13 +51,34 @@ void display_set_flipped(bool flipped) {
     esp_lcd_panel_set_gap(panel, 40, 53);
 }
 
+void display_backlight(int percent) {
+    percent = std::clamp(percent, 0, 100);
+    ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, percent * 1023 / 100);
+    ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+}
+
 void display_init(bool flipped) {
     gpio_config_t out = {};
-    out.pin_bit_mask = (1ULL << PIN_TFT_POWER) | (1ULL << PIN_BACKLIGHT);
+    out.pin_bit_mask = 1ULL << PIN_TFT_POWER;
     out.mode = GPIO_MODE_OUTPUT;
     gpio_config(&out);
     gpio_set_level(PIN_TFT_POWER, 1);  // powers the display and the Stemma QT connector
-    gpio_set_level(PIN_BACKLIGHT, 0);
+
+    // the backlight is dimmed with PWM (10 bit, 5 kHz); dark until the first picture is drawn
+    ledc_timer_config_t timer = {};
+    timer.speed_mode = LEDC_LOW_SPEED_MODE;
+    timer.duty_resolution = LEDC_TIMER_10_BIT;
+    timer.timer_num = LEDC_TIMER_0;
+    timer.freq_hz = 5000;
+    timer.clk_cfg = LEDC_AUTO_CLK;
+    ESP_ERROR_CHECK(ledc_timer_config(&timer));
+    ledc_channel_config_t ch = {};
+    ch.gpio_num = PIN_BACKLIGHT;
+    ch.speed_mode = LEDC_LOW_SPEED_MODE;
+    ch.channel = LEDC_CHANNEL_0;
+    ch.timer_sel = LEDC_TIMER_0;
+    ch.duty = 0;
+    ESP_ERROR_CHECK(ledc_channel_config(&ch));
 
     done = xSemaphoreCreateBinary();
     buf = (uint16_t *)heap_caps_malloc(BUF_PIXELS * 2, MALLOC_CAP_DMA);
@@ -93,7 +115,7 @@ void display_init(bool flipped) {
     display_set_flipped(flipped);
     display_fill(0, 0, DISPLAY_W, DISPLAY_H, 0);
     ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(panel, true));
-    gpio_set_level(PIN_BACKLIGHT, 1);
+    display_backlight(100);
     ESP_LOGI(TAG, "display ready");
 }
 

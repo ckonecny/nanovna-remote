@@ -45,8 +45,16 @@ Er ist klein, halte das Handy 10 bis 15 cm vor das Display.
 `[Setup WiFi]` öffnet das Setup-WLAN. D0/D2 wählen, D1 kurz verbindet. D1 lang öffnet die Optionen des gewählten
 Netzes: Connect (verbinden), Enable/Disable (aktivieren/deaktivieren), Delete (löschen, mit Rückfrage), Back (zurück).
 
-**Menü:** Choose WiFi (WLAN wählen), Start setup WiFi (Setup-WLAN starten), Rotate display (Bild um 180 Grad drehen,
-wird gemerkt), Restart (Neustart), About (die Firmware-Version, zum Beispiel `v1.1.0`), Back (zurück).
+**Menü:** Choose WiFi (WLAN wählen), Start setup WiFi (Setup-WLAN starten), Display (siehe unten), Restart (Neustart), About (die Firmware-Version, zum Beispiel `v1.1.0`), Back (zurück).
+
+**Display-Menü:** *Rotate display* dreht das Bild um 180 Grad (wird gemerkt). Bei den anderen Einträgen schaltet jeder Druck auf D1 zum nächsten Wert weiter; alle Werte werden gemerkt.
+*Brightness* (1/5 bis 5/5) ist die normale Helligkeit der Hintergrundbeleuchtung. *Dim after* (never = nie, 1, 5, 10 oder 15 min) ist
+die Zeit ohne Tastendruck, nach der die Beleuchtung abgedunkelt wird. *Dimmed* (off, 1/4 bis 4/4) ist die Stufe, auf die sie dann
+sinkt; jede Stufe liegt unter der niedrigsten normalen Helligkeit, „off“ schaltet die Beleuchtung ganz aus. Jeder Tastendruck
+bringt die normale Helligkeit zurück. War die Beleuchtung ganz aus, schaltet dieser erste Druck sie nur ein und löst nichts aus,
+damit man keine Funktion blind auslöst; war das Display nur abgedunkelt, wirkt der Druck wie gewohnt. Der Zeitgeber zählt nur
+Tastendrücke am Gerät, nicht die Bedienung der Web-App. Die Energieersparnis ist gering (WLAN und der NanoVNA brauchen das
+meiste); die Funktion dient vor allem dem Komfort im Dunkeln.
 
 Die Anzeige am Gerät und die Webseiten sind englisch.
 

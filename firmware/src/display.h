@@ -10,6 +10,8 @@
 constexpr uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) { return (uint16_t)(((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)); }
 
 void display_init(bool flipped);
+// backlight in percent of full power (PWM duty), 0 = off
+void display_backlight(int percent);
 void display_set_flipped(bool flipped);  // turns the picture by 180 degrees
 void display_fill(int x, int y, int w, int h, uint16_t color);
 // draws one line of text (opaque background); returns the width in pixels. scale 1 = 6x8 px per character, 2 = 12x16

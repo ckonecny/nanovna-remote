@@ -43,8 +43,15 @@ appears by itself when the setup WiFi opens; any key closes it, and it closes by
 `[Setup WiFi]` opens the setup WiFi. D0/D2 select, D1 short connects. D1 long opens the options of the
 selected network: Connect, Enable/Disable, Delete (with a question), Back.
 
-**Menu:** Choose WiFi, Start setup WiFi, Rotate display (turns the picture by 180 degrees, remembered),
-Restart, About (the firmware version, for example `v1.1.0`), Back.
+**Menu:** Choose WiFi, Start setup WiFi, Display (see below), Restart, About (the firmware version, for example `v1.1.0`), Back.
+
+**Display menu:** *Rotate display* turns the picture by 180 degrees (remembered). On the other entries each press of D1 switches to the next value; all values are remembered.
+*Brightness* (1/5 to 5/5) is the normal brightness of the backlight. *Dim after* (never, 1, 5, 10 or 15 min) is the time without a
+key press after which the backlight is dimmed. *Dimmed* (off, 1/4 to 4/4) is the level it drops to; every level is below the lowest
+normal brightness, and "off" switches the backlight off completely. Any key press brings the normal brightness back. If the
+backlight was completely off, that first press only switches it on and does nothing else, so you never trigger a function
+blindly; if the display was only dimmed, the press works as usual. The timer counts key presses on the device only, not use of the
+web app. The saving of energy is small (WiFi and the NanoVNA need most of it); the feature is mainly for comfort in the dark.
 
 ## 4. First start and WiFi setup
 

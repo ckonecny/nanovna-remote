@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "ui.h"
 
+#include <algorithm>
 #include <functional>
 #include <memory>
 #include <string>
@@ -188,9 +189,60 @@ void about() {
                    [](int) { pop(); }));
 }
 
+// Display brightness: 5 steps for normal use; after an inactivity time the backlight drops to one of 5 dimmed steps (all below the
+// lowest normal one, the first is fully off). Duty in percent; the eye sees roughly the square root, hence the uneven steps.
+const int NORMAL_PCT[5] = {10, 25, 45, 70, 100};
+const int DIM_PCT[5] = {0, 1, 2, 4, 7};
+const int DIM_AFTER_MIN[5] = {0, 1, 5, 10, 15};  // 0 = never
+
+uint8_t bright_step = 4;  // index into NORMAL_PCT
+uint8_t dim_step = 0;     // index into DIM_PCT
+uint8_t dim_after = 0;    // index into DIM_AFTER_MIN
+bool dimmed = false;
+
+void load_display_settings() {
+    bright_step = std::min<int>(ui_setting_get("bright", 4), 4);
+    dim_step = std::min<int>(ui_setting_get("dimlvl", 0), 4);
+    dim_after = std::min<int>(ui_setting_get("dimmin", 0), 4);
+}
+
+void backlight_normal() {
+    dimmed = false;
+    display_backlight(NORMAL_PCT[bright_step]);
+}
+
+void display_menu() {
+    push(make_list("Display", "D1:change long:back",
+                   [] {
+                       std::string after = DIM_AFTER_MIN[dim_after] ? std::to_string(DIM_AFTER_MIN[dim_after]) + " min" : "never";
+                       return std::vector<std::string>{"Brightness " + std::to_string(bright_step + 1) + "/5", "Dim after " + after,
+                                                       "Dimmed " + (dim_step ? std::to_string(dim_step) + "/4" : std::string("off")),
+                                                       "Rotate display", "Back"};
+                   },
+                   [](int i) {
+                       switch (i) {
+                           case 0:
+                               bright_step = (bright_step + 1) % 5;
+                               ui_setting_set("bright", bright_step);
+                               backlight_normal();
+                               break;
+                           case 1:
+                               dim_after = (dim_after + 1) % 5;
+                               ui_setting_set("dimmin", dim_after);
+                               break;
+                           case 2:
+                               dim_step = (dim_step + 1) % 5;
+                               ui_setting_set("dimlvl", dim_step);
+                               break;
+                           case 3: ui_flipped_set(!ui_flipped_get()); display_set_flipped(ui_flipped_get()); break;
+                           default: pop();
+                       }
+                   }));
+}
+
 void main_menu() {
     push(make_list("Menu", "D1:ok long:back",
-                   [] { return std::vector<std::string>{"Choose WiFi", "Start setup WiFi", "Rotate display", "Restart", "About", "Back"}; },
+                   [] { return std::vector<std::string>{"Choose WiFi", "Start setup WiFi", "Display", "Restart", "About", "Back"}; },
                    [](int i) {
                        switch (i) {
                            case 0: wifi_list(); break;
@@ -198,7 +250,7 @@ void main_menu() {
                                wifi_mgr_open_ap();
                                pop_to_root();
                                break;
-                           case 2: ui_flipped_set(!ui_flipped_get()); display_set_flipped(ui_flipped_get()); break;
+                           case 2: display_menu(); break;
                            case 3: esp_restart(); break;
                            case 4: about(); break;
                            default: pop();
@@ -334,15 +386,26 @@ void ui_task(void *) {
     bool flipped_seen = ui_flipped_get();
     bool custom_drawn = false;  // the top screen paints itself (QR code) and has covered the rows
     WifiState state_seen = WIFI_STARTING;
+    load_display_settings();
+    backlight_normal();
     while (true) {
         ButtonMessage m;
         if (buttons_wait(m, 250)) {
             last_key = xTaskGetTickCount() * portTICK_PERIOD_MS;
-            stack.back()->key(m);
-            apply_navigation();
+            bool was_dark = dimmed && dim_step == 0;
+            if (dimmed) backlight_normal();
+            if (!was_dark) {  // a press on a dark display only switches the light on: nobody should act blind
+                stack.back()->key(m);
+                apply_navigation();
+            }
         } else if (stack.size() > 1 && xTaskGetTickCount() * portTICK_PERIOD_MS - last_key > IDLE_MS && !stack.back()->stays_open()) {
             pop_to_root();
             apply_navigation();
+        }
+        if (!dimmed && DIM_AFTER_MIN[dim_after] &&
+            xTaskGetTickCount() * portTICK_PERIOD_MS - last_key > (uint32_t)DIM_AFTER_MIN[dim_after] * 60000) {
+            dimmed = true;
+            display_backlight(DIM_PCT[dim_step]);
         }
         WifiState state = wifi_mgr_status().state;
         if (state == WIFI_AP && state_seen != WIFI_AP && stack.size() == 1) {  // the setup WiFi just opened: show the code to join it

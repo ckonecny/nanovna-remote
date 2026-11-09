@@ -136,6 +136,25 @@ void ui_flipped_set(bool flipped) {
     nvs_close(h);
 }
 
+uint8_t ui_setting_get(const char *key, uint8_t def) {
+    nvs_handle_t h;
+    uint8_t v = def;
+    if (nvs_open("ui", NVS_READONLY, &h) == ESP_OK) {
+        nvs_get_u8(h, key, &v);
+        nvs_close(h);
+    }
+    return v;
+}
+
+void ui_setting_set(const char *key, uint8_t value) {
+    if (ui_setting_get(key, value + 1) == value) return;  // spare the flash
+    nvs_handle_t h;
+    if (nvs_open("ui", NVS_READWRITE, &h) != ESP_OK) return;
+    nvs_set_u8(h, key, value);
+    nvs_commit(h);
+    nvs_close(h);
+}
+
 std::vector<WifiScanResult> wifi_scan() {
     std::vector<WifiScanResult> out;
     if (esp_wifi_scan_start(nullptr, true) != ESP_OK) return out;

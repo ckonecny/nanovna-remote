@@ -430,3 +430,10 @@ installer page on https cannot call a http device (mixed content); the installer
   plain OTG adapter containing a hub (class 09) enumerates it and the device behind it. No firmware "host mode" can change this.
 - Supported ways to power the Feather: a full OTG adapter (data and power, no PD) or the LiPo battery. Documented in the manuals and README.
 - Enclosure fifth print (2026-11-07): the version with the 2 mm outer chamfers was printed (user report: the photo shows the chamfers and looks good); the files in `enclosure/` match the print.
+
+## Display brightness and dimming (#26, 2026-11)
+- The backlight (GPIO 45) is driven by LEDC PWM (10 bit, 5 kHz) instead of on/off. Normal steps 10/25/45/70/100 % duty, dimmed steps
+  off/1/2/4/7 % (below the lowest normal step). Settings in NVS namespace `ui` (`bright`, `dimlvl`, `dimmin`); the menu entry is "Display".
+- A key press while dimmed restores the normal level; when the light was fully off the press is swallowed (nothing runs blind).
+  The timer counts button presses only; web-app use does not keep the display lit. Power saving is small (backlight about 5 % of the
+  battery draw, estimated, not measured). Flash 88.5 %.

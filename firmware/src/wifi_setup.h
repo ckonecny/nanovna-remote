@@ -29,6 +29,9 @@ void wifi_last_set(const std::string &ssid);
 
 bool ui_flipped_get();
 void ui_flipped_set(bool flipped);
+// small display settings kept in NVS (namespace "ui"): brightness steps and dimming
+uint8_t ui_setting_get(const char *key, uint8_t def);
+void ui_setting_set(const char *key, uint8_t value);
 
 // networks in range, strongest first, without duplicates (blocking scan, needs the station interface up)
 std::vector<WifiScanResult> wifi_scan();
