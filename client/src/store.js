@@ -88,6 +88,7 @@ const defaultState = {
     themeEffective: 'light',
     lastDataAt: 0, // when the last measurement arrived
     silentSecs: 0, // seconds without a new measurement while one is expected
+    takenOver: false, // another browser took over the bridge (only one browser can use the NanoVNA at a time)
     deviceFrozen: false, // the NanoVNA keeps returning exactly the same values
     singleFreq: 145e6, // frequency of the Single view
     velocityFactor: 0.66, // Default for RG58 etc
@@ -284,6 +285,7 @@ export function detectBestConnectionType() {
 export async function connect() {
     try {
         store.status = 'connecting';
+        store.takenOver = false;
 
         const type = detectBestConnectionType();
         store.connectionType = type; // Ensure store state reflects detection
@@ -314,6 +316,7 @@ export async function connect() {
             onerror: (e) => {
                 log('Worker/Client error: ' + e);
                 store.error = String(e); // Show error
+                if (String(e).includes('taken over')) store.takenOver = true;
             },
             ondisconnected: () => {
                 log('Worker/Client disconnected');

@@ -659,9 +659,10 @@ export class NanoVNA_WebSocket extends NanoVNA_Base {
             socket.onopen = () => resolve(socket);
             socket.onerror = () => reject(new Error('cannot reach ' + device.url));
         });
-        this.socket.onclose = () => {
+        this.socket.onclose = (event) => {
             if (this.readerThread) {
-                this.onerror(new Error('connection closed'));
+                // close code 4001: another browser opened the bridge and took over (firmware, ws_handler)
+                this.onerror(new Error(event && event.code === 4001 ? 'taken over' : 'connection closed'));
                 this.close();
             }
         };

@@ -441,6 +441,10 @@ const quit = () => {
       <button class="btn" @click="store.fwDismissed = store.fwNew.tag">Dismiss</button>
     </div>
 
+    <div class="stale" v-if="store.takenOver && store.status === 'disconnected'">
+      Another browser has taken over the NanoVNA. Only one browser can use it at a time.
+      <button class="btn" @click="handleConnect">Take over again</button>
+    </div>
     <div class="stale" v-if="store.status === 'connected' && store.autoUpdate && (store.deviceFrozen || store.silentSecs > 6)">
       <template v-if="store.deviceFrozen">The NanoVNA delivers no new measurements (the values no longer change). Please restart the NanoVNA.</template>
       <template v-else>No data from the NanoVNA for {{ store.silentSecs }} s. Check the connection or restart the NanoVNA.</template>

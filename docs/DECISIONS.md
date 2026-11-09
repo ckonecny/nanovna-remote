@@ -437,3 +437,9 @@ installer page on https cannot call a http device (mixed content); the installer
 - A key press while dimmed restores the normal level; when the light was fully off the press is swallowed (nothing runs blind).
   The timer counts button presses only; web-app use does not keep the display lit. Power saving is small (backlight about 5 % of the
   battery draw, estimated, not measured). Flash 88.5 %.
+
+## One browser at a time (#21)
+- The bridge serves one WebSocket. A new handshake closes the old one (`ws_handler`); before that the firmware sends a close frame with code 4001
+  ("taken over"). The client (`NanoVNA_WebSocket.onclose`) turns it into `store.takenOver` and shows a notice with "Take over again".
+- The app never reconnects by itself after a loss, so two open browsers do not kick each other in a loop. Refusing the second browser and sharing
+  the bridge were rejected as the minimal compromise: take over keeps the newest user in control. Checked on the device: the first of two clients gets 4001.

@@ -405,6 +405,7 @@ hochladen. Siehe `firmware/README.md`.
 | Das Display bleibt dunkel | RESET drücken. Bleibt es dunkel, per USB neu flashen. |
 | Kein Setup-WLAN sichtbar | D0 halten und RESET drücken. Nach **NanoVNA-Remote** suchen (nicht nach einem älteren Namen). |
 | Die Seite öffnet nicht | IP-Adresse vom Display verwenden; `nanovna.local` funktioniert nicht überall. |
+| „Another browser has taken over the NanoVNA“ | Der NanoVNA kann nur von einem Browser gleichzeitig genutzt werden; ein neu verbundener Browser ersetzt den früheren. Mit **Take over again** übernimmst du ihn hier zurück (der andere Browser wird dann getrennt). |
 | Chrome unter Android 17 zeigt `ERR_TOO_MANY_RETRIES` für jede Adresse im Heimnetz (Firefox funktioniert) | Android 17 sperrt den Zugriff auf das lokale Netz, bis du ihn erlaubst: **Einstellungen → Apps → Chrome → Berechtigungen → Geräte in der Nähe → Zulassen**. |
 | „USB: no device“ | USB-Kabel zwischen Feather und NanoVNA prüfen; der NanoVNA muss eingeschaltet sein. |
 | Daten bleiben aus, NanoVNA hängt | NanoVNA neu starten (er kann nach einem Feather-Reset während einer Übertragung hängen). |

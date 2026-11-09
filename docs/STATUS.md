@@ -33,6 +33,7 @@ This file holds only the current state and hints for the next session.
 
 ## Next steps
 - #26 display brightness (5 steps), dimming after 1/5/10/15 min to 5 dimmed steps (first = off), first key press on a dark display only lights it: built, flashed via OTA (flash 88.5 %, over 85 %), device boots and joins WiFi. Not yet looked at on the display (brightness steps, dim, wake press). Manual EN + DE and DECISIONS updated, not committed.
+- #21 second browser: the bridge sends close code 4001 when a new browser takes over; the old one shows "Another browser has taken over" with a "Take over again" button. Built, flashed (flash 88.5 %), close code checked with two WebSocket clients; notice in the app not looked at in a browser. Manual EN + DE and DECISIONS updated, not committed.
 - #55 port extension from a measurement (Cable view: "Use as port extension", button "Measure it…" in the port extension input dialog): built, unit-tested, checked in the demo (cable-open 25 m gives 25.08 m, zero not set), manual EN + DE and DECISIONS updated. Client only. Flashed via OTA (flash 87.9 %), not committed. Open: try it on a real feedline, then antenna.
 - #54 resonance (X = 0) in HAM and Multi (Multi: second line and marker per card, colour unchanged; length hint "antenna about x % too long/short" in HAM, in Multi only outside the band): built, unit-tested (`reactanceZero`), checked in the demo (tile, marker lines in the SWR and R / X chart), manual EN + DE and DECISIONS updated. Committed (`4caa464`). Flashed via OTA (flash 87.9 %, over 85 %). Open: try it on the real antenna; the HAM screenshots in `dev-tools/screenshots/` and the feature page still show the old tile name if they include it.
 - Enclosure (`enclosure/`, side task): only the slot variant is left (round removed 2026-11-07). The version with 2 mm chamfers on the outer edge of both shells (no window chamfer) is printed (fifth print, photo in the README). Open: check the window against the real active area.
@@ -52,7 +53,7 @@ This file holds only the current state and hints for the next session.
   `nanovna.js`), flashed and checked on the device (Multi, TDR, back to Freq). Single/Freq live loop and the segment scan are
   unchanged on purpose (see DECISIONS). Committed.
 - #44 port extension: done for S11 in metres only; open: input in ns, S21. Issue stays open (user to decide).
-- Feature backlog in GitHub issues (#6, #8, #10, #14, #15, #17, #21-#24, #29, #44, #45, #47-#50, #53 (#46, #47 done; #51 closed: max 101 points, `measure` is display-only); #16 and #18 are closed by the touch/theme commit). #27 is closed (device page `/update`). #29: screenshots in the manual (the user has not decided).
+- Feature backlog in GitHub issues (#6, #8, #10, #14, #15, #17, #22, #24, #29, #44, #45, #47-#50, #53 (#46, #47 done; #51 closed: max 101 points, `measure` is display-only); #16 and #18 are closed by the touch/theme commit). #27 is closed (device page `/update`). #29: screenshots in the manual (the user has not decided).
 - OSV ignore list (`client/osv-scanner.toml`, 3 build-tool findings in vite-plugin-pwa/workbox-build) expires 2027-02-02:
   check for a workbox-build update before then and drop the entries.
 - Optional: `dev-tools/screenshots/shots.mjs` could use the JS simulator (`client/src/lib/demo.js`) instead of

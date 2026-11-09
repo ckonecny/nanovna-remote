@@ -372,7 +372,14 @@ esp_err_t ws_handler(httpd_req_t *req) {
             std::lock_guard<std::mutex> lock(bridge_mutex);
             previous = bridge_fd;
         }
-        if (previous >= 0) {  // a newer browser tab takes over
+        if (previous >= 0) {  // a newer browser tab takes over; the old one is told why (close code 4001)
+            static const uint8_t taken[] = {0x0F, 0xA1, 't', 'a', 'k', 'e', 'n', ' ', 'o', 'v', 'e', 'r'};
+            httpd_ws_frame_t bye = {};
+            bye.type = HTTPD_WS_TYPE_CLOSE;
+            bye.final = true;
+            bye.payload = const_cast<uint8_t *>(taken);
+            bye.len = sizeof taken;
+            httpd_ws_send_frame_async(server, previous, &bye);
             httpd_sess_trigger_close(server, previous);
             bridge_end(previous);
         }
