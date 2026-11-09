@@ -241,6 +241,7 @@ chart:
 
 - **Start/Stop** or **Center/Span**: tap a field to open the keypad. Type the number and finish with the unit key **G**, **M**,
   **k** or **x1** (Hz); that key also confirms the input. The backspace key deletes the last digit.
+  Inputs that are no frequency (the port extension in metres, the resolution) have a single key instead (**m**, **OK**) that confirms.
 - **Trace chips** (for example `CH0 LogMag`): every chip is one curve; the colour shows whether it is visible. Tap a chip to open
   its settings (5.8).
 - Markers and scales (5.9) apply to these two views.

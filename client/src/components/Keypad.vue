@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   modelValue: { type: String, default: '0' },
@@ -11,12 +11,10 @@ const emit = defineEmits(['update:modelValue', 'submit', 'close']);
 
 const input = ref('0');
 
-const units = [
-  { label: 'G', factor: 1e9 },
-  { label: 'M', factor: 1e6 },
-  { label: 'k', factor: 1e3 },
-  { label: 'x1', factor: 1 }
-];
+// Frequencies take G / M / k / x1; a length (m) or a plain count has no multiples, so it gets a single confirm key
+const units = computed(() => (props.unit === 'Hz'
+  ? [{ label: 'G', factor: 1e9 }, { label: 'M', factor: 1e6 }, { label: 'k', factor: 1e3 }, { label: 'x1', factor: 1 }]
+  : [null, null, null, { label: props.unit || 'OK', factor: 1 }]));
 
 const append = (val) => {
   if (input.value === '0' && val !== '.') {
@@ -51,25 +49,25 @@ const submitWithUnit = (factor) => {
             <td><button class="key-btn" @click="append('7')">7</button></td>
             <td><button class="key-btn" @click="append('8')">8</button></td>
             <td><button class="key-btn" @click="append('9')">9</button></td>
-            <td><button class="key-btn unit-btn" @click="submitWithUnit(units[0].factor)">{{ units[0].label }}</button></td>
+            <td><button v-if="units[0]" class="key-btn unit-btn" @click="submitWithUnit(units[0].factor)">{{ units[0].label }}</button></td>
           </tr>
           <tr>
             <td><button class="key-btn" @click="append('4')">4</button></td>
             <td><button class="key-btn" @click="append('5')">5</button></td>
             <td><button class="key-btn" @click="append('6')">6</button></td>
-            <td><button class="key-btn unit-btn" @click="submitWithUnit(units[1].factor)">{{ units[1].label }}</button></td>
+            <td><button v-if="units[1]" class="key-btn unit-btn" @click="submitWithUnit(units[1].factor)">{{ units[1].label }}</button></td>
           </tr>
           <tr>
             <td><button class="key-btn" @click="append('1')">1</button></td>
             <td><button class="key-btn" @click="append('2')">2</button></td>
             <td><button class="key-btn" @click="append('3')">3</button></td>
-            <td><button class="key-btn unit-btn" @click="submitWithUnit(units[2].factor)">{{ units[2].label }}</button></td>
+            <td><button v-if="units[2]" class="key-btn unit-btn" @click="submitWithUnit(units[2].factor)">{{ units[2].label }}</button></td>
           </tr>
           <tr>
             <td><button class="key-btn" @click="append('0')">0</button></td>
             <td><button class="key-btn" @click="append('.')">.</button></td>
             <td><button class="key-btn" @click="backspace">&#x232B;</button></td>
-            <td><button class="key-btn unit-btn" @click="submitWithUnit(units[3].factor)">{{ units[3].label }}</button></td>
+            <td><button v-if="units[3]" class="key-btn unit-btn" @click="submitWithUnit(units[3].factor)">{{ units[3].label }}</button></td>
           </tr>
         </tbody>
       </table>

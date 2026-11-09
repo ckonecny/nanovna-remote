@@ -253,6 +253,7 @@ Diagramm eingibst:
 
 - **Start/Stop** oder **Center/Span**: Tippe auf ein Feld, es öffnet das Zahlenfeld. Zahl eintippen und mit der Einheitentaste
   **G**, **M**, **k** oder **x1** (Hz) abschließen; diese Taste bestätigt auch die Eingabe. Die Rücktaste löscht die letzte Ziffer.
+  Eingaben, die keine Frequenz sind (die Port Extension in Metern, die Auflösung), haben nur eine einzige Taste (**m**, **OK**), die bestätigt.
 - **Trace-Chips** (zum Beispiel `CH0 LogMag`): Jeder Chip ist eine Kurve; die Farbe zeigt, ob sie sichtbar ist. Tippe auf einen
   Chip, um seine Einstellungen zu öffnen (5.8).
 - Marker und Skalen (5.9) gelten für diese beiden Ansichten.
