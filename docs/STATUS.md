@@ -9,6 +9,10 @@ This file holds only the current state and hints for the next session.
   reference sweep, foldable sections, value display choice, "WiFi + browser" on the Feather); the feature page, README, manual and all screenshots are current.
 - Firmware: bridge, web app, OTA (`/update` page and `/api/ota`), calibration storage, multi-network WiFi, display UI,
   QR codes. Flash 87.3 % of the app slot (over 85 %, about 200 KB free; the user decided to leave it until it gets tight).
+- Client dependencies (2026-11-10): Dependabot bumps merged (vite 8.3.6, vue 3.5.45, plugin-vue 6.0.10, jsdom 31, vitest 5.1; the
+  `connection_switching` test now uses `vi.stubGlobal`). Built and flashed via OTA (flash 88.6 %), `npm test` green, app loads without
+  console errors, connects to the NanoVNA. A one-off `ENUM: CHECK_SHORT_DEV_DESC FAILED` at boot (Apple OTG adapter) went away without a
+  change; not reproducible. Checked on the device with the new bundle: Single, HAM, Multi, Cable, Smith, Freq and TDR all sweep and render.
 - Web app: Single, HAM, Multi, Cable, TDR, Smith, Freq views, app-side OSL calibration, export. Live demo with a simulated
   NanoVNA: https://ckonecny.github.io/nanovna-remote/demo/ . Installer: .../install/ . Feature page: .../ .
 - Release: push a tag `v*`; `release.yml` builds `-first-flash.bin`, `-update.bin`, `SHA256SUMS`, then `pages.yml` republishes
