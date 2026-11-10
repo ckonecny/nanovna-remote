@@ -2,24 +2,21 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { detectBestConnectionType, store } from '../store';
 import { NanoVNA_WebSerial, NanoVNA_WebUSB } from '../lib/nanovna';
 
-// Mock navigator
-const originalNavigator = global.navigator;
-
 describe('Connection Switching Logic', () => {
     beforeEach(() => {
         // Reset store
         store.connectionType = 'auto';
 
         // Mock navigator properties
-        global.navigator = {
+        vi.stubGlobal('navigator', {
             userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             serial: {},
             usb: {}
-        };
+        });
     });
 
     afterEach(() => {
-        global.navigator = originalNavigator;
+        vi.unstubAllGlobals();
     });
 
     it('detectBestConnectionType returns specific type if configured', () => {
