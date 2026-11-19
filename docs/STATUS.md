@@ -13,6 +13,10 @@ This file holds only the current state and hints for the next session.
   `connection_switching` test now uses `vi.stubGlobal`). Built and flashed via OTA (flash 88.6 %), `npm test` green, app loads without
   console errors, connects to the NanoVNA. A one-off `ENUM: CHECK_SHORT_DEV_DESC FAILED` at boot (Apple OTG adapter) went away without a
   change; not reproducible. Checked on the device with the new bundle: Single, HAM, Multi, Cable, Smith, Freq and TDR all sweep and render.
+- Client dependencies (2026-11-19): Dependabot PRs 61-64 (jsdom 31.0.1, plugin-vue 6.0.11, vite 8.3.8, vite-plugin-pwa 2.0.0) applied locally in
+  `client/package.json` and lock file, not committed. `npm test` green, `build:esp` and firmware build OK (flash 88.6 %, unchanged).
+  Flashed via OTA (`nanovna.local` did not resolve, used the IP from the router's ARP table). App loads, connects to the NanoVNA, all seven views
+  switch and render without console errors. The PWA service worker is not exercised over plain HTTP, so it is untested on the device. Open: commit.
 - Web app: Single, HAM, Multi, Cable, TDR, Smith, Freq views, app-side OSL calibration, export. Live demo with a simulated
   NanoVNA: https://ckonecny.github.io/nanovna-remote/demo/ . Installer: .../install/ . Feature page: .../ .
 - Release: push a tag `v*`; `release.yml` builds `-first-flash.bin`, `-update.bin`, `SHA256SUMS`, then `pages.yml` republishes
