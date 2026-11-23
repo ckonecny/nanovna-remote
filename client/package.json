@@ -27,7 +27,7 @@
     "jsdom": "^31.0.1",
     "vite": "^8.3.8",
     "vite-plugin-pwa": "^2.0.0",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   },
   "overrides": {
     "serialize-javascript": "^7.1.4"
